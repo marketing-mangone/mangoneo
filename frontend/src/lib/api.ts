@@ -267,3 +267,39 @@ export const documentsApi = {
     });
   },
 };
+
+// ── Calendar API ──────────────────────────────────────────────────────────────
+
+export interface ApiCalendarEvent {
+  id: number;
+  title: string;
+  type: 'content' | 'meeting' | 'deadline' | 'campaign' | 'event';
+  date: string;
+  end_date?: string;
+  time?: string;
+  description?: string;
+  assignee?: number | null;
+  assignee_name?: string | null;
+  channel?: string;
+  status: 'scheduled' | 'published' | 'draft' | 'cancelled';
+  created_by?: number | null;
+  created_at?: string;
+}
+
+export const calendarApi = {
+  list(month?: string) {
+    const qs = month ? `?month=${month}` : '';
+    return apiJSON<{ results: ApiCalendarEvent[]; count: number }>(`/api/calendar/${qs}`);
+  },
+
+  create(data: Omit<ApiCalendarEvent, 'id' | 'assignee_name' | 'created_by' | 'created_at'>) {
+    return apiJSON<ApiCalendarEvent>('/api/calendar/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  delete(id: number) {
+    return apiFetch(`/api/calendar/${id}/`, { method: 'DELETE' });
+  },
+};

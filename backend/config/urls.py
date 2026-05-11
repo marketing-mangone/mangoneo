@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/documents/', include('documents.urls')),
     path('api/team/', include('team.urls')),
     path('api/tasks/', include('tasks_app.urls')),
+    path('api/calendar/', include('tasks_app.urls_calendar')),
     path('api/dashboard/', include('dashboard.urls')),
 ]
 
