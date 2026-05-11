@@ -303,3 +303,39 @@ export const calendarApi = {
     return apiFetch(`/api/calendar/${id}/`, { method: 'DELETE' });
   },
 };
+
+// ── Tasks API ─────────────────────────────────────────────────────────────────
+
+export interface ApiTask {
+  id: number;
+  title: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'review' | 'done' | 'blocked';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  assignee: number | null;
+  assignee_name: string | null;
+  due_date: string | null;
+  project: string;
+  progress: number;
+  tags: string[];
+  created_by: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+type TaskInput = Omit<ApiTask, 'id' | 'assignee_name' | 'created_by' | 'created_at' | 'updated_at'>;
+
+export const tasksApi = {
+  list() {
+    return apiJSON<{ results: ApiTask[]; count: number }>('/api/tasks/?page_size=100');
+  },
+  create(data: Partial<TaskInput> & { title: string }) {
+    return apiJSON<ApiTask>('/api/tasks/', { method: 'POST', body: JSON.stringify(data) });
+  },
+  update(id: number, data: Partial<TaskInput>) {
+    return apiJSON<ApiTask>(`/api/tasks/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
+  },
+  delete(id: number) {
+    return apiFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
+  },
+};
