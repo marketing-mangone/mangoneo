@@ -4,6 +4,4 @@ buildCommand = "pip install -r requirements.txt"
 
 [deploy]
 startCommand = "bash start.sh"
-healthcheckPath = "/api/health/"
-healthcheckTimeout = 30
 restartPolicyType = "on_failure"
