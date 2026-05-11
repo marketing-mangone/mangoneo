@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing Hub — Documento de Arquitectura Técnica</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a2e;
+  --ink-soft: #4a4a6a;
+  --ink-muted: #8888a8;
+  --surface: #fafafe;
+  --surface-warm: #f4f3f8;
+  --accent: #6c5ce7;
+  --accent-deep: #4834d4;
+  --accent-soft: #a29bfe;
+  --accent-glow: rgba(108,92,231,0.08);
+  --success: #00b894;
+  --warning: #fdcb6e;
+  --danger: #e17055;
+  --border: #e8e8f0;
+  --border-strong: #d0d0e0;
+  --white: #ffffff;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow-sm: 0 1px 3px rgba(26,26,46,0.06);
+  --shadow-md: 0 4px 16px rgba(26,26,46,0.08);
+  --shadow-lg: 0 8px 32px rgba(26,26,46,0.12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--surface);
+  color: var(--ink);
+  line-height: 1.7;
+  font-size: 15px;
+}
+
+/* ─── HEADER ─── */
+.doc-header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #2d2b55 50%, #3d3b75 100%);
+  color: white;
+  padding: 60px 0 50px;
+  position: relative;
+  overflow: hidden;
+}
+.doc-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(108,92,231,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.doc-header::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(162,155,254,0.1) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.header-content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
+  position: relative;
+  z-index: 1;
+}
+.header-badge {
+  display: inline-block;
+  background: rgba(108,92,231,0.25);
+  border: 1px solid rgba(162,155,254,0.3);
+  color: var(--accent-soft);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.doc-header h1 {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.doc-header .subtitle {
+  font-size: 18px;
+  color: rgba(255,255,255,0.7);
+  font-weight: 300;
+  max-width: 600px;
+}
+.header-meta {
+  display: flex;
+  gap: 32px;
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+}
+.header-meta strong { color: rgba(255,255,255,0.85); font-weight: 500; }
+
+/* ─── LAYOUT ─── */
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ─── TOC ─── */
+.toc {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 36px 40px;
+  margin: 40px auto;
+  max-width: 1100px;
+  box-shadow: var(--shadow-sm);
+}
+.toc h2 {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--ink-muted);
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+.toc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 40px;
+}
+.toc a {
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14.5px;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--accent); }
+.toc-num {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 28px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── SECTIONS ─── */
+.section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 44px 48px;
+  margin: 24px auto;
+  max-width: 1100px;
+  box-shadow: var(--shadow-sm);
+}
+.section-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.section h2 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.section-desc {
+  color: var(--ink-soft);
+  font-size: 15px;
+  margin-bottom: 28px;
+  max-width: 700px;
+}
+.section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 32px 0 12px;
+  color: var(--ink);
+}
+.section h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+  color: var(--ink-soft);
+}
+.section p {
+  margin-bottom: 14px;
+  color: var(--ink-soft);
+  line-height: 1.75;
+}
+
+/* ─── CARDS ─── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.card {
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  border-color: var(--accent-soft);
+  box-shadow: 0 2px 12px rgba(108,92,231,0.08);
+}
+.card-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--accent-glow);
+  border: 1px solid rgba(108,92,231,0.15);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+.card h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.card p {
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ─── TECH BADGE ─── */
+.tech-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin: 3px;
+}
+.tech-badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.dot-green { background: var(--success); }
+.dot-purple { background: var(--accent); }
+.dot-orange { background: var(--warning); }
+.dot-blue { background: #0984e3; }
+.dot-red { background: var(--danger); }
+.dot-teal { background: #00cec9; }
+
+/* ─── CODE BLOCKS ─── */
+.code-block {
+  background: #1e1e3a;
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  margin: 16px 0;
+  overflow-x: auto;
+}
+.code-block code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: #e8e8f0;
+  line-height: 1.7;
+}
+.code-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent-soft);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  display: block;
+}
+code.inline {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--accent-deep);
+}
+
+/* ─── TABLES ─── */
+.table-wrap {
+  overflow-x: auto;
+  margin: 16px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+thead th {
+  background: var(--surface-warm);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--ink-muted);
+  border-bottom: 2px solid var(--border);
+}
+tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--ink-soft);
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover { background: var(--accent-glow); }
+
+/* ─── CALLOUTS ─── */
+.callout {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-glow);
+  padding: 16px 20px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 20px 0;
+}
+.callout.warning {
+  border-left-color: var(--warning);
+  background: rgba(253,203,110,0.08);
+}
+.callout.success {
+  border-left-color: var(--success);
+  background: rgba(0,184,148,0.06);
+}
+.callout strong { display: block; margin-bottom: 4px; font-size: 14px; color: var(--ink); }
+.callout p { font-size: 13.5px; margin: 0; color: var(--ink-soft); }
+
+/* ─── FLOW DIAGRAMS ─── */
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.flow-node {
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.flow-node.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent-deep);
+}
+.flow-arrow { color: var(--ink-muted); font-size: 18px; }
+
+/* ─── LISTS ─── */
+.feature-list {
+  list-style: none;
+  margin: 12px 0;
+}
+.feature-list li {
+  padding: 8px 0 8px 28px;
+  position: relative;
+  color: var(--ink-soft);
+  font-size: 14.5px;
+}
+.feature-list li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ─── PHASE TIMELINE ─── */
+.phase-timeline {
+  margin: 24px 0;
+}
+.phase {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 20px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border);
+}
+.phase:last-child { border-bottom: none; }
+.phase-marker {
+  text-align: center;
+}
+.phase-num {
+  width: 48px;
+  height: 48px;
+  background: var(--accent);
+  color: white;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 6px;
+}
+.phase-weeks {
+  font-size: 11px;
+  color: var(--ink-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.phase-content h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--ink);
+}
+.phase-content p {
+  font-size: 13.5px;
+  color: var(--ink-muted);
+  margin: 0 0 10px;
+}
+
+/* ─── ARCHITECTURE DIAGRAM ─── */
+.arch-diagram {
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  margin: 24px 0;
+}
+.arch-layer {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px 24px;
+  margin-bottom: 12px;
+}
+.arch-layer:last-child { margin-bottom: 0; }
+.arch-layer-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.arch-boxes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.arch-box {
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.arch-box.highlight {
+  background: var(--accent-glow);
+  border-color: rgba(108,92,231,0.2);
+  color: var(--accent-deep);
+}
+.arch-connector {
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 20px;
+  padding: 4px 0;
+}
+
+/* ─── SECURITY BADGE ─── */
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.security-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface-warm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.security-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.security-item h5 { font-size: 13.5px; font-weight: 600; margin-bottom: 2px; }
+.security-item p { font-size: 12.5px; color: var(--ink-muted); margin: 0; line-height: 1.5; }
+
+/* ─── FOOTER ─── */
+.doc-footer {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 30px 40px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .doc-header { padding: 40px 0 30px; }
+  .doc-header h1 { font-size: 28px; }
+  .section { padding: 28px 24px; }
+  .toc-grid { grid-template-columns: 1fr; }
+  .header-meta { flex-direction: column; gap: 8px; }
+  .phase { grid-template-columns: 1fr; }
+  .phase-marker { text-align: left; display: flex; align-items: center; gap: 12px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ HEADER ═══════════════════════════ -->
+<header class="doc-header">
+  <div class="header-content">
+    <div class="header-badge">Documento Técnico v1.0</div>
+    <h1>Marketing Hub</h1>
+    <p class="subtitle">Arquitectura técnica para la plataforma interna del Departamento de Marketing — Mangone Law Firm</p>
+    <div class="header-meta">
+      <span><strong>Autor:</strong> Departamento de Marketing</span>
+      <span><strong>Fecha:</strong> Mayo 2026</span>
+      <span><strong>Estado:</strong> Propuesta de Arquitectura</span>
+      <span><strong>Clasificación:</strong> Uso Interno</span>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════ TOC ═══════════════════════════ -->
+<nav class="toc container">
+  <h2>Tabla de Contenido</h2>
+  <div class="toc-grid">
+    <a href="#vision"><span class="toc-num">01</span> Visión y Alcance del Proyecto</a>
+    <a href="#stack"><span class="toc-num">02</span> Stack Tecnológico</a>
+    <a href="#arch"><span class="toc-num">03</span> Arquitectura del Sistema</a>
+    <a href="#data"><span class="toc-num">04</span> Modelo de Datos</a>
+    <a href="#modules"><span class="toc-num">05</span> Módulos Funcionales</a>
+    <a href="#security"><span class="toc-num">06</span> Seguridad y Autenticación</a>
+    <a href="#files"><span class="toc-num">07</span> Gestión de Archivos y Media</a>
+    <a href="#api"><span class="toc-num">08</span> API e Integraciones</a>
+    <a href="#deploy"><span class="toc-num">09</span> Infraestructura y Deploy</a>
+    <a href="#roadmap"><span class="toc-num">10</span> Roadmap de Desarrollo</a>
+    <a href="#costs"><span class="toc-num">11</span> Estimación de Costos</a>
+    <a href="#decisions"><span class="toc-num">12</span> Decisiones Técnicas Clave</a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ 01 — VISION ═══════════════════════════ -->
+<section class="section container" id="vision">
+  <div class="section-label">Sección 01</div>
+  <h2>Visión y Alcance del Proyecto</h2>
+  <p class="section-desc">Una plataforma interna centralizada que consolide métricas, documentación, assets de marca, KPIs y recursos operativos del departamento de marketing en un solo punto de acceso.</p>
+
+  <h3>Problema que Resuelve</h3>
+  <p>Actualmente la información del departamento vive dispersa entre Google Drive, Dropbox, HubSpot, Monday.com, Canva y múltiples herramientas. El Hub elimina la fragmentación y crea una fuente única de verdad para el equipo de 6 personas, con capacidad de escalar a medida que la firma crece.</p>
+
+  <h3>Objetivos Técnicos</h3>
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h4>Centralización</h4>
+      <p>Un solo punto de entrada para métricas, manuales, SOPs, JDs y recursos del departamento. Sin necesidad de navegar entre 8+ herramientas.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h4>Visibilidad en Tiempo Real</h4>
+      <p>Dashboards con KPIs actualizados automáticamente desde HubSpot, Google Analytics, Meta y otras fuentes via API.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h4>Seguridad</h4>
+      <p>Control de acceso basado en roles. Los documentos internos, métricas financieras y datos sensibles del equipo protegidos con autenticación robusta.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h4>Escalabilidad</h4>
+      <p>Arquitectura modular que permite agregar nuevos módulos (presupuesto, campaign tracker, asset library) sin refactorizar.</p>
+    </div>
+  </div>
+
+  <h3>Usuarios del Sistema</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Rol</th>
+          <th>Acceso</th>
+          <th>Usuarios Iniciales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Director de Marketing</strong></td>
+          <td>Administrador total — todos los módulos, métricas, configuración</td>
+          <td>Sebas</td>
+        </tr>
+        <tr>
+          <td><strong>Marketing Team</strong></td>
+          <td>SOPs, brand assets, KPIs de su área, calendarios, documentación</td>
+          <td>Alejandra, Sara, Gloriana, Andrés, Jesús</td>
+        </tr>
+        <tr>
+          <td><strong>Liderazgo Firma</strong></td>
+          <td>Dashboard ejecutivo de métricas clave (vista de solo lectura)</td>
+          <td>Auguy Mangone + partners</td>
+        </tr>
+        <tr>
+          <td><strong>Viewer</strong></td>
+          <td>Acceso limitado a brand guidelines y recursos públicos del departamento</td>
+          <td>Otros departamentos</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 02 — STACK ═══════════════════════════ -->
+<section class="section container" id="stack">
+  <div class="section-label">Sección 02</div>
+  <h2>Stack Tecnológico</h2>
+  <p class="section-desc">Selección de tecnologías optimizada para un equipo pequeño con capacidad de crecimiento, priorizando estabilidad, ecosistema maduro y velocidad de desarrollo.</p>
+
+  <h3>Backend</h3>
+  <div style="margin: 12px 0 20px; display: flex; flex-wrap: wrap; gap: 6px;">
+    <span class="tech-badge"><span class="dot dot-green"></span> Django 5.x</span>
+    <span class="tech-badge"><span class="dot dot-green"></span> Django REST Framework</span>
+    <span class="tech-badge"><span class="dot dot-green"></span> Python 3.12+</span>
+    <span class="tech-badge"><span class="dot dot-green"></span> Celery + Redis</span>
+    <span class="tech-badge"><span class="dot dot-green"></span> django-storages</span>
+  </div>
+  <p>Django es la elección natural: ORM potente, admin panel integrado, sistema de autenticación robusto, y un ecosistema de paquetes maduro. Django REST Framework expone la API que consume el frontend. Celery gestiona tareas asíncronas como sincronización de métricas, generación de reportes y procesamiento de archivos.</p>
+
+  <h3>Frontend</h3>
+  <div style="margin: 12px 0 20px; display: flex; flex-wrap: wrap; gap: 6px;">
+    <span class="tech-badge"><span class="dot dot-purple"></span> Next.js 14+</span>
+    <span class="tech-badge"><span class="dot dot-purple"></span> React 18+</span>
+    <span class="tech-badge"><span class="dot dot-purple"></span> TypeScript</span>
+    <span class="tech-badge"><span class="dot dot-purple"></span> Tailwind CSS</span>
+    <span class="tech-badge"><span class="dot dot-purple"></span> shadcn/ui</span>
+    <span class="tech-badge"><span class="dot dot-purple"></span> Recharts</span>
+  </div>
+  <p>Next.js ofrece rendering híbrido (SSR + CSR), routing integrado, y optimización automática. Tailwind + shadcn/ui permiten construir interfaces profesionales con alta velocidad sin sacrificar calidad visual. Recharts para las visualizaciones de datos y dashboards.</p>
+
+  <h3>Base de Datos</h3>
+  <div style="margin: 12px 0 20px; display: flex; flex-wrap: wrap; gap: 6px;">
+    <span class="tech-badge"><span class="dot dot-blue"></span> PostgreSQL 16</span>
+    <span class="tech-badge"><span class="dot dot-blue"></span> Redis</span>
+  </div>
+
+  <div class="callout">
+    <strong>¿Por qué PostgreSQL?</strong>
+    <p>PostgreSQL es la base de datos recomendada por Django y la más robusta para este caso de uso. Soporta tipos JSON nativos (útil para métricas flexibles), full-text search en español (para buscar dentro de documentos), campos de array, y excelente manejo de archivos binarios grandes a través de referencias. Redis funciona como cache, message broker para Celery, y almacenamiento de sesiones.</p>
+  </div>
+
+  <h3>Almacenamiento de Archivos</h3>
+  <div style="margin: 12px 0 20px; display: flex; flex-wrap: wrap; gap: 6px;">
+    <span class="tech-badge"><span class="dot dot-orange"></span> AWS S3 / Cloudflare R2</span>
+    <span class="tech-badge"><span class="dot dot-orange"></span> django-storages</span>
+    <span class="tech-badge"><span class="dot dot-orange"></span> Pillow</span>
+  </div>
+  <p>Los archivos (PDFs del brand manual, imágenes, SOPs en Word/PDF, videos) no se almacenan en la base de datos. Se suben a object storage (S3 o R2 para mejor costo) y la DB solo guarda la referencia (URL, metadata, permisos). Esto mantiene la DB ligera y permite servir archivos pesados directamente desde CDN.</p>
+
+  <h3>Comparativa de Alternativas Consideradas</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Componente</th>
+          <th>Elegido</th>
+          <th>Alternativa</th>
+          <th>Razón de la decisión</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Frontend</td>
+          <td><strong>Next.js</strong></td>
+          <td>Vue/Nuxt, Angular</td>
+          <td>Mayor ecosistema, SSR nativo, mejor con shadcn/ui</td>
+        </tr>
+        <tr>
+          <td>DB</td>
+          <td><strong>PostgreSQL</strong></td>
+          <td>MySQL, MongoDB</td>
+          <td>JSON nativo, full-text search, mejor con Django ORM</td>
+        </tr>
+        <tr>
+          <td>Storage</td>
+          <td><strong>Cloudflare R2</strong></td>
+          <td>AWS S3, GCS</td>
+          <td>Sin egress fees, compatible con S3 API, menor costo</td>
+        </tr>
+        <tr>
+          <td>Cache</td>
+          <td><strong>Redis</strong></td>
+          <td>Memcached</td>
+          <td>También sirve como broker para Celery</td>
+        </tr>
+        <tr>
+          <td>Task Queue</td>
+          <td><strong>Celery</strong></td>
+          <td>Django-Q, Dramatiq</td>
+          <td>Estándar de facto en Django, mejor documentación</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 03 — ARCHITECTURE ═══════════════════════════ -->
+<section class="section container" id="arch">
+  <div class="section-label">Sección 03</div>
+  <h2>Arquitectura del Sistema</h2>
+  <p class="section-desc">Arquitectura desacoplada con API REST como contrato entre backend y frontend, permitiendo evolución independiente de cada capa.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-layer">
+      <div class="arch-layer-label">🖥️ Capa de Presentación (Next.js)</div>
+      <div class="arch-boxes">
+        <div class="arch-box highlight">Dashboard</div>
+        <div class="arch-box highlight">Brand Center</div>
+        <div class="arch-box highlight">KPI Tracker</div>
+        <div class="arch-box highlight">Doc Library</div>
+        <div class="arch-box highlight">Team Hub</div>
+        <div class="arch-box">Auth UI</div>
+      </div>
+    </div>
+    <div class="arch-connector">↕</div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">🔌 Capa de API (Django REST Framework)</div>
+      <div class="arch-boxes">
+        <div class="arch-box">REST Endpoints</div>
+        <div class="arch-box">JWT Auth</div>
+        <div class="arch-box">Permissions</div>
+        <div class="arch-box">Serializers</div>
+        <div class="arch-box">Throttling</div>
+        <div class="arch-box">Filtering</div>
+      </div>
+    </div>
+    <div class="arch-connector">↕</div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">⚙️ Capa de Lógica de Negocio (Django)</div>
+      <div class="arch-boxes">
+        <div class="arch-box">Models / ORM</div>
+        <div class="arch-box">Services</div>
+        <div class="arch-box">Celery Tasks</div>
+        <div class="arch-box">Signals</div>
+        <div class="arch-box">Management Commands</div>
+      </div>
+    </div>
+    <div class="arch-connector">↕</div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">💾 Capa de Datos</div>
+      <div class="arch-boxes">
+        <div class="arch-box highlight">PostgreSQL 16</div>
+        <div class="arch-box highlight">Redis</div>
+        <div class="arch-box highlight">Cloudflare R2</div>
+      </div>
+    </div>
+    <div class="arch-connector">↕</div>
+    <div class="arch-layer">
+      <div class="arch-layer-label">🔗 Integraciones Externas</div>
+      <div class="arch-boxes">
+        <div class="arch-box">HubSpot API</div>
+        <div class="arch-box">Google Analytics</div>
+        <div class="arch-box">Meta Business</div>
+        <div class="arch-box">Monday.com</div>
+        <div class="arch-box">Google Ads</div>
+        <div class="arch-box">Search Console</div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Estructura de Proyecto Django</h3>
+  <div class="code-block">
+    <span class="code-label">Estructura de directorios</span>
+    <code><pre>marketing_hub/
+├── config/                  # Settings, URLs raíz, ASGI/WSGI
+│   ├── settings/
+│   │   ├── base.py          # Configuración compartida
+│   │   ├── development.py   # Dev overrides
+│   │   ├── staging.py
+│   │   └── production.py
+│   ├── urls.py
+│   └── celery.py
+│
+├── apps/
+│   ├── accounts/            # Auth, perfiles, roles
+│   ├── dashboard/           # Métricas agregadas, widgets
+│   ├── brand/               # Brand manual, assets, guidelines
+│   ├── documents/           # SOPs, manuales, JDs
+│   ├── metrics/             # KPIs, data pipelines, reports
+│   ├── integrations/        # Conectores a APIs externas
+│   └── notifications/       # Alertas internas
+│
+├── core/                    # Utilidades compartidas
+│   ├── permissions.py
+│   ├── mixins.py
+│   ├── pagination.py
+│   └── storage.py
+│
+├── media/                   # Dev only — producción usa R2
+├── static/
+├── templates/               # Templates mínimos (emails, admin)
+├── requirements/
+│   ├── base.txt
+│   ├── dev.txt
+│   └── prod.txt
+├── docker-compose.yml
+├── Dockerfile
+├── .env.example
+└── manage.py</pre></code>
+  </div>
+
+  <h3>Estructura Frontend (Next.js)</h3>
+  <div class="code-block">
+    <span class="code-label">Estructura Next.js App Router</span>
+    <code><pre>frontend/
+├── src/
+│   ├── app/
+│   │   ├── (auth)/
+│   │   │   ├── login/page.tsx
+│   │   │   └── layout.tsx
+│   │   ├── (hub)/
+│   │   │   ├── dashboard/page.tsx
+│   │   │   ├── brand/
+│   │   │   │   ├── page.tsx
+│   │   │   │   ├── colors/page.tsx
+│   │   │   │   ├── logos/page.tsx
+│   │   │   │   └── typography/page.tsx
+│   │   │   ├── metrics/page.tsx
+│   │   │   ├── documents/page.tsx
+│   │   │   ├── team/page.tsx
+│   │   │   └── layout.tsx           # Shell con sidebar
+│   │   ├── layout.tsx
+│   │   └── page.tsx                 # Redirect a dashboard
+│   │
+│   ├── components/
+│   │   ├── ui/                      # shadcn/ui components
+│   │   ├── charts/                  # Recharts wrappers
+│   │   ├── layout/                  # Sidebar, Header, Nav
+│   │   └── modules/                 # Componentes por módulo
+│   │
+│   ├── lib/
+│   │   ├── api.ts                   # Axios/fetch config
+│   │   ├── auth.ts                  # JWT helpers
+│   │   └── utils.ts
+│   │
+│   ├── hooks/                       # Custom hooks
+│   ├── types/                       # TypeScript interfaces
+│   └── styles/
+│       └── globals.css
+│
+├── public/
+├── next.config.js
+├── tailwind.config.ts
+├── tsconfig.json
+└── package.json</pre></code>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 04 — DATA MODEL ═══════════════════════════ -->
+<section class="section container" id="data">
+  <div class="section-label">Sección 04</div>
+  <h2>Modelo de Datos</h2>
+  <p class="section-desc">Esquema relacional diseñado para flexibilidad en métricas, versionamiento de documentos y control granular de permisos.</p>
+
+  <h3>Modelos Core</h3>
+
+  <div class="code-block">
+    <span class="code-label">apps/accounts/models.py</span>
+    <code><pre>class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(choices=ROLE_CHOICES)  # admin, team, leadership, viewer
+    department = models.CharField(default='marketing')
+    position = models.CharField()            # "Content Creator", "Designer", etc.
+    avatar = models.ImageField(upload_to='avatars/')
+    phone = models.CharField(blank=True)
+    bio = models.TextField(blank=True)
+    is_active_member = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)</pre></code>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">apps/documents/models.py</span>
+    <code><pre>class DocumentCategory(models.Model):
+    """SOPs, Manuales, JDs, Templates, Políticas"""
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    icon = models.CharField()               # Emoji o icono
+    sort_order = models.IntegerField(default=0)
+
+class Document(models.Model):
+    title = models.CharField(max_length=255)
+    category = models.ForeignKey(DocumentCategory, on_delete=models.PROTECT)
+    description = models.TextField(blank=True)
+    file = models.FileField(upload_to='documents/%Y/%m/')
+    file_type = models.CharField()          # pdf, docx, html, md
+    version = models.CharField(default='1.0')
+    status = models.CharField(choices=STATUS_CHOICES)  # draft, active, archived
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    visibility = models.CharField(choices=VISIBILITY)   # team, leadership, all
+    tags = models.ManyToManyField('Tag', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class DocumentVersion(models.Model):
+    """Historial de versiones de cada documento"""
+    document = models.ForeignKey(Document, related_name='versions')
+    file = models.FileField(upload_to='documents/versions/')
+    version = models.CharField()
+    changelog = models.TextField()
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)</pre></code>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">apps/brand/models.py</span>
+    <code><pre>class BrandAsset(models.Model):
+    """Logos, paletas, tipografías, templates"""
+    name = models.CharField(max_length=200)
+    asset_type = models.CharField(choices=ASSET_TYPES)  # logo, color, font, template, photo
+    file = models.FileField(upload_to='brand/%Y/')
+    thumbnail = models.ImageField(upload_to='brand/thumbs/', blank=True)
+    description = models.TextField(blank=True)
+    usage_notes = models.TextField(blank=True)  # Instrucciones de uso
+    metadata = models.JSONField(default=dict)   # Colores hex, dimensiones, etc.
+    is_primary = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class BrandGuideline(models.Model):
+    """Secciones del manual de marca renderizadas como contenido"""
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    content = models.TextField()              # Rich text / Markdown
+    sort_order = models.IntegerField(default=0)
+    assets = models.ManyToManyField(BrandAsset, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)</pre></code>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">apps/metrics/models.py</span>
+    <code><pre>class MetricDefinition(models.Model):
+    """Definición de cada KPI que trackeamos"""
+    name = models.CharField()               # "Leads Generados", "Costo por Lead"
+    slug = models.SlugField(unique=True)
+    category = models.CharField()            # acquisition, engagement, conversion, brand
+    source = models.CharField()              # hubspot, google_analytics, meta, manual
+    unit = models.CharField()                # count, currency, percentage, time
+    target_value = models.DecimalField(null=True)
+    description = models.TextField()
+    formula = models.TextField(blank=True)   # Cómo se calcula
+    owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+class MetricSnapshot(models.Model):
+    """Valores capturados periódicamente"""
+    metric = models.ForeignKey(MetricDefinition, related_name='snapshots')
+    value = models.DecimalField(max_digits=14, decimal_places=4)
+    period_start = models.DateField()
+    period_end = models.DateField()
+    period_type = models.CharField()         # daily, weekly, monthly
+    raw_data = models.JSONField(default=dict)  # Data cruda de la fuente
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['metric', 'period_start', 'period_type']
+        indexes = [
+            models.Index(fields=['metric', 'period_start']),
+        ]</pre></code>
+  </div>
+
+  <h3>Diagrama Relacional Simplificado</h3>
+  <div class="flow" style="justify-content: center; margin: 24px 0;">
+    <div class="flow-node primary">User / Profile</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Documents</div>
+    <span class="flow-arrow">←→</span>
+    <div class="flow-node">Categories / Tags</div>
+  </div>
+  <div class="flow" style="justify-content: center; margin: 0 0 24px;">
+    <div class="flow-node primary">MetricDefinition</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">MetricSnapshot (time-series)</div>
+    <span class="flow-arrow">←</span>
+    <div class="flow-node">IntegrationSource</div>
+  </div>
+  <div class="flow" style="justify-content: center;">
+    <div class="flow-node primary">BrandGuideline</div>
+    <span class="flow-arrow">←→</span>
+    <div class="flow-node">BrandAsset</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">R2 Storage</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 05 — MODULES ═══════════════════════════ -->
+<section class="section container" id="modules">
+  <div class="section-label">Sección 05</div>
+  <h2>Módulos Funcionales</h2>
+  <p class="section-desc">Cada módulo es una Django app independiente con su API, modelos y lógica. El frontend renderiza cada módulo como una sección del Hub.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h4>Dashboard Principal</h4>
+      <p>Vista ejecutiva con widgets configurables: leads del mes, costo por adquisición, tráfico web, engagement social, pipeline de casos. Filtros por periodo y fuente. Exportable a PDF.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎨</div>
+      <h4>Brand Center</h4>
+      <p>Manual de marca interactivo: paleta de colores con copy-to-clipboard de hex, logos descargables en múltiples formatos, tipografías, tono de voz, do's &amp; don'ts. Galería de assets aprobados.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <h4>KPI Tracker</h4>
+      <p>Definición y tracking de métricas clave por área. Gráficos de tendencia, comparación mes-a-mes, progreso vs. target. Alertas automáticas cuando un KPI está por debajo del umbral.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📁</div>
+      <h4>Biblioteca de Documentos</h4>
+      <p>SOPs, manuales, JDs, templates, políticas. Categorización, búsqueda full-text, control de versiones, vista previa in-app. Permisos por documento.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👥</div>
+      <h4>Team Hub</h4>
+      <p>Directorio del equipo con roles, JDs, skills, contacto. Organigrama visual. Ideal para onboarding de nuevos miembros y para que Liderazgo vea la estructura.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔔</div>
+      <h4>Centro de Notificaciones</h4>
+      <p>Alertas de documentos actualizados, KPIs fuera de rango, tareas pendientes de aprobación, nuevos assets de marca. In-app + email digest configurable.</p>
+    </div>
+  </div>
+
+  <h3>Módulos Fase 2 (Expansión)</h3>
+  <div class="card-grid">
+    <div class="card" style="border-style: dashed;">
+      <div class="card-icon">💰</div>
+      <h4>Budget Tracker</h4>
+      <p>Presupuesto mensual por canal, gasto real vs. planeado, ROI por campaña. Integración con datos financieros de la firma.</p>
+    </div>
+    <div class="card" style="border-style: dashed;">
+      <div class="card-icon">📅</div>
+      <h4>Content Calendar</h4>
+      <p>Calendario visual de contenido (blog, social, podcast, Consultation Day). Drag-and-drop, estados de aprobación, integración con Monday.com.</p>
+    </div>
+    <div class="card" style="border-style: dashed;">
+      <div class="card-icon">🎙️</div>
+      <h4>Podcast Manager</h4>
+      <p>Banco de episodios, scripts, temas pendientes (conectado al banco de 56 temas), métricas de audiencia por episodio, calendario de grabación con Natalia.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 06 — SECURITY ═══════════════════════════ -->
+<section class="section container" id="security">
+  <div class="section-label">Sección 06</div>
+  <h2>Seguridad y Autenticación</h2>
+  <p class="section-desc">Múltiples capas de seguridad adaptadas a una firma de abogados que maneja información sensible de clientes y del negocio.</p>
+
+  <h3>Autenticación</h3>
+  <div class="flow">
+    <div class="flow-node">Login (email + password)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node primary">Django genera JWT</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Access Token (15min)</div>
+    <span class="flow-arrow">+</span>
+    <div class="flow-node">Refresh Token (7d)</div>
+  </div>
+
+  <p>Se recomienda <code class="inline">djangorestframework-simplejwt</code> para la gestión de tokens. El access token tiene vida corta (15 minutos) y se renueva automáticamente con el refresh token, que tiene rotación (cada uso genera uno nuevo e invalida el anterior).</p>
+
+  <div class="callout">
+    <strong>MFA Recomendado para Fase 2</strong>
+    <p>Para el lanzamiento inicial, email + password con JWT es suficiente dado que es un sistema interno de 6-10 usuarios. En Fase 2 se puede agregar TOTP (Google Authenticator) o SSO con Google Workspace si la firma ya lo usa.</p>
+  </div>
+
+  <h3>Sistema de Permisos (RBAC)</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Recurso</th>
+          <th>Admin</th>
+          <th>Team</th>
+          <th>Leadership</th>
+          <th>Viewer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Dashboard completo</td>
+          <td>✅ Full</td>
+          <td>✅ Su área</td>
+          <td>✅ Read-only</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>Brand Center</td>
+          <td>✅ CRUD</td>
+          <td>✅ Read + Download</td>
+          <td>✅ Read</td>
+          <td>✅ Read</td>
+        </tr>
+        <tr>
+          <td>Documentos (SOPs, JDs)</td>
+          <td>✅ CRUD</td>
+          <td>✅ Read + según visibilidad</td>
+          <td>✅ Read seleccionados</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>KPI Tracker</td>
+          <td>✅ CRUD + Config</td>
+          <td>✅ Read + Input manual</td>
+          <td>✅ Read resumen</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>Team Hub</td>
+          <td>✅ CRUD</td>
+          <td>✅ Read + editar perfil propio</td>
+          <td>✅ Read</td>
+          <td>❌</td>
+        </tr>
+        <tr>
+          <td>Configuración del sistema</td>
+          <td>✅ Full</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Capas de Seguridad</h3>
+  <div class="security-grid">
+    <div class="security-item">
+      <span class="security-icon">🔐</span>
+      <div>
+        <h5>HTTPS Obligatorio</h5>
+        <p>TLS 1.3 en toda la comunicación. HSTS headers activados. Certificados via Let's Encrypt o Cloudflare.</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <span class="security-icon">🛡️</span>
+      <div>
+        <h5>CORS Restrictivo</h5>
+        <p>Solo el dominio del frontend permitido. No wildcards. Headers de seguridad configurados.</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <span class="security-icon">🚦</span>
+      <div>
+        <h5>Rate Limiting</h5>
+        <p>DRF throttling por usuario y por IP. Protección contra fuerza bruta en login (5 intentos / lockout 15min).</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <span class="security-icon">📝</span>
+      <div>
+        <h5>Audit Log</h5>
+        <p>Registro de acciones sensibles: login, descarga de documentos, cambios de permisos, edición de métricas.</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <span class="security-icon">🔒</span>
+      <div>
+        <h5>Encriptación en Reposo</h5>
+        <p>PostgreSQL con pgcrypto para campos sensibles. R2/S3 con server-side encryption para archivos.</p>
+      </div>
+    </div>
+    <div class="security-item">
+      <span class="security-icon">🧹</span>
+      <div>
+        <h5>Input Validation</h5>
+        <p>Serializers de DRF validan todo input. Protección CSRF, XSS, SQL injection out-of-the-box con Django.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 07 — FILES ═══════════════════════════ -->
+<section class="section container" id="files">
+  <div class="section-label">Sección 07</div>
+  <h2>Gestión de Archivos y Media</h2>
+  <p class="section-desc">Estrategia para manejar documentos pesados, imágenes, videos y assets de marca sin degradar performance.</p>
+
+  <h3>Flujo de Upload</h3>
+  <div class="flow">
+    <div class="flow-node">Usuario sube archivo</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Validación (tipo, tamaño)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node primary">Presigned URL → R2</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">Celery: thumbnail + metadata</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-node">DB guarda referencia</div>
+  </div>
+
+  <p>Los archivos nunca pasan por el servidor Django en producción. El frontend obtiene un presigned URL de R2/S3 y sube directamente al bucket. Esto reduce carga del servidor y permite archivos grandes (videos, PDFs pesados del brand manual).</p>
+
+  <h3>Tipos de Archivo Soportados</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Categoría</th>
+          <th>Formatos</th>
+          <th>Límite</th>
+          <th>Procesamiento</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Documentos</td>
+          <td>PDF, DOCX, PPTX, XLSX, MD</td>
+          <td>50 MB</td>
+          <td>Extracción de texto para búsqueda, preview thumbnail</td>
+        </tr>
+        <tr>
+          <td>Imágenes</td>
+          <td>PNG, JPG, SVG, WebP</td>
+          <td>25 MB</td>
+          <td>Resize automático, thumbnail 400px, conversión a WebP</td>
+        </tr>
+        <tr>
+          <td>Brand Assets</td>
+          <td>AI, EPS, PSD, PDF, SVG, PNG</td>
+          <td>100 MB</td>
+          <td>Thumbnail del preview, metadata de dimensiones</td>
+        </tr>
+        <tr>
+          <td>Video</td>
+          <td>MP4, MOV</td>
+          <td>500 MB</td>
+          <td>Thumbnail del primer frame, duración</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Estructura en R2/S3</h3>
+  <div class="code-block">
+    <span class="code-label">Bucket structure</span>
+    <code><pre>marketing-hub-files/
+├── documents/
+│   ├── 2026/05/
+│   │   ├── sop-content-creation-v2.pdf
+│   │   └── jd-content-creator.docx
+│   └── versions/              # Versiones anteriores
+│
+├── brand/
+│   ├── logos/
+│   │   ├── mangone-primary.svg
+│   │   ├── mangone-primary.png
+│   │   └── mangone-white.svg
+│   ├── fonts/
+│   ├── templates/
+│   └── photos/
+│
+├── avatars/                   # Fotos de perfil del equipo
+├── thumbnails/                # Auto-generados por Celery
+└── temp/                      # Uploads temporales (TTL: 24h)</pre></code>
+  </div>
+
+  <div class="callout success">
+    <strong>Búsqueda Full-Text dentro de Documentos</strong>
+    <p>Al subir un PDF o DOCX, un task de Celery extrae el texto y lo indexa en PostgreSQL usando <code class="inline">SearchVectorField</code>. Esto permite buscar "VAWA" o "Golden Tickets" y encontrar todos los documentos que mencionan esos términos, sin depender de servicios externos como Elasticsearch.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 08 — API ═══════════════════════════ -->
+<section class="section container" id="api">
+  <div class="section-label">Sección 08</div>
+  <h2>API e Integraciones</h2>
+  <p class="section-desc">Endpoints REST y conectores a las herramientas existentes del departamento para alimentar el Hub con datos en tiempo real.</p>
+
+  <h3>Endpoints Principales</h3>
+  <div class="code-block">
+    <span class="code-label">API routes (DRF ViewSets)</span>
+    <code><pre># Autenticación
+POST   /api/auth/login/              # JWT token pair
+POST   /api/auth/refresh/            # Refresh access token
+POST   /api/auth/logout/             # Blacklist refresh token
+
+# Dashboard
+GET    /api/dashboard/summary/       # KPIs agregados del período
+GET    /api/dashboard/widgets/       # Configuración de widgets del usuario
+
+# Documentos
+GET    /api/documents/               # Lista con filtros y búsqueda
+POST   /api/documents/               # Crear nuevo (admin/team)
+GET    /api/documents/{id}/          # Detalle + versiones
+PUT    /api/documents/{id}/          # Actualizar
+GET    /api/documents/{id}/download/ # Presigned URL para descarga
+POST   /api/documents/{id}/upload/   # Presigned URL para nueva versión
+GET    /api/documents/search/?q=     # Full-text search
+
+# Brand
+GET    /api/brand/assets/            # Todos los assets con filtros
+GET    /api/brand/guidelines/        # Secciones del manual
+GET    /api/brand/colors/            # Paleta de colores
+GET    /api/brand/assets/{id}/download/
+
+# Métricas
+GET    /api/metrics/definitions/     # KPIs configurados
+GET    /api/metrics/snapshots/       # Data points con filtros de fecha
+POST   /api/metrics/snapshots/       # Input manual de métricas
+GET    /api/metrics/trends/{slug}/   # Serie temporal de un KPI
+
+# Team
+GET    /api/team/members/            # Directorio del equipo
+GET    /api/team/members/{id}/       # Perfil detallado + JD
+
+# Notificaciones
+GET    /api/notifications/           # Lista del usuario
+PATCH  /api/notifications/{id}/read/ # Marcar como leída</pre></code>
+  </div>
+
+  <h3>Integraciones con Herramientas Existentes</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Herramienta</th>
+          <th>Datos que Alimenta</th>
+          <th>Frecuencia</th>
+          <th>Método</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>HubSpot</strong></td>
+          <td>Leads, contactos, deals pipeline, email performance, fuentes de tráfico</td>
+          <td>Cada 30 min</td>
+          <td>HubSpot API v3 via Celery beat</td>
+        </tr>
+        <tr>
+          <td><strong>Google Analytics 4</strong></td>
+          <td>Sesiones, pageviews, fuentes, conversiones, bounce rate</td>
+          <td>Diario (3am)</td>
+          <td>GA4 Data API via service account</td>
+        </tr>
+        <tr>
+          <td><strong>Google Search Console</strong></td>
+          <td>Impresiones, clicks, CTR, posición promedio, queries top</td>
+          <td>Diario (4am)</td>
+          <td>Search Console API</td>
+        </tr>
+        <tr>
+          <td><strong>Meta Business Suite</strong></td>
+          <td>Reach, engagement, ad spend, CPL, campaign metrics</td>
+          <td>Cada 2 horas</td>
+          <td>Meta Marketing API</td>
+        </tr>
+        <tr>
+          <td><strong>Google Ads</strong></td>
+          <td>Spend, conversions, CPC, impressions por campaña</td>
+          <td>Cada 2 horas</td>
+          <td>Google Ads API</td>
+        </tr>
+        <tr>
+          <td><strong>Monday.com</strong></td>
+          <td>Estado de tareas, workload del equipo, deadlines</td>
+          <td>Cada 15 min</td>
+          <td>Monday.com API v2 (GraphQL)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="code-block">
+    <span class="code-label">Ejemplo: Celery task para HubSpot sync</span>
+    <code><pre># apps/integrations/tasks.py
+
+@shared_task(bind=True, max_retries=3)
+def sync_hubspot_metrics(self):
+    """Sincroniza métricas de HubSpot cada 30 min"""
+    try:
+        client = HubSpotClient(api_key=settings.HUBSPOT_API_KEY)
+        
+        # Leads generados hoy
+        leads_today = client.crm.contacts.search(
+            filter_groups=[{
+                "filters": [{
+                    "propertyName": "createdate",
+                    "operator": "GTE",
+                    "value": today_start_ms()
+                }]
+            }]
+        )
+        
+        MetricSnapshot.objects.update_or_create(
+            metric=MetricDefinition.objects.get(slug='leads-diarios'),
+            period_start=date.today(),
+            period_type='daily',
+            defaults={
+                'value': leads_today.total,
+                'period_end': date.today(),
+                'raw_data': {'source': 'hubspot', 'total': leads_today.total}
+            }
+        )
+    except Exception as exc:
+        self.retry(exc=exc, countdown=60 * 5)</pre></code>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 09 — DEPLOY ═══════════════════════════ -->
+<section class="section container" id="deploy">
+  <div class="section-label">Sección 09</div>
+  <h2>Infraestructura y Deploy</h2>
+  <p class="section-desc">Setup de producción containerizado, diseñado para ser mantenible por un equipo pequeño con costo controlado.</p>
+
+  <h3>Opción Recomendada: Railway / Render</h3>
+  <p>Para un equipo de 6-10 usuarios internos, un PaaS manejado elimina la complejidad de administrar servidores propios. Railway o Render permiten deploy desde Git con zero-config para Django + PostgreSQL + Redis.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🚀</div>
+      <h4>Railway (Recomendado)</h4>
+      <p>Deploy de Django + PostgreSQL + Redis en un click. $5/mes por servicio, incluye SSL automático, custom domains, y logs. Ideal para internal tools.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">▲</div>
+      <h4>Vercel (Frontend)</h4>
+      <p>Next.js en Vercel es deploy nativo. Free tier suficiente para un Hub interno. Edge functions, ISR, image optimization incluidos.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">☁️</div>
+      <h4>Cloudflare R2 (Storage)</h4>
+      <p>$0.015/GB almacenado, sin costo de egress (lectura gratuita). Para el volumen de archivos del departamento, costo < $5/mes.</p>
+    </div>
+  </div>
+
+  <h3>Docker Compose (Development)</h3>
+  <div class="code-block">
+    <span class="code-label">docker-compose.yml</span>
+    <code><pre>version: '3.9'
+
+services:
+  backend:
+    build: ./backend
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    env_file: .env
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build: ./frontend
+    command: npm run dev
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "3000:3000"
+    env_file: .env
+
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: marketing_hub
+      POSTGRES_USER: mhub_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  celery:
+    build: ./backend
+    command: celery -A config worker -l info
+    volumes:
+      - ./backend:/app
+    env_file: .env
+    depends_on:
+      - backend
+      - redis
+
+  celery-beat:
+    build: ./backend
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./backend:/app
+    env_file: .env
+    depends_on:
+      - backend
+      - redis
+
+volumes:
+  postgres_data:</pre></code>
+  </div>
+
+  <h3>Variables de Entorno Requeridas</h3>
+  <div class="code-block">
+    <span class="code-label">.env.example</span>
+    <code><pre># Django
+SECRET_KEY=your-secret-key-here
+DEBUG=False
+ALLOWED_HOSTS=hub.mangonelaw.com
+DJANGO_SETTINGS_MODULE=config.settings.production
+
+# Database
+DATABASE_URL=postgresql://mhub_user:password@db:5432/marketing_hub
+
+# Redis
+REDIS_URL=redis://redis:6379/0
+
+# Storage (Cloudflare R2)
+AWS_ACCESS_KEY_ID=r2-access-key
+AWS_SECRET_ACCESS_KEY=r2-secret-key
+AWS_STORAGE_BUCKET_NAME=marketing-hub-files
+AWS_S3_ENDPOINT_URL=https://account-id.r2.cloudflarestorage.com
+
+# Integrations
+HUBSPOT_API_KEY=pat-na1-xxx
+GOOGLE_ANALYTICS_CREDENTIALS=path/to/service-account.json
+META_ACCESS_TOKEN=EAAxxxxx
+MONDAY_API_KEY=xxx
+
+# JWT
+ACCESS_TOKEN_LIFETIME_MINUTES=15
+REFRESH_TOKEN_LIFETIME_DAYS=7
+
+# Frontend
+NEXT_PUBLIC_API_URL=https://api.hub.mangonelaw.com</pre></code>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 10 — ROADMAP ═══════════════════════════ -->
+<section class="section container" id="roadmap">
+  <div class="section-label">Sección 10</div>
+  <h2>Roadmap de Desarrollo</h2>
+  <p class="section-desc">Plan de ejecución por fases, priorizando funcionalidad core y valor inmediato para el equipo.</p>
+
+  <div class="phase-timeline">
+    <div class="phase">
+      <div class="phase-marker">
+        <div class="phase-num">1</div>
+        <div class="phase-weeks">Sem 1-3</div>
+      </div>
+      <div class="phase-content">
+        <h4>Fundación</h4>
+        <p>Setup del proyecto, infraestructura base y autenticación.</p>
+        <ul class="feature-list">
+          <li>Inicializar proyecto Django + Next.js con Docker Compose</li>
+          <li>Configurar PostgreSQL, Redis, Celery</li>
+          <li>Implementar sistema de auth (JWT, registro, roles RBAC)</li>
+          <li>Shell del frontend: layout, sidebar, routing, theme system</li>
+          <li>CI/CD pipeline (GitHub Actions → Railway/Vercel)</li>
+          <li>Setup de R2 con django-storages y presigned URLs</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker">
+        <div class="phase-num">2</div>
+        <div class="phase-weeks">Sem 4-6</div>
+      </div>
+      <div class="phase-content">
+        <h4>Módulos Core</h4>
+        <p>Biblioteca de documentos y Brand Center — valor inmediato para el equipo.</p>
+        <ul class="feature-list">
+          <li>CRUD completo de documentos con versionamiento</li>
+          <li>Upload directo a R2 con progress bar</li>
+          <li>Full-text search con PostgreSQL tsvector</li>
+          <li>Brand Center: guidelines renderizados, galería de assets</li>
+          <li>Paleta de colores interactiva con copy-to-clipboard</li>
+          <li>Vista previa in-app de PDFs e imágenes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker">
+        <div class="phase-num">3</div>
+        <div class="phase-weeks">Sem 7-10</div>
+      </div>
+      <div class="phase-content">
+        <h4>Métricas e Integraciones</h4>
+        <p>Dashboard de KPIs conectado a las fuentes reales de datos.</p>
+        <ul class="feature-list">
+          <li>Conector HubSpot: leads, pipeline, email metrics</li>
+          <li>Conector Google Analytics 4: tráfico, conversiones</li>
+          <li>Conector Meta Business: ad spend, reach, engagement</li>
+          <li>Dashboard con Recharts: gráficos de tendencia, comparaciones</li>
+          <li>Celery beat para sync automático (configurable por fuente)</li>
+          <li>Sistema de alertas cuando KPIs caen bajo el target</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-marker">
+        <div class="phase-num">4</div>
+        <div class="phase-weeks">Sem 11-12</div>
+      </div>
+      <div class="phase-content">
+        <h4>Team Hub + Polish</h4>
+        <p>Directorio del equipo, notificaciones y refinamiento general.</p>
+        <ul class="feature-list">
+          <li>Team Hub: perfiles, JDs, organigrama visual</li>
+          <li>Centro de notificaciones in-app</li>
+          <li>Dashboard ejecutivo para Liderazgo (vista simplificada)</li>
+          <li>Testing end-to-end, security audit</li>
+          <li>Documentación técnica y guía de administración</li>
+          <li>Onboarding del equipo y launch</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <strong>Estimación Realista</strong>
+    <p>Este timeline asume un desarrollador dedicado full-time. Si Andrés divide su tiempo con las responsabilidades de SEO/Web actuales, el timeline se extiende proporcionalmente. La Fase 1-2 es la prioridad: con documentos + brand center funcionando, el equipo ya obtiene valor inmediato.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 11 — COSTS ═══════════════════════════ -->
+<section class="section container" id="costs">
+  <div class="section-label">Sección 11</div>
+  <h2>Estimación de Costos</h2>
+  <p class="section-desc">Costos mensuales de infraestructura para un sistema de uso interno con bajo tráfico pero alto valor de datos.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Servicio</th>
+          <th>Proveedor</th>
+          <th>Plan/Tier</th>
+          <th>Costo/mes (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Backend (Django + Celery)</td>
+          <td>Railway</td>
+          <td>Pro ($5 base + uso)</td>
+          <td>$10 – $20</td>
+        </tr>
+        <tr>
+          <td>PostgreSQL</td>
+          <td>Railway / Neon</td>
+          <td>Managed</td>
+          <td>$5 – $15</td>
+        </tr>
+        <tr>
+          <td>Redis</td>
+          <td>Railway / Upstash</td>
+          <td>Managed</td>
+          <td>$0 – $10</td>
+        </tr>
+        <tr>
+          <td>Frontend (Next.js)</td>
+          <td>Vercel</td>
+          <td>Pro (si custom domain)</td>
+          <td>$0 – $20</td>
+        </tr>
+        <tr>
+          <td>Object Storage</td>
+          <td>Cloudflare R2</td>
+          <td>Pay-as-you-go</td>
+          <td>$1 – $5</td>
+        </tr>
+        <tr>
+          <td>Dominio</td>
+          <td>Cloudflare / existente</td>
+          <td>Subdominio de mangonelaw.com</td>
+          <td>$0</td>
+        </tr>
+        <tr>
+          <td>SSL</td>
+          <td>Cloudflare / Let's Encrypt</td>
+          <td>Automático</td>
+          <td>$0</td>
+        </tr>
+        <tr style="background: var(--accent-glow); font-weight: 600;">
+          <td colspan="3">Total Estimado Mensual</td>
+          <td>$20 – $70</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout success">
+    <strong>Costo vs. Valor</strong>
+    <p>$20-70/mes por una plataforma interna que centraliza la operación de marketing de la firma es un costo negligible comparado con las herramientas que ya se pagan (HubSpot, Monday.com, etc.). El valor real está en la eficiencia operativa y la visibilidad que da al equipo y al liderazgo.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ 12 — DECISIONS ═══════════════════════════ -->
+<section class="section container" id="decisions">
+  <div class="section-label">Sección 12</div>
+  <h2>Decisiones Técnicas Clave</h2>
+  <p class="section-desc">Registro de decisiones arquitectónicas (ADRs) que fundamentan las elecciones del proyecto.</p>
+
+  <h3>ADR-001: API desacoplada vs. Django Templates</h3>
+  <p><strong>Decisión:</strong> API REST (DRF) + Next.js separado.</p>
+  <p><strong>Razón:</strong> Aunque Django templates es más rápido de desarrollar inicialmente, un frontend desacoplado permite: interfaces más ricas y reactivas (drag-and-drop, dashboards en tiempo real, transiciones), que Andrés (frontend/SEO) y un backend developer trabajen en paralelo, y eventual uso de la misma API para una app móvil o integraciones futuras.</p>
+
+  <h3>ADR-002: PostgreSQL full-text search vs. Elasticsearch</h3>
+  <p><strong>Decisión:</strong> PostgreSQL nativo con <code class="inline">SearchVectorField</code> + <code class="inline">SearchQuery</code>.</p>
+  <p><strong>Razón:</strong> Para un catálogo de ~100-500 documentos, PostgreSQL maneja full-text search sin problema y en español con la configuración <code class="inline">spanish</code>. Elasticsearch agregaría un servicio adicional a mantener, costo de infra, y complejidad operacional que no se justifica para el volumen actual. Se puede migrar a Elasticsearch si el catálogo supera los 10,000 documentos.</p>
+
+  <h3>ADR-003: Presigned URLs vs. Upload through Django</h3>
+  <p><strong>Decisión:</strong> Upload directo a R2 via presigned URLs.</p>
+  <p><strong>Razón:</strong> Los archivos (especialmente videos de Gloriana y assets de Sara) pueden ser pesados. Pasar por Django significa que el servidor debe buffearear todo el archivo en memoria, lo cual limita concurrencia y puede causar timeouts. Con presigned URLs, el browser sube directamente a R2, Django solo genera el URL firmado y registra la metadata post-upload.</p>
+
+  <h3>ADR-004: Monorepo vs. Repos separados</h3>
+  <p><strong>Decisión:</strong> Monorepo con carpetas <code class="inline">/backend</code> y <code class="inline">/frontend</code>.</p>
+  <p><strong>Razón:</strong> Con un equipo tan pequeño (1-2 developers), un monorepo simplifica: un solo PR para features full-stack, docker-compose levanta todo, y no hay necesidad de gestionar versionamiento de API entre repos. Cuando el equipo crezca, se puede dividir.</p>
+
+  <h3>ADR-005: Métricas como snapshots vs. real-time proxy</h3>
+  <p><strong>Decisión:</strong> Celery sincroniza y almacena snapshots en PostgreSQL.</p>
+  <p><strong>Razón:</strong> Hacer proxy directo a las APIs en cada page load significaría latencia alta y riesgo de rate limits. Almacenando snapshots periódicos, el dashboard carga instantáneamente y tenemos historial para tendencias. El tradeoff (datos con delay de hasta 30 min) es aceptable para un dashboard de marketing interno.</p>
+
+  <h3>Próximos Pasos</h3>
+  <ul class="feature-list">
+    <li>Validar este documento con Andrés (viabilidad técnica y timeline)</li>
+    <li>Definir el subdominio: <code class="inline">hub.mangonelaw.com</code> o <code class="inline">marketing.mangonelaw.com</code></li>
+    <li>Crear el repositorio e inicializar el boilerplate de Django + Next.js</li>
+    <li>Configurar cuentas de Railway, Vercel y Cloudflare R2</li>
+    <li>Priorizar el backlog de Fase 1 en Monday.com o Linear</li>
+    <li>Obtener API keys de HubSpot, GA4, Meta y Google Ads para las integraciones</li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
+<footer class="doc-footer">
+  <p>Marketing Hub — Documento de Arquitectura Técnica v1.0</p>
+  <p>Departamento de Marketing · Mangone Law Firm, LLC · Mayo 2026</p>
+  <p style="margin-top: 8px; font-size: 12px; color: var(--ink-muted);">Documento de uso interno. No distribuir fuera de la organización.</p>
+</footer>
+
+</body>
+</html>
