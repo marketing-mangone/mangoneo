@@ -14,6 +14,11 @@ class UserProfile(models.Model):
     skills = models.JSONField(default=list, blank=True)
     start_date = models.DateField(null=True, blank=True)
     status = models.CharField(max_length=20, default='active')
+    reports_to = models.ForeignKey(
+        'self', null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='direct_reports',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

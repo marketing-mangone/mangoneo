@@ -374,8 +374,8 @@ export const tasksApi = {
 // ── Team / Users API ──────────────────────────────────────────────────────────
 
 export interface ApiTeamMember {
-  id: number;
-  user_id: number;
+  id: number;          // UserProfile PK
+  user_id: number;     // User PK
   username: string;
   name: string;
   email: string;
@@ -389,6 +389,7 @@ export interface ApiTeamMember {
   skills: string[];
   start_date: string;
   status: 'active' | 'inactive';
+  reports_to_id: number | null;
 }
 
 export interface ApiUserProfile {
@@ -427,6 +428,12 @@ export const meApi = {
 export const teamApi = {
   list() {
     return apiJSON<{ results: ApiTeamMember[]; count: number }>('/api/team/');
+  },
+  updateHierarchy(profileId: number, reportsToId: number | null) {
+    return apiJSON<ApiTeamMember>(`/api/team/${profileId}/hierarchy/`, {
+      method: 'PATCH',
+      body: JSON.stringify({ reports_to: reportsToId }),
+    });
   },
 };
 

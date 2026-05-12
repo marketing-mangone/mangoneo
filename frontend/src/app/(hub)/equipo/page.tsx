@@ -1,11 +1,12 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import {
   Mail, Phone, Search, Grid, List, ChevronDown,
   Star, Plus, Edit2, Trash2, KeyRound, X, Eye, EyeOff, Loader2,
+  Network, Check,
 } from 'lucide-react';
 import { auth, meApi, teamApi, usersApi, type ApiTeamMember, type ApiUserManagement } from '@/lib/api';
 
@@ -428,56 +429,332 @@ function PasswordModal({ userId, userName, onClose }: { userId: number; userName
 
 // ── Org chart ─────────────────────────────────────────────────────────────────
 
-function OrgChart({ members }: { members: ApiTeamMember[] }) {
-  const director = members.find(m => m.role === 'admin');
-  const team = members.filter(m => m.role !== 'admin');
+// Tree layout constants (px)
+const NW = 152;   // node width
+const NH = 86;    // node height (approximate, for SVG line origin)
+const GAP_X = 20; // horizontal gap between sibling subtrees
+const GAP_Y = 64; // vertical gap between levels
+
+interface OrgNode extends ApiTeamMember {
+  children: OrgNode[];
+}
+
+interface LayoutNode extends OrgNode {
+  x: number;  // left edge of node
+  y: number;  // top edge of node
+  subtreeWidth: number;
+}
+
+function buildTree(members: ApiTeamMember[]): OrgNode[] {
+  const map = new Map<number, OrgNode>();
+  members.forEach(m => map.set(m.id, { ...m, children: [] }));
+  const roots: OrgNode[] = [];
+  map.forEach(node => {
+    const parentId = node.reports_to_id;
+    if (parentId && map.has(parentId)) {
+      map.get(parentId)!.children.push(node);
+    } else {
+      roots.push(node);
+    }
+  });
+  return roots;
+}
+
+function computeLayout(node: OrgNode, level: number, startX: number): LayoutNode {
+  if (node.children.length === 0) {
+    return { ...node, x: startX, y: level * (NH + GAP_Y), subtreeWidth: NW, children: [] };
+  }
+
+  let cursor = startX;
+  const laidChildren: LayoutNode[] = [];
+  for (const child of node.children) {
+    const lc = computeLayout(child, level + 1, cursor);
+    laidChildren.push(lc);
+    cursor += lc.subtreeWidth + GAP_X;
+  }
+  const totalChildSpan = cursor - startX - GAP_X;
+  const subtreeWidth = Math.max(NW, totalChildSpan);
+
+  // Center node over its children
+  const childrenMid = startX + totalChildSpan / 2;
+  const x = childrenMid - NW / 2;
+
+  return {
+    ...node,
+    x,
+    y: level * (NH + GAP_Y),
+    subtreeWidth,
+    children: laidChildren,
+  };
+}
+
+function flattenLayout(node: LayoutNode): LayoutNode[] {
+  return [node, ...(node.children as LayoutNode[]).flatMap(flattenLayout)];
+}
+
+function OrgNodeCard({
+  node,
+  editMode,
+  allMembers,
+  pendingReports,
+  onChangeReportsTo,
+}: {
+  node: LayoutNode;
+  editMode: boolean;
+  allMembers: ApiTeamMember[];
+  pendingReports: Map<number, number | null>;
+  onChangeReportsTo: (profileId: number, reportsTo: number | null) => void;
+}) {
+  const bg = avatarColor(node.avatar);
+  const isRoot = (pendingReports.has(node.id)
+    ? pendingReports.get(node.id)
+    : node.reports_to_id) === null;
 
   return (
-    <Card className="p-6">
-      <h3 className="text-base font-bold text-[#1a1a2e] mb-6">Organigrama del Departamento</h3>
-      <div className="flex flex-col items-center gap-4">
-        {director && (
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-3 bg-[#0C2054] text-white px-5 py-3 rounded-xl shadow-md">
-              <div className="w-8 h-8 rounded-lg bg-[#F79C31] flex items-center justify-center font-bold text-[#0C2054] text-sm">
-                {director.avatar || director.name.slice(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <p className="font-bold text-sm">{director.name}</p>
-                <p className="text-[#F79C31] text-xs">{director.position}</p>
-              </div>
-            </div>
+    <div
+      className={`w-full rounded-xl border shadow-sm overflow-hidden transition-all duration-150 ${
+        isRoot
+          ? 'bg-[#0C2054] border-[#0C2054] text-white'
+          : 'bg-white border-[#e8e8f0]'
+      }`}
+      style={{ width: NW }}
+    >
+      {/* Color stripe */}
+      {!isRoot && <div className="h-1.5" style={{ background: bg }} />}
+
+      <div className="p-3">
+        <div className="flex items-center gap-2.5">
+          <div
+            className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+            style={{ background: isRoot ? '#F79C31' : bg, color: isRoot ? '#0C2054' : 'white' }}
+          >
+            {node.avatar || node.name.slice(0, 2).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className={`font-bold text-xs leading-tight truncate ${isRoot ? 'text-white' : 'text-[#1a1a2e]'}`}>
+              {node.name.split(' ')[0]}
+            </p>
+            <p className={`text-[10px] leading-tight truncate mt-0.5 ${isRoot ? 'text-[#F79C31]' : 'text-[#8888a8]'}`}>
+              {node.position.split(' ').slice(0, 3).join(' ')}
+            </p>
+          </div>
+        </div>
+
+        <span className={`inline-block text-[9px] font-semibold px-1.5 py-0.5 rounded-full mt-2 ${
+          isRoot ? 'bg-white/15 text-white' : (AREA_COLORS[node.area] || 'bg-gray-50 text-gray-600')
+        }`}>
+          {node.area}
+        </span>
+
+        {editMode && (
+          <div className="mt-2 pt-2 border-t border-white/20">
+            <label className={`block text-[9px] font-bold mb-1 ${isRoot ? 'text-white/60' : 'text-[#8888a8]'}`}>
+              Reporta a
+            </label>
+            <select
+              value={
+                pendingReports.has(node.id)
+                  ? (pendingReports.get(node.id) ?? '')
+                  : (node.reports_to_id ?? '')
+              }
+              onChange={e => onChangeReportsTo(node.id, e.target.value === '' ? null : Number(e.target.value))}
+              className="w-full text-[10px] px-1.5 py-1 rounded-md border border-[#d0d0e0] bg-white text-[#1a1a2e] outline-none focus:border-[#F79C31]"
+            >
+              <option value="">— Ninguno (raíz) —</option>
+              {allMembers
+                .filter(m => m.id !== node.id)
+                .map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.name.split(' ')[0]}
+                  </option>
+                ))}
+            </select>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
 
-        {team.length > 0 && (
-          <>
-            <div className="w-px h-8 bg-[#e8e8f0]" />
-            <div className="w-full max-w-2xl h-px bg-[#e8e8f0] relative">
-              {team.map((_, i) => (
-                <div key={i} className="absolute w-px h-6 bg-[#e8e8f0] bottom-0" style={{ left: `${(i + 0.5) * (100 / team.length)}%` }} />
-              ))}
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 w-full">
-              {team.map(m => {
-                const bg = avatarColor(m.avatar);
-                return (
-                  <div key={m.id} className="flex flex-col items-center p-3 bg-[#f7f8fc] border border-[#e8e8f0] rounded-xl hover:border-[#F79C31]/40 hover:bg-white transition-all">
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm mb-2 flex-shrink-0" style={{ background: bg }}>
-                      {m.avatar || m.name.slice(0, 2).toUpperCase()}
-                    </div>
-                    <p className="text-xs font-bold text-[#1a1a2e] text-center leading-tight">{m.name.split(' ')[0]}</p>
-                    <p className="text-[10px] text-[#8888a8] text-center mt-0.5 leading-tight">{m.position.split(' ').slice(0, 2).join(' ')}</p>
-                    <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full mt-1.5 ${AREA_COLORS[m.area] || 'bg-gray-50 text-gray-600'}`}>
-                      {m.area}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </>
+function OrgChart({
+  members,
+  isAdmin,
+  onHierarchyChange,
+}: {
+  members: ApiTeamMember[];
+  isAdmin: boolean;
+  onHierarchyChange: (updated: ApiTeamMember[]) => void;
+}) {
+  const [editMode, setEditMode] = useState(false);
+  const [pendingReports, setPendingReports] = useState<Map<number, number | null>>(new Map());
+  const [saving, setSaving] = useState(false);
+
+  // Build layout
+  const roots = buildTree(members);
+  let cursor = 0;
+  const laidRoots: LayoutNode[] = roots.map(root => {
+    const lr = computeLayout(root, 0, cursor);
+    cursor += lr.subtreeWidth + GAP_X * 2;
+    return lr;
+  });
+
+  const allLayoutNodes = laidRoots.flatMap(flattenLayout);
+  const totalW = Math.max(NW, cursor - GAP_X * 2);
+  const totalH = allLayoutNodes.length > 0
+    ? Math.max(...allLayoutNodes.map(n => n.y)) + NH
+    : NH;
+
+  function handleChangeReportsTo(profileId: number, reportsTo: number | null) {
+    setPendingReports(prev => new Map(prev).set(profileId, reportsTo));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      const updates = Array.from(pendingReports.entries());
+      await Promise.all(updates.map(([id, reportsToId]) => teamApi.updateHierarchy(id, reportsToId)));
+      // Build updated members list from pending changes
+      const updatedMembers = members.map(m =>
+        pendingReports.has(m.id) ? { ...m, reports_to_id: pendingReports.get(m.id)! } : m
+      );
+      onHierarchyChange(updatedMembers);
+      setPendingReports(new Map());
+      setEditMode(false);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleCancel() {
+    setPendingReports(new Map());
+    setEditMode(false);
+  }
+
+  // Effective reports_to for each node (pending overrides stored)
+  function effectiveReportsTo(node: LayoutNode): number | null {
+    return pendingReports.has(node.id) ? pendingReports.get(node.id)! : node.reports_to_id;
+  }
+
+  return (
+    <Card className="overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-[#f0f0f0]">
+        <div className="flex items-center gap-2">
+          <Network className="w-4 h-4 text-[#8888a8]" />
+          <h3 className="text-base font-bold text-[#1a1a2e]">Organigrama</h3>
+          {pendingReports.size > 0 && (
+            <span className="text-[10px] font-bold px-2 py-0.5 bg-[#fef5e7] text-[#F79C31] rounded-full">
+              {pendingReports.size} cambio{pendingReports.size > 1 ? 's' : ''} sin guardar
+            </span>
+          )}
+        </div>
+        {isAdmin && (
+          <div className="flex items-center gap-2">
+            {editMode ? (
+              <>
+                <button
+                  onClick={handleCancel}
+                  className="px-3 py-1.5 text-xs font-semibold text-[#4a4a6a] bg-[#f7f8fc] hover:bg-[#eeeef5] rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={saving || pendingReports.size === 0}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-[#0C2054] text-white rounded-lg hover:bg-[#0a1a3e] disabled:opacity-50 transition-colors"
+                >
+                  {saving
+                    ? <Loader2 className="w-3 h-3 animate-spin" />
+                    : <Check className="w-3 h-3" />
+                  }
+                  Guardar jerarquía
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setEditMode(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[#4a4a6a] bg-[#f7f8fc] hover:bg-[#eeeef5] border border-[#e8e8f0] rounded-lg transition-colors"
+              >
+                <Edit2 className="w-3 h-3" /> Editar jerarquía
+              </button>
+            )}
+          </div>
         )}
       </div>
+
+      {/* Canvas */}
+      <div className="p-6 overflow-x-auto">
+        <div
+          className="relative mx-auto"
+          style={{ width: totalW, height: totalH + (editMode ? 40 : 0) }}
+        >
+          {/* SVG connections */}
+          <svg
+            className="absolute inset-0 pointer-events-none"
+            width={totalW}
+            height={totalH + (editMode ? 40 : 0)}
+            style={{ overflow: 'visible' }}
+          >
+            <defs>
+              <marker id="dot" markerWidth="4" markerHeight="4" refX="2" refY="2">
+                <circle cx="2" cy="2" r="1.5" fill="#e8e8f0" />
+              </marker>
+            </defs>
+            {allLayoutNodes
+              .filter(n => effectiveReportsTo(n) !== null)
+              .map(n => {
+                const parentId = effectiveReportsTo(n);
+                const parent = allLayoutNodes.find(p => p.id === parentId);
+                if (!parent) return null;
+                const x1 = parent.x + NW / 2;
+                const y1 = parent.y + NH;
+                const x2 = n.x + NW / 2;
+                const y2 = n.y;
+                const my = (y1 + y2) / 2;
+                // Cubic bezier: exit bottom of parent, enter top of child
+                const d = `M${x1},${y1} C${x1},${my} ${x2},${my} ${x2},${y2}`;
+                return (
+                  <path
+                    key={`${parent.id}-${n.id}`}
+                    d={d}
+                    stroke="#d0d5e8"
+                    strokeWidth={1.5}
+                    fill="none"
+                    strokeDasharray={editMode ? '4 3' : undefined}
+                    markerEnd="url(#dot)"
+                  />
+                );
+              })}
+          </svg>
+
+          {/* Nodes */}
+          {allLayoutNodes.map(n => (
+            <div
+              key={n.id}
+              className="absolute"
+              style={{ left: n.x, top: n.y, width: NW }}
+            >
+              <OrgNodeCard
+                node={n}
+                editMode={editMode}
+                allMembers={members}
+                pendingReports={pendingReports}
+                onChangeReportsTo={handleChangeReportsTo}
+              />
+            </div>
+          ))}
+        </div>
+
+        {members.length === 0 && (
+          <p className="text-center text-sm text-[#8888a8] py-8">No hay miembros activos.</p>
+        )}
+      </div>
+
+      {editMode && (
+        <div className="px-6 pb-4 text-xs text-[#8888a8]">
+          Cambia el campo "Reporta a" en cada tarjeta para redefinir la jerarquía, luego guarda.
+        </div>
+      )}
     </Card>
   );
 }
@@ -639,7 +916,13 @@ export default function EquipoPage() {
         </div>
 
         {/* Org chart */}
-        {!loading && members.length > 0 && <OrgChart members={members} />}
+        {!loading && members.length > 0 && (
+          <OrgChart
+            members={members}
+            isAdmin={isAdmin}
+            onHierarchyChange={setMembers}
+          />
+        )}
 
         {/* Team grid / list */}
         <div>

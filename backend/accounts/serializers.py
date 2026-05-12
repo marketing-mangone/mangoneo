@@ -39,6 +39,8 @@ class UserProfileInlineSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         exclude = ['id', 'user', 'created_at']
+        # reports_to accepts a profile PK (int) or null
+        extra_kwargs = {'reports_to': {'required': False}}
 
 
 class UserManagementSerializer(serializers.ModelSerializer):
