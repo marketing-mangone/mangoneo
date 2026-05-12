@@ -1,3 +1,10 @@
+# Google OAuth credentials — NEVER commit
+client_secret_youtube.json
+client_secret*.json
+token_youtube.json
+*_credentials.json
+service_account*.json
+
 # Python / Django
 __pycache__/
 *.py[cod]
