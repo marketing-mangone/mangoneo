@@ -69,6 +69,20 @@ async function apiJSON<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
 
+export interface CurrentUser {
+  id: number;
+  username: string;
+  email: string;
+  name: string;
+  role: string;
+  avatar: string;
+  position: string;
+}
+
+function saveCurrentUser(user: CurrentUser) {
+  localStorage.setItem('current_user', JSON.stringify(user));
+}
+
 export const auth = {
   async login(username: string, password: string) {
     const res = await fetch(`${API_BASE}/api/auth/login/`, {
@@ -79,10 +93,27 @@ export const auth = {
     if (!res.ok) throw new Error('Credenciales incorrectas');
     const data = await res.json();
     saveTokens(data.access, data.refresh);
+    // Fetch and cache user info after login
+    try {
+      const me = await fetch(`${API_BASE}/api/accounts/me/`, {
+        headers: { Authorization: `Bearer ${data.access}` },
+      }).then(r => r.json());
+      saveCurrentUser(me);
+    } catch {
+      // Non-fatal: user info will be fetched on next load
+    }
     return data;
   },
-  logout: clearTokens,
+  logout() {
+    clearTokens();
+    localStorage.removeItem('current_user');
+  },
   isAuthenticated: () => !!getTokens().access,
+  getCurrentUser(): CurrentUser | null {
+    if (typeof window === 'undefined') return null;
+    const raw = localStorage.getItem('current_user');
+    return raw ? JSON.parse(raw) : null;
+  },
 };
 
 // ── Tipos de documentos ───────────────────────────────────────────────────────
@@ -337,5 +368,94 @@ export const tasksApi = {
   },
   delete(id: number) {
     return apiFetch(`/api/tasks/${id}/`, { method: 'DELETE' });
+  },
+};
+
+// ── Team / Users API ──────────────────────────────────────────────────────────
+
+export interface ApiTeamMember {
+  id: number;
+  user_id: number;
+  username: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'team' | 'leadership' | 'viewer';
+  position: string;
+  department: string;
+  area: string;
+  phone: string;
+  bio: string;
+  avatar: string;
+  skills: string[];
+  start_date: string;
+  status: 'active' | 'inactive';
+}
+
+export interface ApiUserProfile {
+  role: string;
+  position: string;
+  department: string;
+  area: string;
+  phone: string;
+  bio: string;
+  avatar: string;
+  skills: string[];
+  start_date: string | null;
+  status: string;
+}
+
+export interface ApiUserManagement {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  name: string;
+  is_active: boolean;
+  profile: ApiUserProfile;
+}
+
+export type UserCreateInput = Omit<ApiUserManagement, 'id' | 'name'> & { password: string };
+export type UserUpdateInput = Partial<Omit<ApiUserManagement, 'id' | 'name'>>;
+
+export const meApi = {
+  get() {
+    return apiJSON<CurrentUser>('/api/accounts/me/');
+  },
+};
+
+export const teamApi = {
+  list() {
+    return apiJSON<{ results: ApiTeamMember[]; count: number }>('/api/team/');
+  },
+};
+
+export const usersApi = {
+  list() {
+    return apiJSON<{ results: ApiUserManagement[]; count: number }>('/api/accounts/users/');
+  },
+  create(data: UserCreateInput) {
+    return apiJSON<ApiUserManagement>('/api/accounts/users/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  update(id: number, data: UserUpdateInput) {
+    return apiJSON<ApiUserManagement>(`/api/accounts/users/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+  setPassword(id: number, password: string) {
+    return apiJSON(`/api/accounts/users/${id}/set-password/`, {
+      method: 'POST',
+      body: JSON.stringify({ password }),
+    });
+  },
+  deactivate(id: number) {
+    return apiJSON<ApiUserManagement>(`/api/accounts/users/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_active: false }),
+    });
   },
 };

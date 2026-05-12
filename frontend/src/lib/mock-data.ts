@@ -4,7 +4,7 @@ export const MOCK_TEAM: TeamMember[] = [
   {
     id: 1, name: 'Sebastian Quijada', email: 'Sebastian.q@mangonelawfirmllc.com',
     role: 'admin', position: 'Director de Marketing', department: 'Marketing',
-    area: 'Dirección', phone: '(862) 701-2097', startDate: '2023-01-15', status: 'active',
+    area: 'Dirección', phone: '(862) 701-2097', start_date: '2023-01-15', status: 'active',
     bio: 'Director de Marketing responsable de la estrategia de marca y comunicaciones de la firma.',
     skills: ['Estrategia', 'Branding', 'Analytics', 'Liderazgo'],
     avatar: 'SQ',
@@ -12,7 +12,7 @@ export const MOCK_TEAM: TeamMember[] = [
   {
     id: 2, name: 'Alejandra Andrade', email: 'alejandra@mangonelawfirmllc.com',
     role: 'team', position: 'Creadora de Contenido', department: 'Marketing',
-    area: 'Contenido', startDate: '2023-06-01', status: 'active',
+    area: 'Contenido', start_date: '2023-06-01', status: 'active',
     bio: 'Responsable de guiones, copys y estrategia de contenido para todos los canales.',
     skills: ['Copywriting', 'Guiones', 'SEO Content', 'Storytelling'],
     avatar: 'AA',
@@ -20,7 +20,7 @@ export const MOCK_TEAM: TeamMember[] = [
   {
     id: 3, name: 'Andrés Coronel', email: 'andres@mangonelawfirmllc.com',
     role: 'team', position: 'Web & SEO', department: 'Marketing',
-    area: 'Digital', startDate: '2023-03-15', status: 'active',
+    area: 'Digital', start_date: '2023-03-15', status: 'active',
     bio: 'Gestiona el sitio web, estrategia SEO y analítica digital de la firma.',
     skills: ['Next.js', 'SEO', 'Google Analytics', 'WordPress'],
     avatar: 'AC',
@@ -28,7 +28,7 @@ export const MOCK_TEAM: TeamMember[] = [
   {
     id: 4, name: 'Gloriana López', email: 'gloriana@mangonelawfirmllc.com',
     role: 'team', position: 'Editora de Video', department: 'Marketing',
-    area: 'Producción', startDate: '2023-08-01', status: 'active',
+    area: 'Producción', start_date: '2023-08-01', status: 'active',
     bio: 'Produce y edita todo el contenido audiovisual para redes sociales y YouTube.',
     skills: ['Premiere Pro', 'After Effects', 'TikTok', 'YouTube'],
     avatar: 'GL',
@@ -36,7 +36,7 @@ export const MOCK_TEAM: TeamMember[] = [
   {
     id: 5, name: 'Sara Castaño', email: 'sara@mangonelawfirmllc.com',
     role: 'team', position: 'Diseñadora Gráfica', department: 'Marketing',
-    area: 'Diseño', startDate: '2024-01-10', status: 'active',
+    area: 'Diseño', start_date: '2024-01-10', status: 'active',
     bio: 'Diseñadora responsable de la identidad visual, templates y assets gráficos.',
     skills: ['Figma', 'Illustrator', 'Photoshop', 'Canva Pro'],
     avatar: 'SC',
@@ -44,7 +44,7 @@ export const MOCK_TEAM: TeamMember[] = [
   {
     id: 6, name: 'Jesús Méndez', email: 'jesus@mangonelawfirmllc.com',
     role: 'team', position: 'HubSpot & Ads Manager', department: 'Marketing',
-    area: 'Paid Media', startDate: '2024-02-20', status: 'active',
+    area: 'Paid Media', start_date: '2024-02-20', status: 'active',
     bio: 'Gestiona campañas de paid media, CRM en HubSpot y automatizaciones de marketing.',
     skills: ['HubSpot', 'Meta Ads', 'Google Ads', 'CRM'],
     avatar: 'JM',

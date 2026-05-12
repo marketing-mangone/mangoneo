@@ -14,9 +14,11 @@ export interface User {
 }
 
 export interface TeamMember extends User {
+  user_id?: number;
+  username?: string;
   slack?: string;
   area: string;
-  startDate: string;
+  start_date: string;
   status: 'active' | 'inactive';
 }
 
