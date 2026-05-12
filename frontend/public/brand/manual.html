@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manual de Marca — Mangone Law Firm LLC</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap');
+
+  :root {
+    --naranja: #F79C31;
+    --azul: #0C2054;
+    --marron: #3B3537;
+    --negro: #000000;
+    --blanco: #FFFFFF;
+    --gris-claro: #F5F5F5;
+    --gris-medio: #E8E8E8;
+    --azul-light: #1a3a7a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--marron);
+    background: var(--blanco);
+    font-size: 14px;
+    line-height: 1.7;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @media print {
+    .page-break { page-break-before: always; }
+    body { font-size: 11px; }
+    .cover { height: 100vh; }
+    .no-print { display: none; }
+  }
+
+  /* ===== COVER ===== */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--azul) 0%, #091840 60%, #06102e 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    right: -150px;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: rgba(247,156,49,0.08);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -200px;
+    left: -100px;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: rgba(247,156,49,0.05);
+  }
+  .cover-logo {
+    width: 220px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-badge {
+    display: inline-block;
+    background: var(--naranja);
+    color: var(--azul);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 8px 28px;
+    border-radius: 30px;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--blanco);
+    letter-spacing: 6px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover h1 span { color: var(--naranja); }
+  .cover-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+    letter-spacing: 1px;
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 1;
+  }
+  .cover-meta {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 40px;
+    color: rgba(255,255,255,0.4);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* ===== TOC ===== */
+  .toc {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 80px 40px;
+  }
+  .toc-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--azul);
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+  .toc-line {
+    width: 60px;
+    height: 4px;
+    background: var(--naranja);
+    border-radius: 2px;
+    margin-bottom: 40px;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li {
+    display: flex;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--gris-medio);
+    transition: background 0.2s;
+  }
+  .toc-list li:hover { background: var(--gris-claro); margin: 0 -10px; padding-left: 10px; padding-right: 10px; }
+  .toc-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--naranja);
+    width: 50px;
+    flex-shrink: 0;
+  }
+  .toc-text {
+    font-weight: 600;
+    color: var(--azul);
+    font-size: 15px;
+  }
+
+  /* ===== SECTIONS ===== */
+  .section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 40px 40px;
+  }
+  .section-header {
+    background: var(--azul);
+    padding: 50px 40px 40px;
+    max-width: 880px;
+    margin: 0 auto;
+    border-radius: 0;
+    position: relative;
+  }
+  .section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 40px;
+    width: 60px;
+    height: 4px;
+    background: var(--naranja);
+    border-radius: 2px;
+  }
+  .section-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: rgba(247,156,49,0.2);
+    line-height: 1;
+    margin-bottom: -10px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--blanco);
+    letter-spacing: 2px;
+  }
+
+  /* ===== CONTENT ELEMENTS ===== */
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--azul);
+    margin: 35px 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--naranja);
+    display: inline-block;
+  }
+  h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--marron);
+    margin: 24px 0 8px;
+  }
+  p { margin-bottom: 14px; }
+
+  .highlight-box {
+    background: linear-gradient(135deg, var(--azul), var(--azul-light));
+    color: var(--blanco);
+    padding: 28px 30px;
+    border-radius: 12px;
+    margin: 24px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .highlight-box::before {
+    content: '';
+    position: absolute;
+    top: -30px;
+    right: -30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(247,156,49,0.12);
+  }
+  .highlight-box h4 { color: var(--naranja); margin-top: 0; }
+  .highlight-box p { color: rgba(255,255,255,0.9); }
+  .highlight-box ul { color: rgba(255,255,255,0.9); }
+
+  .info-card {
+    background: var(--gris-claro);
+    border-left: 4px solid var(--naranja);
+    padding: 20px 24px;
+    border-radius: 0 8px 8px 0;
+    margin: 20px 0;
+  }
+  .info-card strong { color: var(--azul); }
+
+  ul, ol { margin: 10px 0 16px 20px; }
+  li { margin-bottom: 6px; }
+
+  /* ===== TABLES ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 13px;
+  }
+  thead th {
+    background: var(--azul);
+    color: var(--blanco);
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  thead th:first-child { border-radius: 8px 0 0 0; }
+  thead th:last-child { border-radius: 0 8px 0 0; }
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gris-medio);
+    vertical-align: top;
+  }
+  tbody tr:nth-child(even) { background: var(--gris-claro); }
+  tbody tr:hover { background: #fef5e7; }
+
+  /* ===== COLOR SWATCHES ===== */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .color-card {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+  }
+  .color-card:hover { transform: translateY(-3px); }
+  .color-swatch {
+    height: 90px;
+    display: flex;
+    align-items: flex-end;
+    padding: 10px 14px;
+  }
+  .color-swatch span {
+    font-size: 20px;
+    font-weight: 800;
+    color: rgba(255,255,255,0.9);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  }
+  .color-info {
+    padding: 14px;
+    background: var(--blanco);
+  }
+  .color-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--azul);
+    margin-bottom: 6px;
+  }
+  .color-codes {
+    font-size: 11px;
+    color: #888;
+    line-height: 1.6;
+  }
+
+  /* ===== TYPOGRAPHY SHOWCASE ===== */
+  .type-sample {
+    background: var(--gris-claro);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 12px 0;
+  }
+  .type-sample-name {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--naranja);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .type-sample-bebas {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--azul);
+    letter-spacing: 2px;
+  }
+  .type-sample-mont-bold {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--azul);
+  }
+  .type-sample-mont-reg {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--marron);
+  }
+
+  /* ===== BADGES / RECONOCIMIENTOS ===== */
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .badge-card {
+    border: 1px solid var(--gris-medio);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    transition: box-shadow 0.2s;
+  }
+  .badge-card:hover { box-shadow: 0 4px 20px rgba(12,32,84,0.1); }
+  .badge-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--azul);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+  .badge-content h4 { margin-top: 0; font-size: 14px; color: var(--azul); }
+  .badge-content p { font-size: 12px; margin: 0; color: #666; }
+  .badge-tag {
+    display: inline-block;
+    background: #fef5e7;
+    color: var(--naranja);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== DO / DONT ===== */
+  .do-dont-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .do-box, .dont-box {
+    padding: 20px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .do-box {
+    background: #f0faf0;
+    border: 1px solid #c3e6c3;
+  }
+  .do-box::before {
+    content: '✓ CORRECTO';
+    display: block;
+    font-weight: 800;
+    color: #2d8a2d;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .dont-box {
+    background: #fef0f0;
+    border: 1px solid #e6c3c3;
+  }
+  .dont-box::before {
+    content: '✗ INCORRECTO';
+    display: block;
+    font-weight: 800;
+    color: #c0392b;
+    font-size: 11px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  /* ===== PROPORTION BAR ===== */
+  .proportion-bar {
+    display: flex;
+    height: 40px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  .proportion-bar div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  /* ===== CHANNEL CARDS ===== */
+  .channel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+  }
+  .channel-card {
+    background: var(--gris-claro);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s;
+  }
+  .channel-card:hover { transform: translateY(-2px); }
+  .channel-card .icon { font-size: 28px; margin-bottom: 8px; }
+  .channel-card h4 { margin: 0 0 4px; font-size: 14px; color: var(--azul); }
+  .channel-card p { font-size: 11px; color: #888; margin: 0; }
+
+  /* ===== VOCAB PILLS ===== */
+  .vocab-yes {
+    display: inline-block;
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 4px;
+  }
+  .vocab-no {
+    display: inline-block;
+    background: #ffebee;
+    color: #c62828;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 4px;
+    text-decoration: line-through;
+  }
+
+  /* ===== DISCLAIMER BOX ===== */
+  .disclaimer-box {
+    background: #fff8e1;
+    border: 2px solid var(--naranja);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin: 24px 0;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--marron);
+  }
+  .disclaimer-box::before {
+    content: '⚠ DISCLAIMER OBLIGATORIO';
+    display: block;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 11px;
+    color: var(--naranja);
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  /* ===== ROLE CARDS ===== */
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .role-card {
+    background: var(--blanco);
+    border: 1px solid var(--gris-medio);
+    border-top: 3px solid var(--naranja);
+    border-radius: 0 0 10px 10px;
+    padding: 18px;
+  }
+  .role-card h4 { margin-top: 0; font-size: 13px; color: var(--azul); }
+  .role-card p { font-size: 12px; color: #666; margin: 0; }
+
+  /* ===== FOOTER ===== */
+  .doc-footer {
+    background: var(--azul);
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 40px;
+    font-size: 12px;
+    margin-top: 60px;
+  }
+  .doc-footer strong { color: var(--naranja); }
+
+  /* ===== UTILITIES ===== */
+  .mt-0 { margin-top: 0; }
+  .mb-sm { margin-bottom: 8px; }
+  .text-naranja { color: var(--naranja); }
+  .text-azul { color: var(--azul); }
+  .fw-700 { font-weight: 700; }
+  .fs-sm { font-size: 12px; }
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: var(--gris-medio);
+    margin: 40px 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="cover-badge">Documento Oficial</div>
+  <h1>MANUAL DE<br><span>MARCA</span></h1>
+  <p class="cover-sub">Mangone Law Firm LLC</p>
+  <div class="cover-meta">
+    <span>Versión 2.0</span>
+    <span>Abril 2026</span>
+    <span>Confidencial</span>
+  </div>
+</div>
+
+<!-- ============ TOC ============ -->
+<div class="toc page-break">
+  <div class="toc-title">ÍNDICE</div>
+  <div class="toc-line"></div>
+  <ul class="toc-list">
+    <li><span class="toc-num">01</span><span class="toc-text">Introducción y propósito del manual</span></li>
+    <li><span class="toc-num">02</span><span class="toc-text">Sobre la empresa</span></li>
+    <li><span class="toc-num">03</span><span class="toc-text">Plataforma de marca</span></li>
+    <li><span class="toc-num">04</span><span class="toc-text">Identidad verbal</span></li>
+    <li><span class="toc-num">05</span><span class="toc-text">Identidad visual</span></li>
+    <li><span class="toc-num">06</span><span class="toc-text">Reconocimientos y credenciales</span></li>
+    <li><span class="toc-num">07</span><span class="toc-text">Aplicaciones de marca</span></li>
+    <li><span class="toc-num">08</span><span class="toc-text">Presencia y estrategia digital</span></li>
+    <li><span class="toc-num">09</span><span class="toc-text">Organización y recursos humanos</span></li>
+    <li><span class="toc-num">10</span><span class="toc-text">Usos incorrectos y prohibiciones</span></li>
+    <li><span class="toc-num">11</span><span class="toc-text">Marco legal y disclaimer</span></li>
+    <li><span class="toc-num">12</span><span class="toc-text">Gobernanza y actualización</span></li>
+  </ul>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">01</div>
+  <div class="section-title">INTRODUCCIÓN Y PROPÓSITO</div>
+</div>
+<div class="section">
+  <h3>¿Qué es este manual?</h3>
+  <p>Este documento es la guía definitiva que define cómo <strong>Mangone Law Firm LLC</strong> se presenta, se comunica y se expresa ante el mundo. Contiene todos los lineamientos necesarios para que cualquier persona, equipo interno, agencia externa, proveedor o aliado estratégico pueda representar la marca de manera coherente, profesional y fiel a su esencia.</p>
+
+  <h3>¿Para quién es?</h3>
+  <div class="info-card">
+    <strong>Equipos internos:</strong> Marketing, ventas, community managers, creadores de contenido, diseñadores y editores.<br>
+    <strong>Terceros autorizados:</strong> Agencias de publicidad, imprentas, consultores, medios de comunicación y cualquier entidad que utilice elementos de la marca.
+  </div>
+
+  <h3>¿Cómo usarlo?</h3>
+  <p>Este manual es de <strong>consulta obligatoria</strong> antes de producir cualquier pieza de comunicación que lleve el nombre, logotipo o cualquier elemento asociado a Mangone Law Firm LLC. Ninguna pieza debe publicarse, imprimirse o distribuirse si no cumple con los lineamientos aquí descritos.</p>
+</div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">02</div>
+  <div class="section-title">SOBRE LA EMPRESA</div>
+</div>
+<div class="section">
+  <h3>Datos generales</h3>
+  <table>
+    <tbody>
+      <tr><td><strong>Nombre legal</strong></td><td>Mangone Law Firm LLC</td></tr>
+      <tr><td><strong>Fundadora</strong></td><td>Abogada Auguy Mangone</td></tr>
+      <tr><td><strong>Año de fundación</strong></td><td>2012</td></tr>
+      <tr><td><strong>Sede</strong></td><td>440 Speedwell Ave, Morris Plains, NJ 07950</td></tr>
+      <tr><td><strong>Teléfono</strong></td><td>(862) 701-2097</td></tr>
+      <tr><td><strong>Actividad</strong></td><td>Firma legal especializada en derecho migratorio, con enfoque en visas humanitarias y reunificación familiar.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Historia</h3>
+  <p>Mangone Law Firm es una firma de abogados fundada por la abogada <strong>Auguy Mangone</strong>, una inmigrante latina con una profunda comprensión de los desafíos que enfrentan quienes buscan un estatus legal en Estados Unidos. Desde <strong>2012</strong>, la firma ha trabajado incansablemente para asistir a los Nuevos Americanos en su proceso migratorio, creyendo firmemente en la dignidad y el valor de la comunidad latina.</p>
+
+  <h3>Propuesta de valor diferenciadora</h3>
+  <div class="highlight-box">
+    <h4>¿Qué nos hace únicos?</h4>
+    <ul>
+      <li><strong>+15 años de experiencia</strong> en derecho migratorio.</li>
+      <li><strong>Liderada por una abogada inmigrante</strong>, conexión genuina con los clientes.</li>
+      <li><strong>Comunicación constante</strong> durante todo el proceso legal.</li>
+      <li><strong>Atención en español</strong> y enfoque cultural adaptado.</li>
+      <li><strong>Planes de pago flexibles</strong>, eliminando barreras económicas.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">03</div>
+  <div class="section-title">PLATAFORMA DE MARCA</div>
+</div>
+<div class="section">
+  <h3>Misión</h3>
+  <div class="highlight-box">
+    <p style="font-size:16px; font-weight:500; margin:0;">Apoyar a los nuevos americanos en su camino hacia la estabilidad legal, defendiendo sus derechos y brindando soluciones claras. <span style="color:var(--naranja); font-weight:700;">Más que abogados, somos aliados en tu camino hacia un futuro mejor.</span></p>
+  </div>
+
+  <h3>Visión</h3>
+  <p>Para el año 2026, Mangone Law Firm será una marca reconocida dentro de la comunidad latinoamericana como el primer recurso para ayudar a los Nuevos Americanos a obtener un estatus legal.</p>
+  <p>Contamos con un equipo de profesionales experimentados, altamente capacitados en sus respectivas áreas, y comprometidos con ofrecer el más alto nivel de servicio. Creemos en brindar soluciones legales personalizadas que respondan a las necesidades individuales de cada cliente. Como líderes en derecho migratorio, llevamos a la comunidad inmigrante la reforma legal que tanto han esperado, a través del trabajo arduo, la resiliencia y una defensa apasionada.</p>
+  <p>Además, somos la solución de referencia en casos de bancarrota y planificación patrimonial, no solo para los Nuevos Americanos, sino también para inmigrantes de primera y segunda generación.</p>
+
+  <h3>Manifiesto de marca</h3>
+  <div class="info-card">
+    <p style="margin:0;">Mangone Law Firm no es una firma de abogados clásica ni elitista. Es la representación de una comunidad enfocada en el éxito y en la búsqueda de una vida mejor. Impulsados por un profundo sentido de justicia, nos negamos a permitir que los Nuevos Americanos enfrenten más dificultades. Nuestra misión es garantizar que todos los inmigrantes cuenten con los recursos necesarios para triunfar en los Estados Unidos, y que gocen de los mismos derechos legales y acceso a la justicia que el resto de los ciudadanos.</p>
+  </div>
+
+  <h3>Valores de marca</h3>
+  <table>
+    <thead><tr><th>Valor</th><th>Significado en la práctica</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Honesty<br><span class="fs-sm text-naranja">Honestidad</span></strong></td><td>Siempre decimos la verdad, incluso cuando es difícil. La transparencia guía nuestras acciones y la confianza se construye a través de la honestidad. No establecemos expectativas irreales ni participamos en ninguna forma de engaño, ni con clientes ni entre compañeros.</td></tr>
+      <tr><td><strong>Execution<br><span class="fs-sm text-naranja">Ejecución</span></strong></td><td>Convertimos ideas en acciones concretas. Cumplimos lo que prometemos y completamos las tareas con calidad y responsabilidad. Las buenas intenciones no son suficientes: lo que marca la diferencia es nuestra capacidad de hacer que las cosas sucedan de forma efectiva y a tiempo.</td></tr>
+      <tr><td><strong>Clarity<br><span class="fs-sm text-naranja">Claridad</span></strong></td><td>Comunicar bien es parte del éxito. Todos los miembros del equipo deben tener una visión precisa de lo que es posible y lo que no. Nuestro deber es reunir la información correcta y explicar las cosas de la mejor manera posible, tanto al cliente como a las autoridades migratorias.</td></tr>
+      <tr><td><strong>Result-Oriented<br><span class="fs-sm text-naranja">Orientados a resultados</span></strong></td><td>Trabajamos en un entorno orientado a resultados. Nuestro enfoque no es la productividad en términos de cantidad, sino lo que cada miembro del equipo logra terminar y cómo lo hace: a tiempo y con calidad. Sin enfoque en resultados, nunca alcanzaremos nuestra meta de ayudar a un millón de personas.</td></tr>
+      <tr><td><strong>Deadline-Oriented<br><span class="fs-sm text-naranja">Orientados a plazos</span></strong></td><td>En inmigración, todo es contra reloj. Cuando se establece un plazo, se deben tomar todas las acciones posibles para cumplirlo: planificar con antelación, anticipar obstáculos y priorizar. No cumplir un plazo puede perjudicar seriamente las oportunidades de un cliente.</td></tr>
+      <tr><td><strong>Premium Customer Service<br><span class="fs-sm text-naranja">Servicio premium al cliente</span></strong></td><td>Ofrecemos el mejor servicio a través de hospitalidad y empatía. Hospitalidad significa hacer las cosas con cuidado, atención y seguimiento. El cliente siempre debe sentir que estamos de su lado. A través de la empatía, comprendemos la frustración asociada al proceso migratorio y encontramos formas de ayudar.</td></tr>
+      <tr><td><strong>Zealous Advocacy<br><span class="fs-sm text-naranja">Defensa apasionada</span></strong></td><td>Hacemos todo lo razonablemente posible, dentro de los límites de la ley, para ayudar al cliente a alcanzar sus metas. Esto implica ser creativos, críticos y proactivos: anticipar problemas antes de que surjan y dar siempre la mejor versión de nuestro trabajo en cada caso.</td></tr>
+      <tr><td><strong>Continuous Improvement<br><span class="fs-sm text-naranja">Mejora continua</span></strong></td><td>Siempre hay una mejor versión de nuestro trabajo. Los errores son oportunidades de aprendizaje. Nos adaptamos constantemente a los cambios en las leyes y políticas migratorias. El feedback constructivo es parte de nuestra cultura: Dolor + Reflexión = Progreso.</td></tr>
+      <tr><td><strong>Extreme Ownership<br><span class="fs-sm text-naranja">Responsabilidad absoluta</span></strong></td><td>Asumimos total responsabilidad por nuestros resultados. No hay excusas, solo soluciones. Nuestra misión no es solo ganar casos, es cambiar un millón de vidas. Si algo no funciona, es nuestra responsabilidad arreglarlo. Sin culpas, sin excusas. Solo resultados.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Personalidad de marca</h3>
+  <p>Si Mangone Law Firm fuera una persona, sería alguien que te recibe con calidez y te escucha sin juzgar, te explica todo con paciencia y en tu idioma, te da tranquilidad porque domina su campo, te acompaña en cada paso y celebra tus logros contigo.</p>
+  <div style="display:flex; flex-wrap:wrap; gap:8px; margin:16px 0;">
+    <span class="vocab-yes" style="background:var(--azul); color:white;">Confiable</span>
+    <span class="vocab-yes" style="background:var(--azul); color:white;">Cercana</span>
+    <span class="vocab-yes" style="background:var(--azul); color:white;">Profesional</span>
+    <span class="vocab-yes" style="background:var(--azul); color:white;">Sencilla</span>
+    <span class="vocab-yes" style="background:var(--azul); color:white;">Empática</span>
+  </div>
+
+  <h3>Público objetivo</h3>
+  <h4>Perfil demográfico</h4>
+  <table>
+    <tbody>
+      <tr><td><strong>Origen</strong></td><td>Inmigrantes latinos (México, Centro y Sudamérica)</td></tr>
+      <tr><td><strong>Ubicación geográfica</strong></td><td>Estados Unidos</td></tr>
+      <tr><td><strong>Edad</strong></td><td>18 — 65 años</td></tr>
+      <tr><td><strong>Escolaridad</strong></td><td>Generalmente baja</td></tr>
+      <tr><td><strong>Empleo</strong></td><td>Trabajos operativos</td></tr>
+      <tr><td><strong>Digitalización</strong></td><td>Baja (principalmente smartphone)</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Necesidades principales</h4>
+  <ul>
+    <li>Regularizar su estatus migratorio</li>
+    <li>Reunificación familiar</li>
+    <li>Protección a través de visas humanitarias (Visa U, Visa T, VAWA, Visa Juvenil)</li>
+    <li>Defensa ante procesos de deportación</li>
+    <li>Obtención de permisos de trabajo como resultado de la aplicación a casos migratorios, permitiéndoles trabajar legalmente en Estados Unidos</li>
+  </ul>
+
+  <h4>Perfil psicográfico</h4>
+  <div class="info-card">
+    Sienten miedo e incertidumbre ante el sistema legal. Desconfían por experiencias previas negativas con abogados o "notarios". Valoran que les hablen en español, con respeto y sin condescendencia. Buscan esperanza realista, no promesas vacías. Necesitan sentirse acompañados, no como un número de caso.
+  </div>
+</div>
+
+<!-- ============ SECTION 4 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">04</div>
+  <div class="section-title">IDENTIDAD VERBAL</div>
+</div>
+<div class="section">
+  <h3>Tono de voz</h3>
+  <table>
+    <thead><tr><th>Pilar</th><th>Descripción</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Formal pero humano</strong></td><td>No somos robóticos ni fríos. Hablamos con seriedad profesional pero siempre con calidez.</td></tr>
+      <tr><td><strong>Amable y claro</strong></td><td>Cada palabra busca que el cliente entienda. Si hay una forma más sencilla de decirlo, la usamos.</td></tr>
+      <tr><td><strong>Tranquilo, sin alarmismo</strong></td><td>No usamos el miedo como herramienta de venta. Informamos con calma y ofrecemos soluciones.</td></tr>
+      <tr><td><strong>Educativo y esperanzador</strong></td><td>Empoderamos al cliente con conocimiento. Siempre cerramos con un mensaje de posibilidad.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Estilo de comunicación</h3>
+  <table>
+    <thead><tr><th>Atributo</th><th>En la práctica</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Sencillo</strong></td><td>Evitamos tecnicismos. Si usamos un término legal, lo explicamos inmediatamente.</td></tr>
+      <tr><td><strong>Emocionalmente inteligente</strong></td><td>Reconocemos el estado emocional del cliente. No minimizamos ni exageramos.</td></tr>
+      <tr><td><strong>Directo</strong></td><td>Vamos al punto. El cliente necesita respuestas concretas.</td></tr>
+      <tr><td><strong>Visual y educativo</strong></td><td>Complementamos el texto con recursos visuales que faciliten la comprensión.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Vocabulario de marca</h3>
+  <h4>Palabras y frases que SÍ usamos</h4>
+  <div style="margin:12px 0;">
+    <span class="vocab-yes">"Estamos contigo"</span>
+    <span class="vocab-yes">"Tu camino hacia la estabilidad legal"</span>
+    <span class="vocab-yes">"Tu estatus sí tiene solución"</span>
+    <span class="vocab-yes">"Nuevos Americanos"</span>
+    <span class="vocab-yes">"Tu aliado legal"</span>
+    <span class="vocab-yes">"Te acompañamos"</span>
+    <span class="vocab-yes">"Tus derechos"</span>
+    <span class="vocab-yes">"Confidencial"</span>
+  </div>
+
+  <h4>Palabras y conceptos que NO usamos</h4>
+  <div style="margin:12px 0;">
+    <span class="vocab-no">Jerga legal innecesaria</span>
+    <span class="vocab-no">Lenguaje alarmista</span>
+    <span class="vocab-no">Frases frías o impersonales</span>
+    <span class="vocab-no">Promesas absolutas</span>
+    <span class="vocab-no">Diminutivos excesivos</span>
+    <span class="vocab-no">Anglicismos innecesarios</span>
+  </div>
+
+  <h3>Fórmulas de comunicación por contexto</h3>
+  <h4>Redes sociales</h4>
+  <div class="do-dont-grid">
+    <div class="do-box">"¿Sabías que puedes calificar para una visa aunque no tengas documentos? Agenda tu consulta y te explicamos."</div>
+    <div class="dont-box">"¡CORRE! Si no aplicas HOY podrías perder tu oportunidad PARA SIEMPRE."</div>
+  </div>
+
+  <h4>Consulta inicial</h4>
+  <div class="do-dont-grid">
+    <div class="do-box">"Vamos a revisar tu caso juntos. Cuéntame tu historia y veamos qué opciones tienes."</div>
+    <div class="dont-box">"Necesito que me envíe toda su documentación para proceder con la evaluación."</div>
+  </div>
+
+  <h4>Seguimiento de caso</h4>
+  <div class="do-dont-grid">
+    <div class="do-box">"Queremos que sepas que tu caso va bien. El siguiente paso es…"</div>
+    <div class="dont-box">"Su caso está en proceso. Le notificaremos cuando haya novedades."</div>
+  </div>
+
+  <h4>Situación difícil</h4>
+  <div class="do-dont-grid">
+    <div class="do-box">"Entendemos que esta noticia no es la que esperabas. Vamos a explorar todas las alternativas juntos."</div>
+    <div class="dont-box">"Lamentablemente su solicitud fue denegada. Puede apelar si lo desea."</div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">05</div>
+  <div class="section-title">IDENTIDAD VISUAL</div>
+</div>
+<div class="section">
+  <h3>Logotipo</h3>
+  <p>El logotipo de Mangone Law Firm es de tipo <strong>tipográfico</strong>: profesional y sobrio. Transmite seriedad sin perder accesibilidad.</p>
+
+  <h4>Versiones disponibles</h4>
+  <table>
+    <thead><tr><th>Versión</th><th>Uso principal</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Horizontal</strong></td><td>Headers de web, firmas de email, documentos oficiales.</td></tr>
+      <tr><td><strong>Vertical (stacked)</strong></td><td>Redes sociales, tarjetas de presentación, espacios cuadrados.</td></tr>
+      <tr><td><strong>Monocromática (negro)</strong></td><td>Fondos claros, impresiones en una sola tinta.</td></tr>
+      <tr><td><strong>Monocromática (blanco)</strong></td><td>Fondos oscuros, fotografías.</td></tr>
+    </tbody>
+  </table>
+
+  <h4>Área de protección y tamaño mínimo</h4>
+  <div class="info-card">
+    <strong>Área de protección:</strong> Espacio libre mínimo equivalente a la altura de la letra "M" de "Mangone" en todos sus lados.<br>
+    <strong>Tamaño mínimo impreso:</strong> No menor a 25 mm de ancho.<br>
+    <strong>Tamaño mínimo digital:</strong> No menor a 120 px de ancho.
+  </div>
+
+  <h3>Paleta de colores</h3>
+  <div class="color-grid">
+    <div class="color-card">
+      <div class="color-swatch" style="background:#F79C31;"><span>Aa</span></div>
+      <div class="color-info">
+        <div class="color-name">Naranja Mangone</div>
+        <div class="color-codes">HEX: #F79C31<br>RGB: 247, 156, 49<br>CMYK: 0, 53, 86, 0</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#0C2054;"><span>Aa</span></div>
+      <div class="color-info">
+        <div class="color-name">Azul Mangone</div>
+        <div class="color-codes">HEX: #0C2054<br>RGB: 12, 32, 84<br>CMYK: 99, 100, 44, 17</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#3B3537;"><span>Aa</span></div>
+      <div class="color-info">
+        <div class="color-name">Marrón Oscuro</div>
+        <div class="color-codes">HEX: #3B3537<br>RGB: 59, 53, 53<br>CMYK: 78, 80, 67, 41</div>
+      </div>
+    </div>
+    <div class="color-card">
+      <div class="color-swatch" style="background:#000000;"><span>Aa</span></div>
+      <div class="color-info">
+        <div class="color-name">Negro Texto</div>
+        <div class="color-codes">HEX: #000000<br>RGB: 0, 0, 0<br>CMYK: 84, 83, 73, 80</div>
+      </div>
+    </div>
+  </div>
+
+  <h4>Proporción de uso recomendada</h4>
+  <div class="proportion-bar">
+    <div style="width:40%; background:var(--azul);">40%</div>
+    <div style="width:30%; background:#ccc; color:var(--marron);">30%</div>
+    <div style="width:15%; background:var(--naranja);">15%</div>
+    <div style="width:10%; background:var(--marron);">10%</div>
+    <div style="width:5%; background:#ddd; color:#999; font-size:8px;">5%</div>
+  </div>
+  <p class="fs-sm" style="color:#888;">Azul (40%) · Blanco (30%) · Naranja (15%) · Marrón/Negro (10%) · Gris (5%)</p>
+
+  <h3>Tipografías</h3>
+  <div class="type-sample">
+    <div class="type-sample-name">Títulos principales — Bebas Neue</div>
+    <div class="type-sample-bebas">MANGONE LAW FIRM LLC</div>
+  </div>
+  <div class="type-sample">
+    <div class="type-sample-name">Subtítulos — Montserrat Bold</div>
+    <div class="type-sample-mont-bold">Tu aliado en el camino legal</div>
+  </div>
+  <div class="type-sample">
+    <div class="type-sample-name">Cuerpo de texto — Montserrat Regular</div>
+    <div class="type-sample-mont-reg">Apoyamos a los nuevos americanos en su camino hacia la estabilidad legal, defendiendo sus derechos y brindando soluciones claras.</div>
+  </div>
+
+  <h4>Jerarquía tipográfica</h4>
+  <table>
+    <thead><tr><th>Nivel</th><th>Tipografía</th><th>Peso</th><th>Tamaño web</th></tr></thead>
+    <tbody>
+      <tr><td>H1 — Título principal</td><td>Bebas Neue / Montserrat</td><td>Bold</td><td>36–48 px</td></tr>
+      <tr><td>H2 — Subtítulo</td><td>Montserrat</td><td>SemiBold</td><td>24–32 px</td></tr>
+      <tr><td>H3 — Sección</td><td>Montserrat</td><td>Medium</td><td>20–24 px</td></tr>
+      <tr><td>Cuerpo</td><td>Montserrat / Century Gothic</td><td>Regular</td><td>16–18 px</td></tr>
+      <tr><td>Legal / Pequeño</td><td>Montserrat</td><td>Light</td><td>12–14 px</td></tr>
+      <tr><td>Acento emocional</td><td>Candle Mustard</td><td>Regular</td><td>Variable</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Fotografía e iconografía</h3>
+  <div class="do-dont-grid">
+    <div class="do-box">
+      <strong>Fotografía:</strong><br>
+      Personas reales (abogada y clientes con autorización). Fondos naturales o de oficina. Tono cálido, realista, cercano. Diversidad de la comunidad latina.
+    </div>
+    <div class="dont-box">
+      <strong>Evitar:</strong><br>
+      Caricaturas o ilustraciones genéricas. Filtros fríos o artificiales. Imágenes de bancos genéricas sin conexión cultural. Stock fotos con modelos que no representan al público.
+    </div>
+  </div>
+  <div class="info-card">
+    <strong>Iconografía:</strong> Íconos simples de línea delgada o relleno sólido. Sin contornos pesados. Familias recomendadas: Phosphor Icons, Feather Icons o similares en estilo outline.
+  </div>
+</div>
+
+<!-- ============ SECTION 6 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">06</div>
+  <div class="section-title">RECONOCIMIENTOS Y CREDENCIALES</div>
+</div>
+<div class="section">
+  <h3>Reconocimientos otorgados</h3>
+  <p>Los siguientes reconocimientos forman parte del patrimonio de credibilidad de la marca y deben utilizarse en materiales de comunicación.</p>
+
+  <div class="badge-grid">
+    <div class="badge-card">
+      <div class="badge-icon">🏆</div>
+      <div class="badge-content">
+        <h4>Top 10 Best Law Firm — Client Satisfaction</h4>
+        <p>Reconocida en 2026 por el American Institute of Legal Counsel por su compromiso con la satisfacción del cliente en Derecho de Inmigración.</p>
+        <span class="badge-tag">AILC 2026</span>
+      </div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon">⭐</div>
+      <div class="badge-content">
+        <h4>Best Places to Work 2026 — Medium Size Business</h4>
+        <p>Destacando su cultura organizacional, liderazgo y compromiso con el bienestar y desarrollo profesional de su equipo.</p>
+        <span class="badge-tag">2026</span>
+      </div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon">🚀</div>
+      <div class="badge-content">
+        <h4>Inc. 5000 — N°538 America's Fastest-Growing</h4>
+        <p>Reconocida entre las compañías privadas de más rápido crecimiento en Estados Unidos.</p>
+        <span class="badge-tag">INC. 5000</span>
+      </div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon">⚖️</div>
+      <div class="badge-content">
+        <h4>Inc. 5000 — N°10 Industria Legal</h4>
+        <p>Top 10 de firmas legales de mayor crecimiento en el ranking Inc. 5000.</p>
+        <span class="badge-tag">INC. 5000</span>
+      </div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon">📍</div>
+      <div class="badge-content">
+        <h4>Inc. 5000 — N°13 New Jersey</h4>
+        <p>Empresa legal de más rápido crecimiento N°13 en el estado de New Jersey.</p>
+        <span class="badge-tag">INC. 5000</span>
+      </div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon">🏙️</div>
+      <div class="badge-content">
+        <h4>Inc. 5000 — N°47 Met. New York</h4>
+        <p>Puesto N°47 entre las empresas de mayor crecimiento del área metropolitana de New York.</p>
+        <span class="badge-tag">INC. 5000</span>
+      </div>
+    </div>
+    <div class="badge-card">
+      <div class="badge-icon">✅</div>
+      <div class="badge-content">
+        <h4>Better Business Bureau (BBB)</h4>
+        <p>Empresa acreditada, reflejando compromiso con prácticas comerciales éticas, transparencia y altos estándares de confianza.</p>
+        <span class="badge-tag">ACREDITADO</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>Afiliaciones profesionales</h3>
+  <table>
+    <thead><tr><th>Organización</th><th>Tipo de membresía</th></tr></thead>
+    <tbody>
+      <tr><td><strong>AILA</strong> — American Immigration Lawyers Association (Capítulo NJ)</td><td>Miembro activo y aprobado en regla (<em>Active–Approved Member in Good Standing</em>).</td></tr>
+      <tr><td><strong>National Immigration Project</strong></td><td>Miembro. Defensa de derechos de inmigrantes y fortalecimiento de práctica legal migratoria.</td></tr>
+      <tr><td><strong>ASISTA</strong></td><td>Miembro activo. Protección legal de inmigrantes sobrevivientes de violencia.</td></tr>
+      <tr><td><strong>CLINIC</strong> — Catholic Legal Immigration Network, Inc.</td><td>Miembro. Protección de derechos de inmigrantes y acceso a la justicia.</td></tr>
+      <tr><td><strong>Colegio de Abogados de Nueva Jersey</strong></td><td>Miembro. Estándares profesionales y educación legal continua.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Lineamientos de uso de reconocimientos</h3>
+  <div class="info-card">
+    Los logos de entidades otorgantes se usan en su versión oficial, sin modificaciones. Siempre deben ir acompañados del nombre del reconocimiento y el año. No se debe sugerir un respaldo institucional más allá del reconocimiento específico. Al mostrar múltiples reconocimientos, usar formato de galería con tamaño uniforme.
+  </div>
+</div>
+
+<!-- ============ SECTION 7 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">07</div>
+  <div class="section-title">APLICACIONES DE MARCA</div>
+</div>
+<div class="section">
+  <h3>Firma de email</h3>
+  <p>Todos los miembros del equipo deben usar una firma estandarizada: logo horizontal, nombre y cargo, teléfonos, dirección, links a redes sociales y disclaimer legal. Ancho máximo: 600 px.</p>
+
+  <h3>Papelería corporativa</h3>
+  <table>
+    <thead><tr><th>Pieza</th><th>Especificaciones</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Tarjetas de presentación</strong></td><td>Azul Mangone dominante. Naranja en acentos. Logo al frente, datos al reverso.</td></tr>
+      <tr><td><strong>Hoja membretada</strong></td><td>Header con logo, footer con datos de contacto y disclaimer. Márgenes amplios.</td></tr>
+      <tr><td><strong>Carpeta corporativa</strong></td><td>Azul Mangone exterior, naranja interior. Logo centrado en portada.</td></tr>
+      <tr><td><strong>Sobres</strong></td><td>Logo esquina superior izquierda, dirección debajo.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Presentaciones (Slides)</h3>
+  <div class="info-card">
+    Portada con logo centrado + título + fecha. Slides interiores: fondo blanco, títulos en Azul Mangone, acentos en Naranja. Última slide con datos de contacto y CTA. Máximo 6 líneas de texto por slide.
+  </div>
+
+  <h3>Página web y landing pages</h3>
+  <ul>
+    <li>CTA principales en Naranja Mangone.</li>
+    <li>Secciones alternadas entre fondo blanco y fondo Azul Mangone.</li>
+    <li>Fotografías reales de la abogada y el equipo.</li>
+    <li>Sección de reconocimientos siempre visible.</li>
+    <li>Optimización móvil como prioridad (público usa principalmente smartphone).</li>
+  </ul>
+
+  <h3>Plantillas para redes sociales</h3>
+  <ul>
+    <li>Paleta de colores oficial exclusivamente.</li>
+    <li>Tipografías autorizadas.</li>
+    <li>Logo presente en cada pieza.</li>
+    <li>Disclaimer en piezas informativas sobre procesos migratorios.</li>
+    <li>Texto mínimo: 24 px en feed, 32 px en stories/reels.</li>
+  </ul>
+</div>
+
+<!-- ============ SECTION 8 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">08</div>
+  <div class="section-title">PRESENCIA Y ESTRATEGIA DIGITAL</div>
+</div>
+<div class="section">
+  <h3>Canales activos</h3>
+  <div class="channel-grid">
+    <div class="channel-card">
+      <div class="icon">🌐</div>
+      <h4>Sitio Web</h4>
+      <p>mangonelawfirmllc.com</p>
+      <p>Hub central de conversión</p>
+    </div>
+    <div class="channel-card">
+      <div class="icon">🎵</div>
+      <h4>TikTok</h4>
+      <p>@abogadaauguy</p>
+      <p>Alcance y viralidad</p>
+    </div>
+    <div class="channel-card">
+      <div class="icon">📸</div>
+      <h4>Instagram</h4>
+      <p>@mangonelawfirm</p>
+      <p>Comunidad y relación</p>
+    </div>
+    <div class="channel-card">
+      <div class="icon">▶️</div>
+      <h4>YouTube</h4>
+      <p>Mangone Law Firm</p>
+      <p>Contenido profundo</p>
+    </div>
+    <div class="channel-card">
+      <div class="icon">💼</div>
+      <h4>LinkedIn</h4>
+      <p>Mangone Law Firm LLC</p>
+      <p>Reputación profesional</p>
+    </div>
+    <div class="channel-card">
+      <div class="icon">📘</div>
+      <h4>Facebook</h4>
+      <p>Mangone Law Firm LLC</p>
+      <p>Comunidad latina</p>
+    </div>
+    <div class="channel-card">
+      <div class="icon">🎙️</div>
+      <h4>Podcast</h4>
+      <p>Apple Podcasts</p>
+      <p>Conversaciones profundas</p>
+    </div>
+  </div>
+
+  <h3>Guía de tono por canal</h3>
+  <table>
+    <thead><tr><th>Canal</th><th>Tono</th><th>Formato</th><th>Contenido clave</th></tr></thead>
+    <tbody>
+      <tr><td><strong>TikTok</strong></td><td>Cercano, directo, esperanzador</td><td>30–60s, subtítulos grandes</td><td>FAQs, testimonios, tips rápidos</td></tr>
+      <tr><td><strong>Instagram</strong></td><td>Profesional, amable, empático</td><td>Carruseles, reels, stories</td><td>Procesos, clientes, motivación</td></tr>
+      <tr><td><strong>YouTube</strong></td><td>Educativo, serio, accesible</td><td>Horizontal, 2–10 min</td><td>Explicaciones, entrevistas, casos</td></tr>
+      <tr><td><strong>LinkedIn</strong></td><td>Profesional, institucional</td><td>Artículos, posts</td><td>Logros, reconocimientos, vacantes</td></tr>
+      <tr><td><strong>Facebook</strong></td><td>Informativo, comunitario</td><td>Posts, lives</td><td>Noticias, eventos, servicios</td></tr>
+      <tr><td><strong>Podcast</strong></td><td>Conversacional, profundo</td><td>Audio largo</td><td>Temas migratorios, invitados</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Lineamientos de contenido por formato</h3>
+  <table>
+    <thead><tr><th>Formato</th><th>Recomendaciones clave</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Posteos (feed)</strong></td><td>Un mensaje por pieza. CTA visible. Claridad visual. No saturar de texto.</td></tr>
+      <tr><td><strong>Reels / TikTok</strong></td><td>Subtítulos grandes y legibles. Hook en los primeros 3 segundos. Fondo limpio.</td></tr>
+      <tr><td><strong>Stories</strong></td><td>Texto grande. Stickers funcionales. CTA directo.</td></tr>
+      <tr><td><strong>YouTube</strong></td><td>Thumbnail con rostro + texto. Estructura clara. Lenguaje accesible.</td></tr>
+      <tr><td><strong>Carruseles</strong></td><td>Máximo 10 slides. Un concepto por slide. Cierre con CTA.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Hashtags recurrentes</h3>
+  <div style="margin:12px 0;">
+    <span class="vocab-yes" style="background:#e3f2fd; color:var(--azul);">#MangoneLawFirm</span>
+    <span class="vocab-yes" style="background:#e3f2fd; color:var(--azul);">#AbogadaAuguy</span>
+    <span class="vocab-yes" style="background:#e3f2fd; color:var(--azul);">#NuevosAmericanos</span>
+    <span class="vocab-yes" style="background:#fef5e7; color:var(--naranja);">#VisaU</span>
+    <span class="vocab-yes" style="background:#fef5e7; color:var(--naranja);">#VisaT</span>
+    <span class="vocab-yes" style="background:#fef5e7; color:var(--naranja);">#VAWA</span>
+    <span class="vocab-yes" style="background:#fef5e7; color:var(--naranja);">#ReunificaciónFamiliar</span>
+    <span class="vocab-yes" style="background:#fef5e7; color:var(--naranja);">#DerechoMigratorio</span>
+    <span class="vocab-yes" style="background:#e8f5e9; color:#2e7d32;">#ComunidadLatina</span>
+    <span class="vocab-yes" style="background:#e8f5e9; color:#2e7d32;">#InmigrantesEnUSA</span>
+    <span class="vocab-yes" style="background:#e8f5e9; color:#2e7d32;">#TusDerechosCuentan</span>
+  </div>
+</div>
+
+<!-- ============ SECTION 9 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">09</div>
+  <div class="section-title">ORGANIZACIÓN Y RECURSOS HUMANOS</div>
+</div>
+<div class="section">
+  <h3>Roles involucrados</h3>
+  <div class="role-grid">
+    <div class="role-card">
+      <h4>🧠 Coordinador</h4>
+      <p>Define el mensaje, lidera estrategia, supervisa coherencia y evalúa resultados.</p>
+    </div>
+    <div class="role-card">
+      <h4>💬 Community Manager</h4>
+      <p>Adapta el tono en cada red. Responde con empatía y dentro de lineamientos.</p>
+    </div>
+    <div class="role-card">
+      <h4>📢 Ads Manager</h4>
+      <p>Transforma el mensaje en anuncios efectivos y medibles.</p>
+    </div>
+    <div class="role-card">
+      <h4>📝 Creadora de Contenido</h4>
+      <p>Genera copys y guiones alineados al branding.</p>
+    </div>
+    <div class="role-card">
+      <h4>🎨 Diseñadora Gráfica</h4>
+      <p>Aplica y cuida toda la identidad visual.</p>
+    </div>
+    <div class="role-card">
+      <h4>🎬 Editora de Videos</h4>
+      <p>Crea piezas audiovisuales con ritmo y emoción.</p>
+    </div>
+    <div class="role-card">
+      <h4>🌐 Encargada Web</h4>
+      <p>Mantiene la web alineada a campañas y narrativa.</p>
+    </div>
+  </div>
+
+  <h3>Fases de producción</h3>
+  <table>
+    <thead><tr><th>Fase</th><th>Participantes clave</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Definición de mensaje</strong></td><td>Coordinador (líder), Ads, Contenido, Community, Web (consulta)</td></tr>
+      <tr><td><strong>Producción</strong></td><td>Todos según su rol</td></tr>
+      <tr><td><strong>Distribución</strong></td><td>Ads y Community (activos), Web (actualiza)</td></tr>
+      <tr><td><strong>Interacción</strong></td><td>Community y Coordinador (ajuste por feedback)</td></tr>
+      <tr><td><strong>Medición y ajustes</strong></td><td>Coordinador, Ads, Community, Web</td></tr>
+    </tbody>
+  </table>
+
+  <div class="info-card">
+    <strong>Responsable de marca:</strong> Sebastian Quijada — Responsable de Marketing. Contacto principal para consultas, aprobaciones y actualizaciones.
+  </div>
+</div>
+
+<!-- ============ SECTION 10 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">10</div>
+  <div class="section-title">USOS INCORRECTOS Y PROHIBICIONES</div>
+</div>
+<div class="section">
+  <h3>Sobre el logotipo</h3>
+  <div class="dont-box" style="margin:16px 0;">
+    No distorsionar, estirar o comprimir. No cambiar colores fuera de versiones autorizadas. No colocar sobre fondos caóticos sin caja de protección. No agregar sombras, biseles ni brillos. No rotar. No usar versiones antiguas. No combinar con elementos gráficos no aprobados.
+  </div>
+
+  <h3>Sobre los colores</h3>
+  <div class="dont-box" style="margin:16px 0;">
+    No sustituir colores oficiales por aproximaciones. No invertir la jerarquía (naranja como dominante en vez de azul). No usar colores fuera de la paleta sin aprobación del responsable de marca.
+  </div>
+
+  <h3>Sobre la tipografía</h3>
+  <div class="dont-box" style="margin:16px 0;">
+    No usar tipografías fuera de este manual. No usar Candle Mustard para bloques de texto. No comprimir ni expandir fuentes artificialmente. Respetar siempre la jerarquía definida.
+  </div>
+
+  <h3>Sobre el tono y la comunicación</h3>
+  <div class="dont-box" style="margin:16px 0;">
+    No usar lenguaje alarmista o amenazante. No hacer promesas de resultados garantizados. No usar memes o humor que trivialice la experiencia migratoria. No publicar contenido político partidista. No compartir información de casos sin autorización escrita.
+  </div>
+
+  <h3>Sobre reconocimientos y afiliaciones</h3>
+  <div class="dont-box" style="margin:16px 0;">
+    No alterar logos de entidades otorgantes. No sugerir relación institucional más allá del reconocimiento específico. No usar reconocimientos de años anteriores sin indicar el año.
+  </div>
+</div>
+
+<!-- ============ SECTION 11 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">11</div>
+  <div class="section-title">MARCO LEGAL Y DISCLAIMER</div>
+</div>
+<div class="section">
+  <h3>Disclaimer obligatorio</h3>
+  <div class="disclaimer-box">
+    "La información presentada por Mangone Law Firm, LLC es de carácter general y educativo. No constituye asesoría legal ni crea una relación abogado-cliente. Cada caso es distinto y los resultados pueden variar según las circunstancias individuales."
+  </div>
+
+  <h3>Ubicación del disclaimer</h3>
+  <table>
+    <thead><tr><th>Medio</th><th>Ubicación</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Redes sociales</strong></td><td>Al final del caption o última slide de carrusel.</td></tr>
+      <tr><td><strong>Videos</strong></td><td>Texto sobreimpuesto al final o en la descripción.</td></tr>
+      <tr><td><strong>Web</strong></td><td>Footer de cada página y junto a formularios de contacto.</td></tr>
+      <tr><td><strong>Impresos</strong></td><td>Parte inferior, tamaño mínimo 8 pt.</td></tr>
+      <tr><td><strong>Email</strong></td><td>Después de la firma.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Confidencialidad</h3>
+  <div class="info-card">
+    Nunca se publica información identificable de un cliente sin consentimiento firmado por escrito. Esto incluye nombres, fotografías, detalles de caso y resultados específicos.
+  </div>
+
+  <h3>Propiedad intelectual</h3>
+  <p>Todos los elementos de este manual son propiedad intelectual de Mangone Law Firm LLC. Su uso está autorizado exclusivamente dentro de los fines de comunicación de la firma y bajo estos lineamientos. Cualquier uso no autorizado será considerado una infracción.</p>
+</div>
+
+<!-- ============ SECTION 12 ============ -->
+<div class="section-header page-break">
+  <div class="section-num">12</div>
+  <div class="section-title">GOBERNANZA Y ACTUALIZACIÓN</div>
+</div>
+<div class="section">
+  <h3>Frecuencia de revisión</h3>
+  <ul>
+    <li>Cada <strong>6 meses</strong> de forma obligatoria.</li>
+    <li>Al lanzar nuevas campañas importantes.</li>
+    <li>Cuando se obtengan nuevos reconocimientos o afiliaciones.</li>
+    <li>Cuando haya cambios en la identidad visual.</li>
+    <li>Cuando se incorporen nuevos canales de comunicación.</li>
+  </ul>
+
+  <h3>Proceso de actualización</h3>
+  <div class="highlight-box">
+    <ol style="color:rgba(255,255,255,0.9);">
+      <li>El responsable de marca identifica la necesidad de cambio.</li>
+      <li>Se documenta la propuesta de modificación.</li>
+      <li>Se revisa con los roles clave del equipo.</li>
+      <li>Se aprueba y se actualiza este documento.</li>
+      <li>Se comunica el cambio a todo el equipo y a terceros activos.</li>
+    </ol>
+  </div>
+
+  <h3>Historial de versiones</h3>
+  <table>
+    <thead><tr><th>Versión</th><th>Fecha</th><th>Cambios principales</th><th>Responsable</th></tr></thead>
+    <tbody>
+      <tr><td>1.0</td><td>—</td><td>Creación inicial del manual</td><td>—</td></tr>
+      <tr><td><strong>2.0</strong></td><td><strong>Abril 2026</strong></td><td>Reestructuración completa. Reconocimientos, afiliaciones, vocabulario, fórmulas de comunicación, usos incorrectos, marco legal y gobernanza.</td><td>Sebastian Quijada</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<div class="doc-footer">
+  <strong>© 2026 Mangone Law Firm LLC</strong><br>
+  Todos los derechos reservados.<br><br>
+  <span style="color:rgba(255,255,255,0.3);">Este documento es confidencial y de uso exclusivo para los fines descritos en su contenido.<br>
+  440 Speedwell Ave, Morris Plains, NJ 07950 · (862) 701-2097</span>
+</div>
+
+</body>
+</html>

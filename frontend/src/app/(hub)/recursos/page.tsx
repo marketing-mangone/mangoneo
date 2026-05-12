@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import NextImage from 'next/image';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -7,7 +8,7 @@ import {
   FileText, FileType, Image, Search, Upload, Filter,
   Download, Eye, Clock, FolderOpen, BookOpen,
   Palette, Type, Layers, X, AlertCircle, Trash2,
-  CheckCircle, Loader2, CloudUpload,
+  CheckCircle, Loader2, CloudUpload, Maximize2,
 } from 'lucide-react';
 import { documentsApi, ApiDocument } from '@/lib/api';
 
@@ -446,6 +447,7 @@ export default function RecursosPage() {
   const [apiError, setApiError] = useState('');
   const [uploadOpen, setUploadOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ApiDocument | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
 
   const loadDocs = useCallback(async () => {
     setLoading(true);
@@ -662,12 +664,19 @@ export default function RecursosPage() {
                 Todo lo que necesitas para representar la marca correctamente.
               </p>
               <div className="flex gap-3 mt-4">
-                <button className="flex items-center gap-2 bg-[#F79C31] text-[#0C2054] font-semibold text-sm px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors">
+                <button
+                  onClick={() => setManualOpen(true)}
+                  className="flex items-center gap-2 bg-[#F79C31] text-[#0C2054] font-semibold text-sm px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors"
+                >
                   <Eye className="w-4 h-4" /> Ver manual completo
                 </button>
-                <button className="flex items-center gap-2 bg-white/10 text-white font-semibold text-sm px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
-                  <Download className="w-4 h-4" /> Descargar PDF
-                </button>
+                <a
+                  href="/brand/manual.html"
+                  download="Manual_Marca_Mangone_Law_Firm.html"
+                  className="flex items-center gap-2 bg-white/10 text-white font-semibold text-sm px-4 py-2 rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  <Download className="w-4 h-4" /> Descargar manual
+                </a>
               </div>
             </div>
 
@@ -712,38 +721,66 @@ export default function RecursosPage() {
 
             {/* Logos */}
             <div>
-              <h3 className="text-base font-bold text-[#1a1a2e] mb-4">Logos Disponibles</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-base font-bold text-[#1a1a2e]">Logos Disponibles</h3>
+                <span className="text-xs text-[#8888a8]">PNG · Alta resolución (7800×3800 px)</span>
+              </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                <Card className="p-6 flex flex-col items-center justify-center bg-white min-h-[160px]">
-                  <div className="text-center mb-4">
-                    <div className="inline-flex items-center gap-3 bg-[#0C2054] text-white px-6 py-4 rounded-xl">
-                      <span className="font-display text-3xl text-[#F79C31]">M</span>
-                      <div className="text-left">
-                        <p className="font-bold text-sm">MANGONE</p>
-                        <p className="text-white/60 text-[10px] uppercase tracking-widest">Law Firm LLC</p>
-                      </div>
-                    </div>
+
+                {/* Logo negro — sobre fondo claro */}
+                <Card className="overflow-hidden">
+                  <div className="bg-white flex items-center justify-center px-8 py-8 min-h-[180px]">
+                    <NextImage
+                      src="/brand/logo-negro.png"
+                      alt="Logo Mangone Law Firm — versión negra"
+                      width={280}
+                      height={137}
+                      className="object-contain max-w-full"
+                      priority
+                    />
                   </div>
-                  <p className="text-xs text-[#8888a8] font-medium">Versión oscura (uso en fondos claros)</p>
-                  <button className="mt-3 flex items-center gap-1 text-xs text-[#F79C31] font-semibold hover:underline">
-                    <Download className="w-3 h-3" /> Descargar PNG
-                  </button>
-                </Card>
-                <Card className="p-6 flex flex-col items-center justify-center bg-[#0C2054] min-h-[160px]">
-                  <div className="text-center mb-4">
-                    <div className="inline-flex items-center gap-3 px-6 py-4">
-                      <span className="font-display text-3xl text-[#F79C31]">M</span>
-                      <div className="text-left">
-                        <p className="font-bold text-sm text-white">MANGONE</p>
-                        <p className="text-white/60 text-[10px] uppercase tracking-widest">Law Firm LLC</p>
-                      </div>
+                  <div className="flex items-center justify-between px-5 py-3 border-t border-[#f0f0f0]">
+                    <div>
+                      <p className="text-sm font-semibold text-[#1a1a2e]">Versión negra</p>
+                      <p className="text-xs text-[#8888a8]">Uso en fondos claros / blancos</p>
                     </div>
+                    <a
+                      href="/brand/logo-negro.png"
+                      download="Logo_Mangone_Negro.png"
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] bg-[#f0f2f8] hover:bg-[#e4e8f5] px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Descargar PNG
+                    </a>
                   </div>
-                  <p className="text-xs text-white/40 font-medium">Versión clara (uso en fondos oscuros)</p>
-                  <button className="mt-3 flex items-center gap-1 text-xs text-[#F79C31] font-semibold hover:underline">
-                    <Download className="w-3 h-3" /> Descargar PNG
-                  </button>
                 </Card>
+
+                {/* Logo blanco — sobre fondo oscuro */}
+                <Card className="overflow-hidden">
+                  <div className="bg-[#0C2054] flex items-center justify-center px-8 py-8 min-h-[180px]">
+                    <NextImage
+                      src="/brand/logo-blanco.png"
+                      alt="Logo Mangone Law Firm — versión blanca"
+                      width={280}
+                      height={137}
+                      className="object-contain max-w-full"
+                      priority
+                    />
+                  </div>
+                  <div className="flex items-center justify-between px-5 py-3 border-t border-[#f0f0f0]">
+                    <div>
+                      <p className="text-sm font-semibold text-[#1a1a2e]">Versión blanca</p>
+                      <p className="text-xs text-[#8888a8]">Uso en fondos oscuros / azul Mangone</p>
+                    </div>
+                    <a
+                      href="/brand/logo-blanco.png"
+                      download="Logo_Mangone_Blanco.png"
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] bg-[#f0f2f8] hover:bg-[#e4e8f5] px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      <Download className="w-3.5 h-3.5" /> Descargar PNG
+                    </a>
+                  </div>
+                </Card>
+
               </div>
             </div>
 
@@ -775,6 +812,51 @@ export default function RecursosPage() {
           </div>
         )}
       </div>
+
+      {/* ── Manual viewer modal ─────────────────────────────────────────── */}
+      {manualOpen && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black/60 backdrop-blur-sm">
+          <div className="flex items-center justify-between bg-[#0C2054] px-5 py-3 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-7 h-7 rounded-lg bg-[#F79C31] flex items-center justify-center">
+                <span className="font-bold text-[#0C2054] text-sm">M</span>
+              </div>
+              <div>
+                <p className="text-white font-bold text-sm leading-tight">Manual de Marca</p>
+                <p className="text-white/50 text-[10px]">Mangone Law Firm, LLC</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <a
+                href="/brand/manual.html"
+                download="Manual_Marca_Mangone_Law_Firm.html"
+                className="flex items-center gap-1.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <Download className="w-3.5 h-3.5" /> Descargar
+              </a>
+              <a
+                href="/brand/manual.html"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-xs font-semibold text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                <Maximize2 className="w-3.5 h-3.5" /> Abrir en pestaña
+              </a>
+              <button
+                onClick={() => setManualOpen(false)}
+                className="p-1.5 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+          <iframe
+            src="/brand/manual.html"
+            title="Manual de Marca — Mangone Law Firm"
+            className="flex-1 w-full border-0 bg-white"
+          />
+        </div>
+      )}
     </div>
   );
 }
