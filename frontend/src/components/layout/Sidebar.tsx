@@ -9,12 +9,30 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-const NAV_MAIN = [
+type SubNavItem = { href: string; label: string; exact?: boolean };
+type NavItem = {
+  href: string;
+  icon: React.ElementType;
+  label: string;
+  desc: string;
+  subItems?: SubNavItem[];
+};
+
+const NAV_MAIN: { label: string; items: NavItem[] }[] = [
   {
     label: 'Principal',
     items: [
       { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', desc: 'Vista general' },
-      { href: '/metricas', icon: BarChart3, label: 'Métricas', desc: 'KPIs y datos' },
+      {
+        href: '/metricas',
+        icon: BarChart3,
+        label: 'Métricas',
+        desc: 'KPIs y datos',
+        subItems: [
+          { href: '/metricas', label: 'Departamentales', exact: true },
+          { href: '/metricas/individuales', label: 'Individuales' },
+        ],
+      },
     ],
   },
   {
@@ -95,7 +113,7 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
               </p>
             )}
             <ul className="space-y-1">
-              {group.items.map(({ href, icon: Icon, label, desc }) => {
+              {group.items.map(({ href, icon: Icon, label, desc, subItems }) => {
                 const active = pathname === href || pathname.startsWith(href + '/');
                 return (
                   <li key={href}>
@@ -140,6 +158,36 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                         </div>
                       )}
                     </Link>
+
+                    {/* Sub-items */}
+                    {subItems && !collapsed && (
+                      <ul className="mt-0.5 mb-1 space-y-0.5 pl-[44px] pr-1">
+                        {subItems.map(sub => {
+                          const subActive = sub.exact
+                            ? pathname === sub.href
+                            : pathname.startsWith(sub.href);
+                          return (
+                            <li key={sub.href}>
+                              <Link
+                                href={sub.href}
+                                className={cn(
+                                  'flex items-center gap-2 text-[12px] font-medium px-3 py-1.5 rounded-lg transition-all',
+                                  subActive
+                                    ? 'text-white bg-white/10'
+                                    : 'text-white/40 hover:text-white/70 hover:bg-white/5'
+                                )}
+                              >
+                                <span className={cn(
+                                  'w-1.5 h-1.5 rounded-full flex-shrink-0',
+                                  subActive ? 'bg-[#F79C31]' : 'bg-white/20'
+                                )} />
+                                {sub.label}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
                   </li>
                 );
               })}
