@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import {
   ChevronLeft, ChevronRight, Pencil, Save, X,
-  Loader2, Users, UserMinus,
+  Loader2, Users, UserMinus, Settings2, Plus, Trash2, RotateCcw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { teamApi, type ApiTeamMember } from '@/lib/api';
@@ -26,9 +26,9 @@ interface WeekData {
   notes: Record<string, string>;
 }
 
-// ── KPI definitions by area ────────────────────────────────────────────
+// ── Area default KPIs ──────────────────────────────────────────────────
 
-const KPI_BY_AREA: Record<string, KPIDef[]> = {
+const KPI_DEFAULTS: Record<string, KPIDef[]> = {
   Contenido: [
     { id: 'posts-redes', name: 'Posts en redes', target: 15, unit: 'number' },
     { id: 'articulos-blog', name: 'Artículos de blog', target: 1, unit: 'number' },
@@ -63,19 +63,15 @@ const KPI_BY_AREA: Record<string, KPIDef[]> = {
 };
 
 const AREA_COLORS: Record<string, string> = {
-  Dirección: '#0C2054',
-  Contenido: '#7c3aed',
-  Digital: '#0984e3',
-  Producción: '#00b894',
-  Diseño: '#e17055',
-  'Paid Media': '#F79C31',
+  Dirección: '#0C2054', Contenido: '#7c3aed', Digital: '#0984e3',
+  Producción: '#00b894', Diseño: '#e17055', 'Paid Media': '#F79C31',
 };
 
-function avatarColor(member: ApiTeamMember): string {
-  return AREA_COLORS[member.area] || '#6b7280';
+function avatarColor(m: ApiTeamMember): string {
+  return AREA_COLORS[m.area] || '#6b7280';
 }
 
-// ── Week helpers — all LOCAL time (noon avoids DST edge cases) ─────────
+// ── Week helpers (local time, noon avoids DST) ─────────────────────────
 
 function getISOWeekKey(date: Date): string {
   const d = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
@@ -136,9 +132,8 @@ function pctBadgeCls(pct: number | null): string {
   return 'bg-red-50 text-red-600';
 }
 
-function memberOverallPct(member: ApiTeamMember, kpiMap: Record<string, number | null> | undefined): number | null {
-  const kpis = KPI_BY_AREA[member.area];
-  if (!kpis || !kpiMap) return null;
+function memberOverallPct(kpis: KPIDef[], kpiMap: Record<string, number | null> | undefined): number | null {
+  if (!kpiMap || kpis.length === 0) return null;
   const vals = kpis.map(k => calcPct(kpiMap[k.id], k.target, k.lowerIsBetter)).filter((v): v is number => v !== null);
   if (vals.length === 0) return null;
   return vals.reduce((a, b) => a + b, 0) / vals.length;
@@ -154,8 +149,9 @@ function fmtVal(val: number | null | undefined, unit: KPIUnit): string {
 
 // ── localStorage ────────────────────────────────────────────────────────
 
-const LS_WEEK = 'mangone-kpi-ind-';
+const LS_WEEK     = 'mangone-kpi-ind-';
 const LS_EXCLUDED = 'mangone-kpi-ind-excluded';
+const LS_KPIDEFS  = 'mangone-kpi-ind-defs';
 
 function loadWeek(weekKey: string): WeekData {
   if (typeof window === 'undefined') return { kpis: {}, notes: {} };
@@ -178,10 +174,248 @@ function saveExcluded(ids: number[]): void {
   if (typeof window !== 'undefined') localStorage.setItem(LS_EXCLUDED, JSON.stringify(ids));
 }
 
+function loadAllKPIDefs(): Record<string, KPIDef[]> {
+  if (typeof window === 'undefined') return {};
+  try { return JSON.parse(localStorage.getItem(LS_KPIDEFS) || '{}'); } catch { return {}; }
+}
+
+function saveKPIDefsForMember(memberId: string, kpis: KPIDef[]): void {
+  if (typeof window === 'undefined') return;
+  const all = loadAllKPIDefs();
+  all[memberId] = kpis;
+  localStorage.setItem(LS_KPIDEFS, JSON.stringify(all));
+}
+
+function getKPIsForMember(memberId: string, area: string, allDefs: Record<string, KPIDef[]>): KPIDef[] {
+  return allDefs[memberId] ?? KPI_DEFAULTS[area] ?? [];
+}
+
+function newKpiId(): string {
+  return `kpi-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+}
+
+// ── KPI Config Modal ────────────────────────────────────────────────────
+
+const UNIT_LABELS: Record<KPIUnit, string> = {
+  number: 'Número',
+  percentage: 'Porcentaje',
+  score: 'Score',
+};
+
+interface KPIConfigModalProps {
+  member: ApiTeamMember;
+  initialKPIs: KPIDef[];
+  onSave: (kpis: KPIDef[]) => void;
+  onClose: () => void;
+}
+
+function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModalProps) {
+  const [kpis, setKpis] = useState<KPIDef[]>(() => initialKPIs.map(k => ({ ...k })));
+  const [newName, setNewName] = useState('');
+  const [newTarget, setNewTarget] = useState('');
+  const [newUnit, setNewUnit] = useState<KPIUnit>('number');
+  const [newLower, setNewLower] = useState(false);
+  const [addError, setAddError] = useState('');
+
+  const inputCls = 'px-2 py-1.5 text-xs border border-[#e8e8f0] bg-[#f7f8fc] rounded-md outline-none focus:border-[#0C2054] focus:bg-white transition-all';
+
+  function updateKpi(id: string, field: keyof KPIDef, value: unknown) {
+    setKpis(prev => prev.map(k => k.id === id ? { ...k, [field]: value } : k));
+  }
+
+  function deleteKpi(id: string) {
+    setKpis(prev => prev.filter(k => k.id !== id));
+  }
+
+  function handleAdd() {
+    setAddError('');
+    const name = newName.trim();
+    if (!name) { setAddError('El nombre es obligatorio.'); return; }
+    const target = parseFloat(newTarget);
+    if (isNaN(target) || target <= 0) { setAddError('La meta debe ser mayor que cero.'); return; }
+    setKpis(prev => [...prev, { id: newKpiId(), name, target, unit: newUnit, lowerIsBetter: newLower || undefined }]);
+    setNewName('');
+    setNewTarget('');
+    setNewUnit('number');
+    setNewLower(false);
+  }
+
+  function handleRestore() {
+    const defaults = KPI_DEFAULTS[member.area];
+    if (defaults) setKpis(defaults.map(k => ({ ...k })));
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[88vh] flex flex-col">
+
+        {/* Header */}
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-[#e8e8f0]">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+            style={{ background: avatarColor(member) }}
+          >
+            {member.avatar || member.name.slice(0, 2).toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-bold text-[#1a1a2e] text-base leading-tight">KPIs de {member.name.split(' ')[0]}</h2>
+            <p className="text-xs text-[#8888a8]">{member.position || member.area}</p>
+          </div>
+          <button onClick={onClose} className="p-1.5 text-[#8888a8] hover:text-[#1a1a2e] transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* KPI list */}
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-2">
+          {/* Column headers */}
+          {kpis.length > 0 && (
+            <div className="grid grid-cols-[1fr_80px_100px_28px_28px] gap-2 items-center px-1 mb-1">
+              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide">Nombre</span>
+              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-center">Meta</span>
+              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-center">Unidad</span>
+              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-center" title="¿Menor es mejor?">↓</span>
+              <span />
+            </div>
+          )}
+
+          {kpis.length === 0 && (
+            <p className="text-sm text-[#8888a8] italic text-center py-4">Sin KPIs. Agrega uno abajo.</p>
+          )}
+
+          {kpis.map(kpi => (
+            <div key={kpi.id} className="grid grid-cols-[1fr_80px_100px_28px_28px] gap-2 items-center bg-[#f7f8fc] rounded-lg px-3 py-2">
+              <input
+                value={kpi.name}
+                onChange={e => updateKpi(kpi.id, 'name', e.target.value)}
+                className={`${inputCls} w-full`}
+                placeholder="Nombre del KPI"
+              />
+              <input
+                type="number"
+                value={kpi.target}
+                min={0}
+                step={kpi.unit === 'percentage' ? 0.1 : 1}
+                onChange={e => updateKpi(kpi.id, 'target', parseFloat(e.target.value) || 0)}
+                className={`${inputCls} w-full text-right tabular-nums`}
+              />
+              <select
+                value={kpi.unit}
+                onChange={e => updateKpi(kpi.id, 'unit', e.target.value as KPIUnit)}
+                className={`${inputCls} w-full`}
+              >
+                {(Object.keys(UNIT_LABELS) as KPIUnit[]).map(u => (
+                  <option key={u} value={u}>{UNIT_LABELS[u]}</option>
+                ))}
+              </select>
+              <div className="flex items-center justify-center">
+                <input
+                  type="checkbox"
+                  checked={!!kpi.lowerIsBetter}
+                  onChange={e => updateKpi(kpi.id, 'lowerIsBetter', e.target.checked || undefined)}
+                  className="w-3.5 h-3.5 accent-[#0C2054]"
+                  title="Menor es mejor"
+                />
+              </div>
+              <button
+                onClick={() => deleteKpi(kpi.id)}
+                className="flex items-center justify-center w-7 h-7 rounded-md text-[#c0c0d0] hover:text-red-500 hover:bg-red-50 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+
+          {/* Add new KPI */}
+          <div className="mt-4 pt-4 border-t border-[#e8e8f0]">
+            <p className="text-xs font-semibold text-[#1a1a2e] mb-2">Agregar KPI</p>
+            <div className="grid grid-cols-[1fr_80px_100px_auto] gap-2 items-start">
+              <input
+                value={newName}
+                onChange={e => { setNewName(e.target.value); setAddError(''); }}
+                className={`${inputCls} w-full`}
+                placeholder="Nombre del KPI"
+                onKeyDown={e => e.key === 'Enter' && handleAdd()}
+              />
+              <input
+                type="number"
+                value={newTarget}
+                min={0}
+                onChange={e => setNewTarget(e.target.value)}
+                className={`${inputCls} w-full text-right tabular-nums`}
+                placeholder="Meta"
+                onKeyDown={e => e.key === 'Enter' && handleAdd()}
+              />
+              <select
+                value={newUnit}
+                onChange={e => setNewUnit(e.target.value as KPIUnit)}
+                className={`${inputCls} w-full`}
+              >
+                {(Object.keys(UNIT_LABELS) as KPIUnit[]).map(u => (
+                  <option key={u} value={u}>{UNIT_LABELS[u]}</option>
+                ))}
+              </select>
+              <button
+                onClick={handleAdd}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+                style={{ background: '#0C2054' }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Agregar
+              </button>
+            </div>
+            <label className="flex items-center gap-2 mt-2 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={newLower}
+                onChange={e => setNewLower(e.target.checked)}
+                className="w-3.5 h-3.5 accent-[#0C2054]"
+              />
+              <span className="text-xs text-[#4a4a6a]">Menor es mejor (ej: tiempo de revisión, costo por lead)</span>
+            </label>
+            {addError && <p className="text-xs text-red-500 mt-1">{addError}</p>}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[#e8e8f0]">
+          {KPI_DEFAULTS[member.area] && (
+            <button
+              onClick={handleRestore}
+              className="flex items-center gap-1.5 text-xs font-medium text-[#8888a8] hover:text-[#4a4a6a] transition-colors"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Restaurar defaults del área
+            </button>
+          )}
+          {!KPI_DEFAULTS[member.area] && <span />}
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-semibold text-[#4a4a6a] bg-[#f7f8fc] hover:bg-[#eeeef5] rounded-lg transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => onSave(kpis)}
+              className="px-4 py-2 text-sm font-bold text-white rounded-lg hover:opacity-90 transition-opacity"
+              style={{ background: '#0C2054' }}
+            >
+              Guardar KPIs
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── MemberCard ──────────────────────────────────────────────────────────
 
 interface MemberCardProps {
   member: ApiTeamMember;
+  kpis: KPIDef[];
   kpiMap: Record<string, number | null>;
   notes: string;
   editMode: boolean;
@@ -189,11 +423,11 @@ interface MemberCardProps {
   onKpiChange: (kpiId: string, value: number | null) => void;
   onNotesChange: (v: string) => void;
   onRemove: () => void;
+  onConfigKPIs: () => void;
 }
 
-function MemberCard({ member, kpiMap, notes, editMode, isAdmin, onKpiChange, onNotesChange, onRemove }: MemberCardProps) {
-  const kpis = KPI_BY_AREA[member.area] ?? [];
-  const overall = memberOverallPct(member, kpiMap);
+function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChange, onNotesChange, onRemove, onConfigKPIs }: MemberCardProps) {
+  const overall = memberOverallPct(kpis, kpiMap);
   const color = avatarColor(member);
 
   return (
@@ -213,21 +447,41 @@ function MemberCard({ member, kpiMap, notes, editMode, isAdmin, onKpiChange, onN
         <span className={cn('text-xs font-bold px-2.5 py-1 rounded-full', pctBadgeCls(overall))}>
           {overall !== null ? `${overall.toFixed(0)}%` : 'Pendiente'}
         </span>
+        {/* Admin-only controls */}
         {isAdmin && (
-          <button
-            onClick={onRemove}
-            title="Quitar de seguimiento"
-            className="p-1.5 text-[#c0c0d0] hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
-          >
-            <UserMinus className="w-3.5 h-3.5" />
-          </button>
+          <>
+            <button
+              onClick={onConfigKPIs}
+              title="Configurar KPIs"
+              className="p-1.5 text-[#c0c0d0] hover:text-[#0C2054] hover:bg-[#f0f0f8] rounded-lg transition-colors flex-shrink-0"
+            >
+              <Settings2 className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={onRemove}
+              title="Quitar de seguimiento"
+              className="p-1.5 text-[#c0c0d0] hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+            >
+              <UserMinus className="w-3.5 h-3.5" />
+            </button>
+          </>
         )}
       </div>
 
       {/* KPI rows */}
       <div className="px-5 py-3 flex-1">
         {kpis.length === 0 ? (
-          <p className="text-xs text-[#8888a8] italic py-3 text-center">Sin KPIs definidos para el área "{member.area}"</p>
+          <div className="py-4 text-center">
+            <p className="text-xs text-[#8888a8] italic">Sin KPIs configurados.</p>
+            {isAdmin && (
+              <button
+                onClick={onConfigKPIs}
+                className="mt-2 text-xs font-semibold text-[#0C2054] hover:underline"
+              >
+                + Configurar KPIs
+              </button>
+            )}
+          </div>
         ) : (
           <>
             <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 items-center mb-2">
@@ -314,10 +568,7 @@ function MemberCard({ member, kpiMap, notes, editMode, isAdmin, onKpiChange, onN
 // ── Manage members modal ────────────────────────────────────────────────
 
 function ManageModal({
-  allMembers,
-  excluded,
-  onSave,
-  onClose,
+  allMembers, excluded, onSave, onClose,
 }: {
   allMembers: ApiTeamMember[];
   excluded: number[];
@@ -325,11 +576,9 @@ function ManageModal({
   onClose: () => void;
 }) {
   const [draft, setDraft] = useState<number[]>(excluded);
-
   function toggle(id: number) {
     setDraft(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   }
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
@@ -343,12 +592,11 @@ function ManageModal({
         <div className="px-6 py-4 space-y-1 max-h-80 overflow-y-auto">
           {allMembers.map(m => {
             const included = !draft.includes(m.id);
-            const color = avatarColor(m);
             return (
               <label key={m.id} className="flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-[#f7f8fc] cursor-pointer transition-colors">
                 <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
-                  style={{ background: color }}
+                  style={{ background: avatarColor(m) }}
                 >
                   {m.avatar || m.name.slice(0, 2).toUpperCase()}
                 </div>
@@ -394,16 +642,19 @@ export default function MetricasIndividualesPage() {
 
   const [allMembers, setAllMembers] = useState<ApiTeamMember[]>([]);
   const [excluded, setExcluded] = useState<number[]>([]);
+  const [kpiDefs, setKpiDefs] = useState<Record<string, KPIDef[]>>({});
   const [loadingMembers, setLoadingMembers] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [showManage, setShowManage] = useState(false);
 
-  // Bootstrap: load team + excluded list
+  const [showManage, setShowManage] = useState(false);
+  const [kpiConfigMember, setKpiConfigMember] = useState<ApiTeamMember | null>(null);
+
+  // Bootstrap
   useEffect(() => {
     setMounted(true);
     setExcluded(loadExcluded());
+    setKpiDefs(loadAllKPIDefs());
 
-    // Check if admin from cached user
     try {
       const cached = JSON.parse(localStorage.getItem('current_user') || '{}');
       setIsAdmin(cached?.role === 'admin');
@@ -411,11 +662,10 @@ export default function MetricasIndividualesPage() {
 
     teamApi.list()
       .then(res => setAllMembers(res.results.filter(m => m.status === 'active')))
-      .catch(() => {/* keep empty */})
+      .catch(() => { /* keep empty */ })
       .finally(() => setLoadingMembers(false));
   }, []);
 
-  // Load week data when week changes
   useEffect(() => {
     if (!mounted) return;
     setData(loadWeek(week));
@@ -448,6 +698,13 @@ export default function MetricasIndividualesPage() {
     saveExcluded(newExcluded);
   };
 
+  const handleKPIConfigSave = (member: ApiTeamMember, kpis: KPIDef[]) => {
+    const id = String(member.id);
+    saveKPIDefsForMember(id, kpis);
+    setKpiDefs(prev => ({ ...prev, [id]: kpis }));
+    setKpiConfigMember(null);
+  };
+
   const setKpi = (memberId: string, kpiId: string, value: number | null) => {
     setDraft(prev => ({
       ...prev,
@@ -461,8 +718,9 @@ export default function MetricasIndividualesPage() {
 
   const active = editMode ? draft : data;
 
-  // Team summary
-  const memberPcts = visibleMembers.map(m => memberOverallPct(m, active.kpis[String(m.id)]));
+  const memberPcts = visibleMembers.map(m =>
+    memberOverallPct(getKPIsForMember(String(m.id), m.area, kpiDefs), active.kpis[String(m.id)])
+  );
   const filled = memberPcts.filter((v): v is number => v !== null);
   const teamPct = filled.length > 0 ? filled.reduce((a, b) => a + b, 0) / filled.length : null;
 
@@ -473,6 +731,7 @@ export default function MetricasIndividualesPage() {
         subtitle="Cumplimiento semanal de KPIs por miembro del equipo"
         actions={
           <div className="flex items-center gap-2">
+            {/* Admin-only: manage members */}
             {isAdmin && (
               <button
                 onClick={() => setShowManage(true)}
@@ -526,13 +785,11 @@ export default function MetricasIndividualesPage() {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-
             <div className="px-5 py-2 bg-white border border-[#e8e8f0] rounded-lg">
               <p className="text-sm font-semibold text-[#1a1a2e]">
                 {mounted ? formatWeekLabel(week) : '...'}
               </p>
             </div>
-
             <button
               onClick={() => setWeek(w => shiftWeek(w, 1))}
               disabled={editMode}
@@ -540,7 +797,6 @@ export default function MetricasIndividualesPage() {
             >
               <ChevronRight className="w-4 h-4" />
             </button>
-
             <button
               onClick={() => setWeek(getISOWeekKey(new Date()))}
               disabled={editMode}
@@ -550,7 +806,6 @@ export default function MetricasIndividualesPage() {
             </button>
           </div>
 
-          {/* Per-member mini badges */}
           {visibleMembers.length > 0 && (
             <div className="flex items-center gap-3 flex-wrap">
               {visibleMembers.map((m, i) => (
@@ -591,14 +846,12 @@ export default function MetricasIndividualesPage() {
           </div>
         )}
 
-        {/* Loading */}
         {loadingMembers && (
           <div className="flex items-center justify-center py-16">
             <Loader2 className="w-6 h-6 animate-spin text-[#8888a8]" />
           </div>
         )}
 
-        {/* No members */}
         {!loadingMembers && visibleMembers.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <Users className="w-10 h-10 text-[#d1d5db] mb-3" />
@@ -611,32 +864,47 @@ export default function MetricasIndividualesPage() {
           </div>
         )}
 
-        {/* Member cards */}
         {!loadingMembers && visibleMembers.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {visibleMembers.map(member => (
-              <MemberCard
-                key={member.id}
-                member={member}
-                kpiMap={active.kpis[String(member.id)] ?? {}}
-                notes={active.notes[String(member.id)] ?? ''}
-                editMode={editMode}
-                isAdmin={isAdmin}
-                onKpiChange={(kpiId, value) => setKpi(String(member.id), kpiId, value)}
-                onNotesChange={notes => setNotes(String(member.id), notes)}
-                onRemove={() => handleRemoveMember(member.id)}
-              />
-            ))}
+            {visibleMembers.map(member => {
+              const mid = String(member.id);
+              const kpis = getKPIsForMember(mid, member.area, kpiDefs);
+              return (
+                <MemberCard
+                  key={member.id}
+                  member={member}
+                  kpis={kpis}
+                  kpiMap={active.kpis[mid] ?? {}}
+                  notes={active.notes[mid] ?? ''}
+                  editMode={editMode}
+                  isAdmin={isAdmin}
+                  onKpiChange={(kpiId, value) => setKpi(mid, kpiId, value)}
+                  onNotesChange={notes => setNotes(mid, notes)}
+                  onRemove={() => handleRemoveMember(member.id)}
+                  onConfigKPIs={() => setKpiConfigMember(member)}
+                />
+              );
+            })}
           </div>
         )}
       </div>
 
+      {/* Modals */}
       {showManage && (
         <ManageModal
           allMembers={allMembers}
           excluded={excluded}
           onSave={handleManageSave}
           onClose={() => setShowManage(false)}
+        />
+      )}
+
+      {kpiConfigMember && (
+        <KPIConfigModal
+          member={kpiConfigMember}
+          initialKPIs={getKPIsForMember(String(kpiConfigMember.id), kpiConfigMember.area, kpiDefs)}
+          onSave={kpis => handleKPIConfigSave(kpiConfigMember, kpis)}
+          onClose={() => setKpiConfigMember(null)}
         />
       )}
     </div>
