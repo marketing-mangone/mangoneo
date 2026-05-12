@@ -133,9 +133,12 @@ function pctBadgeCls(pct: number | null): string {
 }
 
 function memberOverallPct(kpis: KPIDef[], kpiMap: Record<string, number | null> | undefined): number | null {
-  if (!kpiMap || kpis.length === 0) return null;
-  const vals = kpis.map(k => calcPct(kpiMap[k.id], k.target, k.lowerIsBetter)).filter((v): v is number => v !== null);
-  if (vals.length === 0) return null;
+  if (kpis.length === 0) return null;
+  const vals = kpis.map(k => {
+    const actual = kpiMap?.[k.id] ?? null;
+    if (actual === null) return 0; // sin valor = 0% de cumplimiento
+    return calcPct(actual, k.target, k.lowerIsBetter) ?? 0;
+  });
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
@@ -721,8 +724,9 @@ export default function MetricasIndividualesPage() {
   const memberPcts = visibleMembers.map(m =>
     memberOverallPct(getKPIsForMember(String(m.id), m.area, kpiDefs), active.kpis[String(m.id)])
   );
-  const filled = memberPcts.filter((v): v is number => v !== null);
-  const teamPct = filled.length > 0 ? filled.reduce((a, b) => a + b, 0) / filled.length : null;
+  // Only exclude members with no KPIs configured (null). Members with unset values count as 0%.
+  const validPcts = memberPcts.filter((v): v is number => v !== null);
+  const teamPct = validPcts.length > 0 ? validPcts.reduce((a, b) => a + b, 0) / validPcts.length : null;
 
   return (
     <div className="animate-fade-in">
