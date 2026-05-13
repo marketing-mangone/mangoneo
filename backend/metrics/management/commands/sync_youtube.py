@@ -54,10 +54,11 @@ class Command(BaseCommand):
                     defaults={'value': value, 'period_end': end_date, 'raw_data': data},
                 )
                 action = 'created' if created else 'updated'
-                self.stdout.write(f'  ✓ Snapshot {action}: {slug}')
+                self.stdout.write(f'  ✓ Snapshot {action}: {slug} = {value}')
                 saved += 1
             except MetricDefinition.DoesNotExist:
-                self.stderr.write(f'  ✗ MetricDefinition not found: {slug}')
-                self.stderr.write('    Run: python manage.py seed_youtube_metrics')
+                self.stdout.write(f'  ✗ MetricDefinition not found: {slug}')
+            except Exception as e:
+                self.stdout.write(f'  ✗ Error saving {slug}: {e}')
 
         self.stdout.write(self.style.SUCCESS(f'\nDone. {saved} snapshot(s) saved.'))
