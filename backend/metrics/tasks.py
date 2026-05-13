@@ -4,41 +4,77 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+MONTHLY_SLUGS = {
+    'youtube-views': 'views',
+    'youtube-watch-time': 'watch_time_minutes',
+    'youtube-net-subscribers': 'net_subscribers',
+    'youtube-likes': 'likes',
+    'youtube-comments': 'comments',
+    'youtube-shares': 'shares',
+}
+
+
+def _save_snapshots(data, period_type):
+    from .models import MetricDefinition, MetricSnapshot
+    start_date = date.fromisoformat(data['start_date'])
+    end_date = date.fromisoformat(data['end_date'])
+    for slug, key in MONTHLY_SLUGS.items():
+        value = data.get(key)
+        if value is None:
+            continue
+        try:
+            metric = MetricDefinition.objects.get(slug=slug)
+            MetricSnapshot.objects.update_or_create(
+                metric=metric,
+                period_start=start_date,
+                period_type=period_type,
+                defaults={'value': value, 'period_end': end_date, 'raw_data': data},
+            )
+        except MetricDefinition.DoesNotExist:
+            logger.warning('MetricDefinition %s not found — run seed_youtube_metrics', slug)
+
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=300)
 def sync_youtube_metrics(self):
-    """Fetches YouTube Analytics for the last 28 days and persists snapshots."""
+    """Fetches YouTube Analytics and persists monthly + last 4 weekly snapshots."""
     try:
-        from .connectors.youtube import fetch_channel_analytics
+        from .connectors.youtube import fetch_channel_analytics, fetch_channel_info
         from .models import MetricDefinition, MetricSnapshot
 
+        # 28-day aggregate
         data = fetch_channel_analytics()
-        end_date = date.fromisoformat(data['end_date'])
-        start_date = date.fromisoformat(data['start_date'])
+        _save_snapshots(data, 'monthly')
 
-        metric_values = {
-            'youtube-views': data['views'],
-            'youtube-watch-time': data['watch_time_minutes'],
-            'youtube-net-subscribers': data['net_subscribers'],
-        }
-
-        for slug, value in metric_values.items():
+        # Subscriber total
+        info = fetch_channel_info()
+        if info:
+            today = date.today()
             try:
-                metric = MetricDefinition.objects.get(slug=slug)
+                metric = MetricDefinition.objects.get(slug='youtube-subscribers-total')
                 MetricSnapshot.objects.update_or_create(
                     metric=metric,
-                    period_start=start_date,
-                    period_type='monthly',
-                    defaults={
-                        'value': value,
-                        'period_end': end_date,
-                        'raw_data': data,
-                    },
+                    period_start=today,
+                    period_type='daily',
+                    defaults={'value': info['subscriber_count'], 'period_end': today, 'raw_data': info},
                 )
             except MetricDefinition.DoesNotExist:
-                logger.warning('MetricDefinition %s not found — run seed_youtube_metrics first', slug)
+                logger.warning('youtube-subscribers-total not found')
 
-        logger.info('YouTube metrics synced: %s views, %s min watched', data['views'], data['watch_time_minutes'])
+        # Last 4 weeks
+        yesterday = date.today() - timedelta(days=1)
+        current_monday = date.today() - timedelta(days=date.today().weekday())
+        for w in range(4):
+            week_monday = current_monday - timedelta(weeks=w)
+            week_sunday = week_monday + timedelta(days=6)
+            actual_end = min(week_sunday, yesterday)
+            if actual_end < week_monday:
+                continue
+            week_data = fetch_channel_analytics(start_date=week_monday, end_date=actual_end)
+            week_data['start_date'] = week_monday.isoformat()
+            week_data['end_date'] = actual_end.isoformat()
+            _save_snapshots(week_data, 'weekly')
+
+        logger.info('YouTube metrics synced successfully')
     except Exception as exc:
         logger.error('YouTube sync failed: %s', exc)
         raise self.retry(exc=exc)

@@ -28,14 +28,20 @@ def _build_credentials() -> Credentials:
     return creds
 
 
+def get_week_bounds(week_str: str) -> tuple[date, date]:
+    """Returns (monday, capped_end) for an ISO week string like '2026-W19'."""
+    year, week = week_str.split('-W')
+    monday = date.fromisocalendar(int(year), int(week), 1)
+    sunday = monday + timedelta(days=6)
+    yesterday = date.today() - timedelta(days=1)
+    return monday, min(sunday, yesterday)
+
+
 def fetch_channel_analytics(
     start_date: date | None = None,
     end_date: date | None = None,
 ) -> dict:
-    """
-    Returns aggregated channel metrics for the given date range.
-    Defaults to the last 28 days.
-    """
+    """Returns aggregated channel metrics for the given date range (default: last 28 days)."""
     if end_date is None:
         end_date = date.today() - timedelta(days=1)
     if start_date is None:
@@ -51,11 +57,11 @@ def fetch_channel_analytics(
         ids=ids,
         startDate=start_date.isoformat(),
         endDate=end_date.isoformat(),
-        metrics='views,estimatedMinutesWatched,subscribersGained,subscribersLost',
+        metrics='views,estimatedMinutesWatched,subscribersGained,subscribersLost,likes,comments,shares',
     ).execute()
 
-    rows = resp.get('rows', [[0, 0, 0, 0]])
-    row = rows[0] if rows else [0, 0, 0, 0]
+    rows = resp.get('rows', [[0, 0, 0, 0, 0, 0, 0]])
+    row = rows[0] if rows else [0, 0, 0, 0, 0, 0, 0]
 
     return {
         'views': int(row[0]),
@@ -63,23 +69,23 @@ def fetch_channel_analytics(
         'subscribers_gained': int(row[2]),
         'subscribers_lost': int(row[3]),
         'net_subscribers': int(row[2]) - int(row[3]),
+        'likes': int(row[4]),
+        'comments': int(row[5]),
+        'shares': int(row[6]),
         'start_date': start_date.isoformat(),
         'end_date': end_date.isoformat(),
     }
 
 
 def fetch_channel_info() -> dict:
-    """Returns basic channel stats (subscriber count, total views, video count)."""
+    """Returns point-in-time channel stats (subscriber count, total views, video count)."""
     creds = _build_credentials()
     service = build('youtube', 'v3', credentials=creds)
 
     channel_id = settings.YOUTUBE_CHANNEL_ID
     kwargs = {'id': channel_id} if channel_id else {'mine': True}
 
-    resp = service.channels().list(
-        part='statistics,snippet',
-        **kwargs,
-    ).execute()
+    resp = service.channels().list(part='statistics,snippet', **kwargs).execute()
 
     items = resp.get('items', [])
     if not items:

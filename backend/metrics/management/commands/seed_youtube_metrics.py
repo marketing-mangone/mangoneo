@@ -1,10 +1,6 @@
 """
 Creates the MetricDefinition records needed for YouTube Analytics.
-
 Safe to run multiple times (uses get_or_create).
-
-Usage:
-    python manage.py seed_youtube_metrics
 """
 from django.core.management.base import BaseCommand
 from metrics.models import MetricDefinition
@@ -16,21 +12,49 @@ YOUTUBE_METRICS = [
         'slug': 'youtube-views',
         'category': 'engagement',
         'unit': 'count',
-        'description': 'Total de reproducciones en los últimos 28 días',
+        'description': 'Total de reproducciones en el período',
     },
     {
         'name': 'YouTube — Minutos de Reproducción',
         'slug': 'youtube-watch-time',
         'category': 'engagement',
         'unit': 'time',
-        'description': 'Minutos estimados reproducidos en los últimos 28 días',
+        'description': 'Minutos estimados reproducidos en el período',
     },
     {
         'name': 'YouTube — Suscriptores Netos',
         'slug': 'youtube-net-subscribers',
         'category': 'acquisition',
         'unit': 'count',
-        'description': 'Suscriptores ganados menos perdidos en los últimos 28 días',
+        'description': 'Suscriptores ganados menos perdidos en el período',
+    },
+    {
+        'name': 'YouTube — Me gusta',
+        'slug': 'youtube-likes',
+        'category': 'engagement',
+        'unit': 'count',
+        'description': 'Total de likes en el período',
+    },
+    {
+        'name': 'YouTube — Comentarios',
+        'slug': 'youtube-comments',
+        'category': 'engagement',
+        'unit': 'count',
+        'description': 'Total de comentarios en el período',
+    },
+    {
+        'name': 'YouTube — Compartidos',
+        'slug': 'youtube-shares',
+        'category': 'engagement',
+        'unit': 'count',
+        'description': 'Total de veces compartido en el período',
+    },
+    {
+        'name': 'YouTube — Suscriptores Totales',
+        'slug': 'youtube-subscribers-total',
+        'category': 'acquisition',
+        'unit': 'count',
+        'description': 'Total de suscriptores actuales del canal',
     },
 ]
 

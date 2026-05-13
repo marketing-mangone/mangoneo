@@ -446,12 +446,38 @@ export type DashboardSummary = {
     'youtube-views': YouTubeMetricValue;
     'youtube-watch-time': YouTubeMetricValue;
     'youtube-net-subscribers': YouTubeMetricValue;
+    'youtube-likes': YouTubeMetricValue;
+    'youtube-comments': YouTubeMetricValue;
+    'youtube-shares': YouTubeMetricValue;
+    'youtube-subscribers-total': YouTubeMetricValue;
+  };
+};
+
+export type YouTubeWeeklyMetric = { value: number | null; prev_value: number | null; change_pct: number | null };
+export type YouTubeWeeklyData = {
+  week: string;
+  period_start: string;
+  period_end: string;
+  metrics: {
+    'youtube-views': YouTubeWeeklyMetric;
+    'youtube-watch-time': YouTubeWeeklyMetric;
+    'youtube-net-subscribers': YouTubeWeeklyMetric;
+    'youtube-likes': YouTubeWeeklyMetric;
+    'youtube-comments': YouTubeWeeklyMetric;
+    'youtube-shares': YouTubeWeeklyMetric;
   };
 };
 
 export const dashboardApi = {
   summary() {
     return apiJSON<DashboardSummary>('/api/dashboard/summary/');
+  },
+};
+
+export const youtubeApi = {
+  weekly(week?: string) {
+    const params = week ? `?week=${week}` : '';
+    return apiJSON<YouTubeWeeklyData>(`/api/metrics/youtube-weekly/${params}`);
   },
 };
 

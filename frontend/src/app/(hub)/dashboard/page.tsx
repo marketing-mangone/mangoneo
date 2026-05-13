@@ -357,9 +357,17 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Subscriber total spans full width on lg */}
             {[
               {
-                label: 'Reproducciones',
+                label: 'Suscriptores Totales',
+                icon: <Users className="w-5 h-5" />,
+                value: ytData?.['youtube-subscribers-total']?.value,
+                fmt: (v: number) => formatNumber(v),
+                highlight: true,
+              },
+              {
+                label: 'Reproducciones (28d)',
                 icon: <Eye className="w-5 h-5" />,
                 value: ytData?.['youtube-views']?.value,
                 fmt: (v: number) => formatNumber(v),
@@ -371,15 +379,33 @@ export default function DashboardPage() {
                 fmt: (v: number) => fmtWatchTime(v),
               },
               {
-                label: 'Suscriptores Netos',
+                label: 'Suscriptores Netos (28d)',
                 icon: <UserPlus className="w-5 h-5" />,
                 value: ytData?.['youtube-net-subscribers']?.value,
-                fmt: (v: number) => (v >= 0 ? `+${formatNumber(v)}` : formatNumber(v)),
+                fmt: (v: number) => (v !== null ? (v >= 0 ? `+${formatNumber(v)}` : formatNumber(v)) : '—'),
               },
-            ].map(({ label, icon, value, fmt }) => (
+              {
+                label: 'Me gusta (28d)',
+                icon: <Activity className="w-5 h-5" />,
+                value: ytData?.['youtube-likes']?.value,
+                fmt: (v: number) => formatNumber(v),
+              },
+              {
+                label: 'Comentarios (28d)',
+                icon: <Activity className="w-5 h-5" />,
+                value: ytData?.['youtube-comments']?.value,
+                fmt: (v: number) => formatNumber(v),
+              },
+              {
+                label: 'Compartidos (28d)',
+                icon: <Activity className="w-5 h-5" />,
+                value: ytData?.['youtube-shares']?.value,
+                fmt: (v: number) => formatNumber(v),
+              },
+            ].map(({ label, icon, value, fmt, highlight }) => (
               <Card key={label} className="p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 flex-shrink-0">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${highlight ? 'bg-red-600 text-white' : 'bg-red-50 text-red-500'}`}>
                     {icon}
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600">YouTube</span>
