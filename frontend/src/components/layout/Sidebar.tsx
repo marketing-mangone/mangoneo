@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
@@ -83,22 +84,30 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
       {/* ── LOGO ── */}
       <div className={cn(
         'relative z-10 flex items-center border-b border-white/8',
-        collapsed ? 'justify-center px-0 py-5' : 'gap-3 px-5 py-5'
+        collapsed ? 'justify-center px-0 py-4' : 'gap-3 px-5 py-4'
       )}>
-        <div className="relative flex-shrink-0">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center font-display text-[#0C2054] text-xl leading-none shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #F79C31 0%, #f0a94a 100%)' }}
-          >
-            M
+        {collapsed ? (
+          <div className="w-9 h-9 relative flex-shrink-0">
+            <Image
+              src="/brand/logo-blanco.png"
+              alt="Mangone Law Firm"
+              fill
+              className="object-contain"
+            />
           </div>
-          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#10b981] border-2 border-[#0C2054]" />
-        </div>
-
-        {!collapsed && (
-          <div className="overflow-hidden">
-            <p className="text-white font-bold text-sm leading-tight tracking-tight">Marketing Hub</p>
-            <p className="text-white/40 text-[11px] mt-0.5 truncate">Mangone Law Firm, LLC</p>
+        ) : (
+          <div className="flex flex-col gap-1 overflow-hidden">
+            <div className="relative h-9 w-36 flex-shrink-0">
+              <Image
+                src="/brand/logo-blanco.png"
+                alt="Mangone Law Firm"
+                fill
+                className="object-contain object-left"
+              />
+            </div>
+            <p className="text-white/50 text-[11px] font-semibold uppercase tracking-[0.12em] truncate">
+              Marketing Hub
+            </p>
           </div>
         )}
       </div>
