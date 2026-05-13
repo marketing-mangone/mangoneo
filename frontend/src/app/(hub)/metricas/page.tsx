@@ -343,12 +343,6 @@ function YouTubeSection({ ytData }: { ytData: DashboardSummary['youtube'] | null
       icon: <UserPlus className="w-5 h-5" />,
       fmt: (v: number) => (v >= 0 ? `+${formatNumber(v)}` : formatNumber(v)),
     },
-    {
-      slug: 'youtube-unique-viewers' as const,
-      label: 'Espectadores Únicos',
-      icon: <Users className="w-5 h-5" />,
-      fmt: (v: number) => formatNumber(v),
-    },
   ];
 
   const period = ytData?.['youtube-views']

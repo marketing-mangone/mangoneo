@@ -51,11 +51,11 @@ def fetch_channel_analytics(
         ids=ids,
         startDate=start_date.isoformat(),
         endDate=end_date.isoformat(),
-        metrics='views,estimatedMinutesWatched,subscribersGained,subscribersLost,uniqueViewers',
+        metrics='views,estimatedMinutesWatched,subscribersGained,subscribersLost',
     ).execute()
 
-    rows = resp.get('rows', [[0, 0, 0, 0, 0]])
-    row = rows[0] if rows else [0, 0, 0, 0, 0]
+    rows = resp.get('rows', [[0, 0, 0, 0]])
+    row = rows[0] if rows else [0, 0, 0, 0]
 
     return {
         'views': int(row[0]),
@@ -63,7 +63,6 @@ def fetch_channel_analytics(
         'subscribers_gained': int(row[2]),
         'subscribers_lost': int(row[3]),
         'net_subscribers': int(row[2]) - int(row[3]),
-        'unique_viewers': int(row[4]),
         'start_date': start_date.isoformat(),
         'end_date': end_date.isoformat(),
     }

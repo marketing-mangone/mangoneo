@@ -20,7 +20,6 @@ def sync_youtube_metrics(self):
             'youtube-views': data['views'],
             'youtube-watch-time': data['watch_time_minutes'],
             'youtube-net-subscribers': data['net_subscribers'],
-            'youtube-unique-viewers': data['unique_viewers'],
         }
 
         for slug, value in metric_values.items():

@@ -446,7 +446,6 @@ export type DashboardSummary = {
     'youtube-views': YouTubeMetricValue;
     'youtube-watch-time': YouTubeMetricValue;
     'youtube-net-subscribers': YouTubeMetricValue;
-    'youtube-unique-viewers': YouTubeMetricValue;
   };
 };
 

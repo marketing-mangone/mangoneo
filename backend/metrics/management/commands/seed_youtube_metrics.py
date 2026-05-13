@@ -32,13 +32,6 @@ YOUTUBE_METRICS = [
         'unit': 'count',
         'description': 'Suscriptores ganados menos perdidos en los últimos 28 días',
     },
-    {
-        'name': 'YouTube — Espectadores Únicos',
-        'slug': 'youtube-unique-viewers',
-        'category': 'engagement',
-        'unit': 'count',
-        'description': 'Espectadores únicos en los últimos 28 días',
-    },
 ]
 
 

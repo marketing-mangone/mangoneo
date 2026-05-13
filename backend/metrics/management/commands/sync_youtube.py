@@ -30,10 +30,9 @@ class Command(BaseCommand):
             raise CommandError(f'Failed to fetch YouTube data: {exc}') from exc
 
         self.stdout.write(f"  Period : {data['start_date']} → {data['end_date']}")
-        self.stdout.write(f"  Views  : {data['views']:,}")
-        self.stdout.write(f"  Watch  : {data['watch_time_minutes']:,.0f} min")
+        self.stdout.write(f"  Views   : {data['views']:,}")
+        self.stdout.write(f"  Watch   : {data['watch_time_minutes']:,.0f} min")
         self.stdout.write(f"  Net subs: {data['net_subscribers']:+d}")
-        self.stdout.write(f"  Unique viewers: {data['unique_viewers']:,}")
 
         end_date = date.fromisoformat(data['end_date'])
         start_date = date.fromisoformat(data['start_date'])
@@ -42,7 +41,6 @@ class Command(BaseCommand):
             'youtube-views': data['views'],
             'youtube-watch-time': data['watch_time_minutes'],
             'youtube-net-subscribers': data['net_subscribers'],
-            'youtube-unique-viewers': data['unique_viewers'],
         }
 
         saved = 0

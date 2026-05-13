@@ -14,7 +14,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand
 
-CLIENT_SECRET_PATH = Path(__file__).resolve().parents[4] / 'client_secret_youtube.json'
+CLIENT_SECRET_PATH = Path(__file__).resolve().parents[3] / 'client_secret_youtube.json'
 
 SCOPES = [
     'https://www.googleapis.com/auth/yt-analytics.readonly',

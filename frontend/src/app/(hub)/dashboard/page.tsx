@@ -376,12 +376,6 @@ export default function DashboardPage() {
                 value: ytData?.['youtube-net-subscribers']?.value,
                 fmt: (v: number) => (v >= 0 ? `+${formatNumber(v)}` : formatNumber(v)),
               },
-              {
-                label: 'Espectadores Únicos',
-                icon: <Users className="w-5 h-5" />,
-                value: ytData?.['youtube-unique-viewers']?.value,
-                fmt: (v: number) => formatNumber(v),
-              },
             ].map(({ label, icon, value, fmt }) => (
               <Card key={label} className="p-6">
                 <div className="flex items-center justify-between mb-4">
