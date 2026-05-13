@@ -21,6 +21,7 @@ WEEKLY_SLUGS = [
 class MetricDefinitionViewSet(viewsets.ModelViewSet):
     queryset = MetricDefinition.objects.filter(is_active=True)
     serializer_class = MetricDefinitionSerializer
+    permission_classes = [IsAuthenticated]
     search_fields = ['name', 'description']
     filterset_fields = ['category', 'source']
 
@@ -34,6 +35,7 @@ class MetricDefinitionViewSet(viewsets.ModelViewSet):
 class MetricSnapshotViewSet(viewsets.ModelViewSet):
     queryset = MetricSnapshot.objects.all()
     serializer_class = MetricSnapshotSerializer
+    permission_classes = [IsAuthenticated]
     filterset_fields = ['metric', 'period_type']
 
 

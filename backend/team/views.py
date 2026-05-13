@@ -37,6 +37,7 @@ class TeamMemberSerializer(serializers.ModelSerializer):
 class TeamViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = UserProfile.objects.select_related('user').filter(status='active').order_by('id')
     serializer_class = TeamMemberSerializer
+    permission_classes = [IsAuthenticated]
 
     @action(detail=True, methods=['patch'], url_path='hierarchy',
             permission_classes=[IsAdminRole])

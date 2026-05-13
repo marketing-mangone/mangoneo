@@ -155,10 +155,7 @@ export default function LoginPage() {
 
             <div className="mt-6 pt-6 border-t border-[#e8e8f0]">
               <p className="text-center text-xs text-[#8888a8]">
-                ¿Problemas para ingresar?{' '}
-                <a href="mailto:Sebastian.q@mangonelawfirmllc.com" className="text-[#F79C31] hover:underline font-medium">
-                  Contacta al administrador
-                </a>
+                ¿Problemas para ingresar? Contacta al administrador del sistema.
               </p>
             </div>
           </div>

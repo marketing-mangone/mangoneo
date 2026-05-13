@@ -6,9 +6,10 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, Bell, ChevronLeft, ChevronRight,
-  Settings, Sparkles, TrendingUp,
+  Settings, Sparkles, TrendingUp, LogOut,
 } from 'lucide-react';
 import { useState } from 'react';
+import { auth } from '@/lib/api';
 
 type SubNavItem = { href: string; label: string; exact?: boolean };
 type NavItem = {
@@ -50,6 +51,10 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
 export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  const currentUser = auth.getCurrentUser();
+  const displayName = currentUser?.name || currentUser?.username || 'Usuario';
+  const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
+  const roleLabel = currentUser?.role === 'admin' ? 'Admin' : currentUser?.role || '';
 
   return (
     <aside
@@ -256,9 +261,9 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
           )}
         </Link>
 
-        {/* User profile */}
+        {/* User profile + logout */}
         <div className={cn(
-          'flex items-center rounded-xl transition-all cursor-pointer hover:bg-white/6',
+          'flex items-center rounded-xl transition-all',
           collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5'
         )}>
           <div className={cn(
@@ -267,13 +272,22 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
           )}
             style={{ background: 'linear-gradient(135deg, #F79C31 0%, #f0a94a 100%)' }}
           >
-            SQ
+            {initials}
           </div>
           {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-white text-[13px] font-semibold truncate leading-tight">Sebastian Quijada</p>
-              <p className="text-white/35 text-[11px] truncate">Director · Admin</p>
-            </div>
+            <>
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-[13px] font-semibold truncate leading-tight">{displayName}</p>
+                <p className="text-white/35 text-[11px] truncate">{currentUser?.position || roleLabel}</p>
+              </div>
+              <button
+                onClick={() => auth.logout()}
+                title="Cerrar sesión"
+                className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 hover:bg-white/6 transition-all"
+              >
+                <LogOut style={{ width: '14px', height: '14px' }} />
+              </button>
+            </>
           )}
         </div>
       </div>

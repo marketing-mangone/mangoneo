@@ -7,7 +7,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='dev-secret-key-change-in-production-immediately')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+_allowed = config('ALLOWED_HOSTS', default='')
+ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()] or (['localhost', '127.0.0.1'] if DEBUG else [])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -18,6 +19,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'django_filters',
     'django_celery_beat',
@@ -99,6 +101,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 52_428_800
 # ── REST Framework ────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'core.authentication.CookieJWTAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -111,13 +114,30 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '60/minute',
+        'user': '300/minute',
+        'login': '10/minute',
+    },
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
     'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
 }
+
+# ── JWT Cookies ───────────────────────────────────────────────────────────────
+JWT_ACCESS_COOKIE  = 'mh_access'
+JWT_REFRESH_COOKIE = 'mh_refresh'
+JWT_COOKIE_SECURE   = not DEBUG
+JWT_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
 # En producción agrega el dominio de Vercel en CORS_ALLOWED_ORIGINS (env var).
@@ -128,6 +148,20 @@ CORS_ALLOWED_ORIGINS = [
 ] + [o.strip() for o in _cors_extra.split(',') if o.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# ── Seguridad HTTP ─────────────────────────────────────────────────────────────
+X_FRAME_OPTIONS                  = 'DENY'
+SECURE_CONTENT_TYPE_NOSNIFF      = True
+SECURE_BROWSER_XSS_FILTER        = True
+SECURE_REFERRER_POLICY           = 'strict-origin-when-cross-origin'
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT              = True
+    SECURE_HSTS_SECONDS              = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS   = True
+    SECURE_HSTS_PRELOAD              = True
+    SESSION_COOKIE_SECURE            = True
+    CSRF_COOKIE_SECURE               = True
 
 # ── Celery ────────────────────────────────────────────────────────────────────
 REDIS_URL = config('REDIS_URL', default='redis://localhost:6379/0')

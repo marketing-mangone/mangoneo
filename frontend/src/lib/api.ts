@@ -1,54 +1,57 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-// ── Auth helpers ─────────────────────────────────────────────────────────────
+// ── Session helpers (non-sensitive only) ─────────────────────────────────────
 
-function getTokens() {
-  if (typeof window === 'undefined') return { access: null, refresh: null };
-  return {
-    access:  localStorage.getItem('access_token'),
-    refresh: localStorage.getItem('refresh_token'),
-  };
-}
-
-function saveTokens(access: string, refresh: string) {
-  localStorage.setItem('access_token', access);
-  localStorage.setItem('refresh_token', refresh);
-}
-
-function clearTokens() {
+function clearSession() {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem('current_user');
+  // Legacy cleanup (tokens moved to httpOnly cookies)
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
 }
 
-// ── Base fetch con manejo de JWT ─────────────────────────────────────────────
+// ── Base fetch ────────────────────────────────────────────────────────────────
+// Always sends credentials (httpOnly cookies). Falls back to localStorage
+// Authorization header for local dev where cross-origin cookies don't work.
 
 async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
-  const { access } = getTokens();
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string> ?? {}),
   };
-  if (access) headers['Authorization'] = `Bearer ${access}`;
 
-  const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  // Dev fallback: include legacy Authorization header if token still in localStorage
+  if (typeof window !== 'undefined') {
+    const legacyToken = localStorage.getItem('access_token');
+    if (legacyToken && !headers['Authorization']) {
+      headers['Authorization'] = `Bearer ${legacyToken}`;
+    }
+  }
+
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers,
+    credentials: 'include', // sends httpOnly cookies automatically
+  });
 
   if (res.status === 401) {
-    // Intentar refrescar el token
-    const { refresh } = getTokens();
-    if (refresh) {
-      const refreshRes = await fetch(`${API_BASE}/api/auth/refresh/`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh }),
+    // Try silent refresh via cookie
+    const refreshRes = await fetch(`${API_BASE}/api/auth/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({}),
+    });
+    if (refreshRes.ok) {
+      // Retry original request — new access cookie was set
+      return fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers,
+        credentials: 'include',
       });
-      if (refreshRes.ok) {
-        const { access: newAccess } = await refreshRes.json();
-        saveTokens(newAccess, refresh);
-        headers['Authorization'] = `Bearer ${newAccess}`;
-        return fetch(`${API_BASE}${path}`, { ...options, headers });
-      }
     }
-    clearTokens();
-    window.location.href = '/login';
+    // Session truly expired
+    clearSession();
+    if (typeof window !== 'undefined') window.location.href = '/login';
   }
 
   return res;
@@ -88,27 +91,36 @@ export const auth = {
     const res = await fetch(`${API_BASE}/api/auth/login/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) throw new Error('Credenciales incorrectas');
-    const data = await res.json();
-    saveTokens(data.access, data.refresh);
-    // Fetch and cache user info after login
+    // Cookies are set by the server — fetch and cache user info only
     try {
       const me = await fetch(`${API_BASE}/api/accounts/me/`, {
-        headers: { Authorization: `Bearer ${data.access}` },
+        credentials: 'include',
       }).then(r => r.json());
       saveCurrentUser(me);
     } catch {
       // Non-fatal: user info will be fetched on next load
     }
-    return data;
   },
-  logout() {
-    clearTokens();
-    localStorage.removeItem('current_user');
+  async logout() {
+    try {
+      await fetch(`${API_BASE}/api/auth/logout/`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {
+      // Proceed even if request fails
+    }
+    clearSession();
+    if (typeof window !== 'undefined') window.location.href = '/login';
   },
-  isAuthenticated: () => !!getTokens().access,
+  isAuthenticated: () => {
+    if (typeof window === 'undefined') return false;
+    return !!localStorage.getItem('current_user');
+  },
   getCurrentUser(): CurrentUser | null {
     if (typeof window === 'undefined') return null;
     const raw = localStorage.getItem('current_user');
@@ -203,7 +215,6 @@ export const documentsApi = {
     meta: { title: string; description?: string; category: string },
     onProgress?: (pct: number) => void,
   ): Promise<ApiDocument> {
-    const { access } = getTokens();
     return new Promise((resolve, reject) => {
       const formData = new FormData();
       formData.append('file', file);
@@ -213,7 +224,7 @@ export const documentsApi = {
 
       const xhr = new XMLHttpRequest();
       xhr.open('POST', `${API_BASE}/api/documents/`);
-      if (access) xhr.setRequestHeader('Authorization', `Bearer ${access}`);
+      xhr.withCredentials = true; // send httpOnly cookies
 
       xhr.upload.onprogress = (e) => {
         if (e.lengthComputable && onProgress) {
