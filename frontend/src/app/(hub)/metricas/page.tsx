@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -10,14 +10,22 @@ import {
 import {
   TrendingUp, TrendingDown, Minus, Target, RefreshCw,
   ArrowUpRight, ArrowDownRight, Filter, Download,
+  PlaySquare, Eye, Clock, UserPlus, Users,
 } from 'lucide-react';
 import {
   MOCK_KPIS, MOCK_LEADS_SERIES, MOCK_SESIONES_SERIES,
   MOCK_AD_SPEND_SERIES, MOCK_CHANNEL_DATA,
 } from '@/lib/mock-data';
 import { formatNumber, formatCurrency, calcChange } from '@/lib/utils';
+import { dashboardApi, type DashboardSummary } from '@/lib/api';
 
 const PERIODS = ['Este mes', 'Último trimestre', 'Últimos 6 meses', 'Este año'];
+const TABS = ['Departamentales', 'YouTube'];
+
+function fmtWatchTime(minutes: number): string {
+  if (minutes >= 60) return `${(minutes / 60).toFixed(1)}h`;
+  return `${Math.round(minutes)} min`;
+}
 
 const sourceLabels: Record<string, { label: string; color: string; dot: string }> = {
   hubspot: { label: 'HubSpot', color: 'bg-orange-50 text-orange-700', dot: 'bg-orange-500' },
@@ -98,6 +106,12 @@ const COMBINED_SERIES = MOCK_LEADS_SERIES.map((d, i) => ({
 export default function MetricasPage() {
   const [period, setPeriod] = useState(PERIODS[0]);
   const [activeCategory, setActiveCategory] = useState('all');
+  const [activeTab, setActiveTab] = useState(TABS[0]);
+  const [ytData, setYtData] = useState<DashboardSummary['youtube'] | null>(null);
+
+  useEffect(() => {
+    dashboardApi.summary().then(d => setYtData(d.youtube)).catch(() => {});
+  }, []);
 
   const filtered = activeCategory === 'all'
     ? MOCK_KPIS
@@ -128,6 +142,30 @@ export default function MetricasPage() {
       />
 
       <div className="px-10 py-10 space-y-10">
+
+        {/* ── Tabs ── */}
+        <div className="flex items-center gap-1 border-b border-[#e8e8f0]">
+          {TABS.map(tab => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 border-b-2 -mb-px transition-all ${
+                activeTab === tab
+                  ? 'border-[#0C2054] text-[#0C2054]'
+                  : 'border-transparent text-[#8888a8] hover:text-[#4a4a6a]'
+              }`}
+            >
+              {tab === 'YouTube' && <PlaySquare className="w-3.5 h-3.5 text-red-500" />}
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {activeTab === 'YouTube' && (
+          <YouTubeSection ytData={ytData} />
+        )}
+
+        {activeTab === 'Departamentales' && <>
         {/* Period selector */}
         <div className="flex items-center gap-3">
           <span className="text-sm text-[#8888a8] font-medium">Período:</span>
@@ -278,7 +316,108 @@ export default function MetricasPage() {
             </div>
           </div>
         </Card>
+        </>}
       </div>
+    </div>
+  );
+}
+
+/* ─── YouTube Section ─── */
+function YouTubeSection({ ytData }: { ytData: DashboardSummary['youtube'] | null }) {
+  const stats = [
+    {
+      slug: 'youtube-views' as const,
+      label: 'Reproducciones',
+      icon: <Eye className="w-5 h-5" />,
+      fmt: (v: number) => formatNumber(v),
+    },
+    {
+      slug: 'youtube-watch-time' as const,
+      label: 'Tiempo de Reproducción',
+      icon: <Clock className="w-5 h-5" />,
+      fmt: (v: number) => fmtWatchTime(v),
+    },
+    {
+      slug: 'youtube-net-subscribers' as const,
+      label: 'Suscriptores Netos',
+      icon: <UserPlus className="w-5 h-5" />,
+      fmt: (v: number) => (v >= 0 ? `+${formatNumber(v)}` : formatNumber(v)),
+    },
+    {
+      slug: 'youtube-unique-viewers' as const,
+      label: 'Espectadores Únicos',
+      icon: <Users className="w-5 h-5" />,
+      fmt: (v: number) => formatNumber(v),
+    },
+  ];
+
+  const period = ytData?.['youtube-views']
+    ? `${ytData['youtube-views'].period_start} → ${ytData['youtube-views'].period_end}`
+    : null;
+
+  return (
+    <div className="space-y-8">
+      {/* Header row */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center">
+            <PlaySquare className="w-5 h-5 text-red-600" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-[#111827]">YouTube Analytics</h3>
+            <p className="text-xs text-[#9ca3af]">{period ?? 'Sin datos — ejecuta sync_youtube para cargar métricas'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map(({ slug, label, icon, fmt }) => {
+          const entry = ytData?.[slug];
+          const value = entry?.value ?? null;
+          return (
+            <Card key={slug} className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 flex-shrink-0">
+                  {icon}
+                </div>
+              </div>
+              <p className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-[0.1em] mb-2">{label}</p>
+              {value !== null ? (
+                <p className="text-[28px] font-extrabold text-[#111827] leading-none tracking-tight">
+                  {fmt(value)}
+                </p>
+              ) : (
+                <p className="text-[18px] font-semibold text-[#d1d5db] leading-none">Sin datos</p>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Setup instructions when no data */}
+      {!ytData?.['youtube-views']?.value && (
+        <Card className="p-8 border-dashed border-2 border-[#e5e7eb]">
+          <div className="flex items-start gap-4">
+            <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+              <PlaySquare className="w-5 h-5 text-red-500" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-[#111827] mb-1">Configurar integración con YouTube</h4>
+              <p className="text-xs text-[#6b7280] mb-3 leading-relaxed">
+                Los datos de YouTube Analytics se sincronizan automáticamente cada 6 horas una vez configurada la integración.
+              </p>
+              <ol className="text-xs text-[#6b7280] space-y-1.5 list-decimal list-inside">
+                <li>Coloca <code className="bg-[#f3f4f6] px-1 rounded">client_secret_youtube.json</code> en la carpeta <code className="bg-[#f3f4f6] px-1 rounded">backend/</code></li>
+                <li>Ejecuta <code className="bg-[#f3f4f6] px-1 rounded">python manage.py authorize_youtube</code> para obtener el refresh token</li>
+                <li>Agrega <code className="bg-[#f3f4f6] px-1 rounded">YOUTUBE_CLIENT_ID</code>, <code className="bg-[#f3f4f6] px-1 rounded">YOUTUBE_CLIENT_SECRET</code>, <code className="bg-[#f3f4f6] px-1 rounded">YOUTUBE_REFRESH_TOKEN</code> y <code className="bg-[#f3f4f6] px-1 rounded">YOUTUBE_CHANNEL_ID</code> al <code className="bg-[#f3f4f6] px-1 rounded">.env</code></li>
+                <li>Ejecuta <code className="bg-[#f3f4f6] px-1 rounded">python manage.py seed_youtube_metrics</code> para crear las definiciones</li>
+                <li>Ejecuta <code className="bg-[#f3f4f6] px-1 rounded">python manage.py sync_youtube</code> para cargar datos inmediatamente</li>
+              </ol>
+            </div>
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

@@ -437,6 +437,25 @@ export const teamApi = {
   },
 };
 
+export type YouTubeMetricValue = { value: number | null; period_start: string | null; period_end: string | null };
+export type DashboardSummary = {
+  tasks_active: number;
+  tasks_done: number;
+  metrics_count: number;
+  youtube: {
+    'youtube-views': YouTubeMetricValue;
+    'youtube-watch-time': YouTubeMetricValue;
+    'youtube-net-subscribers': YouTubeMetricValue;
+    'youtube-unique-viewers': YouTubeMetricValue;
+  };
+};
+
+export const dashboardApi = {
+  summary() {
+    return apiJSON<DashboardSummary>('/api/dashboard/summary/');
+  },
+};
+
 export const usersApi = {
   list() {
     return apiJSON<{ results: ApiUserManagement[]; count: number }>('/api/accounts/users/');

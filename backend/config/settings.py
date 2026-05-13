@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
+    'django_celery_beat',
     'accounts',
     'metrics',
     'documents',
@@ -127,3 +128,19 @@ CORS_ALLOWED_ORIGINS = [
 ] + [o.strip() for o in _cors_extra.split(',') if o.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
+
+# ── Celery ────────────────────────────────────────────────────────────────────
+REDIS_URL = config('REDIS_URL', default='redis://localhost:6379/0')
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# ── YouTube API ───────────────────────────────────────────────────────────────
+YOUTUBE_CLIENT_ID     = config('YOUTUBE_CLIENT_ID', default='')
+YOUTUBE_CLIENT_SECRET = config('YOUTUBE_CLIENT_SECRET', default='')
+YOUTUBE_REFRESH_TOKEN = config('YOUTUBE_REFRESH_TOKEN', default='')
+YOUTUBE_CHANNEL_ID    = config('YOUTUBE_CHANNEL_ID', default='')

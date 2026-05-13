@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class MetricDefinition(models.Model):
     CATEGORY_CHOICES = [('acquisition','Adquisición'),('engagement','Engagement'),('conversion','Conversión'),('brand','Marca')]
-    SOURCE_CHOICES = [('hubspot','HubSpot'),('google_analytics','GA4'),('meta','Meta'),('google_ads','Google Ads'),('manual','Manual')]
+    SOURCE_CHOICES = [('hubspot','HubSpot'),('google_analytics','GA4'),('meta','Meta'),('google_ads','Google Ads'),('youtube','YouTube'),('manual','Manual')]
     UNIT_CHOICES = [('count','Conteo'),('currency','Moneda'),('percentage','Porcentaje'),('time','Tiempo')]
     name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)

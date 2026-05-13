@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -8,13 +9,15 @@ import {
 } from 'recharts';
 import {
   Users, Target, Globe, DollarSign, Eye,
-  ArrowUpRight, ArrowDownRight, Activity,
+  ArrowUpRight, ArrowDownRight, Activity, PlaySquare,
+  Clock, UserPlus,
 } from 'lucide-react';
 import {
   MOCK_KPIS, MOCK_LEADS_SERIES, MOCK_AD_SPEND_SERIES,
   MOCK_CHANNEL_DATA, MOCK_TASKS, MOCK_EVENTS,
 } from '@/lib/mock-data';
 import { formatNumber, formatCurrency, calcChange } from '@/lib/utils';
+import { dashboardApi, type DashboardSummary } from '@/lib/api';
 import Link from 'next/link';
 
 /* ─── Constantes de diseño ─── */
@@ -128,11 +131,22 @@ const upcomingEvents = MOCK_EVENTS
   .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
   .slice(0, 5);
 
+function fmtWatchTime(minutes: number): string {
+  if (minutes >= 60) return `${(minutes / 60).toFixed(1)}h`;
+  return `${Math.round(minutes)} min`;
+}
+
 /* ─── Page ─── */
 export default function DashboardPage() {
   const mainKpis      = MOCK_KPIS.slice(0, 4);
   const secondaryKpis = MOCK_KPIS.slice(4);
   const totalLeads    = MOCK_CHANNEL_DATA.reduce((s, d) => s + d.leads, 0);
+
+  const [ytData, setYtData] = useState<DashboardSummary['youtube'] | null>(null);
+
+  useEffect(() => {
+    dashboardApi.summary().then(d => setYtData(d.youtube)).catch(() => {});
+  }, []);
 
   return (
     <div className="animate-fade-in">
@@ -326,6 +340,66 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {secondaryKpis.map(kpi => <KpiCard key={kpi.id} kpi={kpi} />)}
+          </div>
+        </section>
+
+        {/* ════════════ YOUTUBE ════════════ */}
+        <section>
+          <div className="flex items-end justify-between mb-6">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-red-50 flex items-center justify-center">
+                <PlaySquare className="w-4 h-4 text-red-600" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-[#111827] leading-tight">YouTube Analytics</h2>
+                <p className="text-sm text-[#9ca3af] mt-0.5">Últimos 28 días</p>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                label: 'Reproducciones',
+                icon: <Eye className="w-5 h-5" />,
+                value: ytData?.['youtube-views']?.value,
+                fmt: (v: number) => formatNumber(v),
+              },
+              {
+                label: 'Tiempo de Reproducción',
+                icon: <Clock className="w-5 h-5" />,
+                value: ytData?.['youtube-watch-time']?.value,
+                fmt: (v: number) => fmtWatchTime(v),
+              },
+              {
+                label: 'Suscriptores Netos',
+                icon: <UserPlus className="w-5 h-5" />,
+                value: ytData?.['youtube-net-subscribers']?.value,
+                fmt: (v: number) => (v >= 0 ? `+${formatNumber(v)}` : formatNumber(v)),
+              },
+              {
+                label: 'Espectadores Únicos',
+                icon: <Users className="w-5 h-5" />,
+                value: ytData?.['youtube-unique-viewers']?.value,
+                fmt: (v: number) => formatNumber(v),
+              },
+            ].map(({ label, icon, value, fmt }) => (
+              <Card key={label} className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 flex-shrink-0">
+                    {icon}
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600">YouTube</span>
+                </div>
+                <p className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-[0.1em] mb-2">{label}</p>
+                {value !== null && value !== undefined ? (
+                  <p className="text-[28px] font-extrabold text-[#111827] leading-none tracking-tight">
+                    {fmt(value)}
+                  </p>
+                ) : (
+                  <p className="text-[18px] font-semibold text-[#d1d5db] leading-none">Sin datos</p>
+                )}
+              </Card>
+            ))}
           </div>
         </section>
 
