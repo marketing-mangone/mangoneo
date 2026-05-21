@@ -6,7 +6,7 @@ import {
   Plus, Search, Clock, CheckCircle2, Circle, AlertCircle, Ban,
   Calendar, MoreVertical, X, Loader2, Trash2, Pencil, CheckSquare,
 } from 'lucide-react';
-import { tasksApi, ApiTask } from '@/lib/api';
+import { tasksApi, teamApi, ApiTask, ApiTeamMember } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 
 // ── Config ────────────────────────────────────────────────────────────────────
@@ -57,16 +57,22 @@ function TaskModal({
 }) {
   const isEdit = !!task;
 
-  const [title,       setTitle]       = useState(task?.title ?? '');
-  const [description, setDescription] = useState(task?.description ?? '');
-  const [status,      setStatus]      = useState<ApiTask['status']>(task?.status ?? 'pending');
-  const [priority,    setPriority]    = useState<ApiTask['priority']>(task?.priority ?? 'medium');
-  const [dueDate,     setDueDate]     = useState(task?.due_date ?? '');
-  const [project,     setProject]     = useState(task?.project ?? '');
-  const [progress,    setProgress]    = useState(task?.progress ?? 0);
-  const [tagsInput,   setTagsInput]   = useState((task?.tags ?? []).join(', '));
-  const [saving,      setSaving]      = useState(false);
-  const [error,       setError]       = useState('');
+  const [title,        setTitle]        = useState(task?.title ?? '');
+  const [description,  setDescription]  = useState(task?.description ?? '');
+  const [status,       setStatus]       = useState<ApiTask['status']>(task?.status ?? 'pending');
+  const [priority,     setPriority]     = useState<ApiTask['priority']>(task?.priority ?? 'medium');
+  const [dueDate,      setDueDate]      = useState(task?.due_date ?? '');
+  const [project,      setProject]      = useState(task?.project ?? '');
+  const [progress,     setProgress]     = useState(task?.progress ?? 0);
+  const [tagsInput,    setTagsInput]    = useState((task?.tags ?? []).join(', '));
+  const [assignee,     setAssignee]     = useState<number | null>(task?.assignee ?? null);
+  const [teamMembers,  setTeamMembers]  = useState<ApiTeamMember[]>([]);
+  const [saving,       setSaving]       = useState(false);
+  const [error,        setError]        = useState('');
+
+  useEffect(() => {
+    teamApi.list().then(data => setTeamMembers(data.results)).catch(() => {});
+  }, []);
 
   const submit = async () => {
     if (!title.trim()) { setError('El título es obligatorio.'); return; }
@@ -81,7 +87,7 @@ function TaskModal({
       project:     project.trim(),
       progress,
       tags:        tagsInput.split(',').map(t => t.trim()).filter(Boolean),
-      assignee:    null,
+      assignee:    assignee,
     };
     try {
       const saved = isEdit
@@ -233,6 +239,27 @@ function TaskModal({
               placeholder="diseño, redes, VAWA"
               className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors"
             />
+          </div>
+
+          {/* Responsable */}
+          <div>
+            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
+              Responsable <span className="text-[#8888a8] font-normal">(opcional)</span>
+            </label>
+            <select
+              value={assignee ?? ''}
+              onChange={e => setAssignee(e.target.value ? Number(e.target.value) : null)}
+              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors text-[#1a1a2e] bg-white"
+            >
+              <option value="">— Sin asignar —</option>
+              {teamMembers
+                .filter(m => m.status === 'active')
+                .map(m => (
+                  <option key={m.user_id} value={m.user_id}>
+                    {m.name} {m.position ? `· ${m.position}` : ''}
+                  </option>
+                ))}
+            </select>
           </div>
 
           {error && (
