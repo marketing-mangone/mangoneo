@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'team',
     'tasks_app',
     'dashboard',
+    'competitors',
 ]
 
 MIDDLEWARE = [

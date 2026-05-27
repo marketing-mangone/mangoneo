@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, Bell, ChevronLeft, ChevronRight,
-  Settings, Sparkles, TrendingUp, LogOut,
+  Settings, Sparkles, TrendingUp, LogOut, Target,
 } from 'lucide-react';
 import { useState } from 'react';
 import { auth } from '@/lib/api';
@@ -44,6 +44,12 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
       { href: '/equipo', icon: Users, label: 'Equipo', desc: 'Directorio' },
       { href: '/tareas', icon: CheckSquare, label: 'Tareas', desc: 'Kanban' },
       { href: '/calendario', icon: Calendar, label: 'Calendario', desc: 'Contenido' },
+    ],
+  },
+  {
+    label: 'Inteligencia',
+    items: [
+      { href: '/competencia', icon: Target, label: 'Competencia', desc: 'Radar competitivo' },
     ],
   },
 ];

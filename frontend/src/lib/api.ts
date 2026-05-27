@@ -529,3 +529,216 @@ export const usersApi = {
     });
   },
 };
+
+// ── Competitors API ───────────────────────────────────────────────────────────
+
+export type CompetitorCategory = 'direct' | 'indirect';
+export type CompetitorDimension = 'seo' | 'social_media' | 'advertising' | 'web_presence' | 'content' | 'reviews';
+export type ScoreSource = 'manual' | 'similarweb' | 'api';
+export type AdPlatform = 'meta' | 'google' | 'youtube' | 'tiktok';
+export type InsightType = 'threat' | 'opportunity' | 'observation';
+export type InsightImpact = 'high' | 'medium' | 'low';
+
+export interface ApiCompetitorScore {
+  id: number;
+  competitor: number;
+  dimension: CompetitorDimension;
+  dimension_display: string;
+  score: string; // decimal string from DRF
+  raw_value: string;
+  source: ScoreSource;
+  source_display: string;
+  period: string; // YYYY-MM-DD
+  notes: string;
+  created_at: string;
+}
+
+export interface ApiAdObservation {
+  id: number;
+  competitor: number;
+  platform: AdPlatform;
+  platform_display: string;
+  creative_url: string;
+  headline: string;
+  message: string;
+  cta: string;
+  differentiator: string;
+  observed_date: string;
+  is_active: boolean;
+  notes: string;
+  created_by: number | null;
+  created_at: string;
+}
+
+export interface ApiCompetitorInsight {
+  id: number;
+  competitor: number | null;
+  insight_type: InsightType;
+  insight_type_display: string;
+  impact: InsightImpact;
+  impact_display: string;
+  title: string;
+  description: string;
+  action_items: string[];
+  created_by: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiCompetitor {
+  id: number;
+  name: string;
+  website: string;
+  logo_url: string;
+  category: CompetitorCategory;
+  practice_areas: string[];
+  description: string;
+  location: string;
+  is_active: boolean;
+  scores: ApiCompetitorScore[];
+  ad_observations: ApiAdObservation[];
+  insights: ApiCompetitorInsight[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiCompetitorList {
+  id: number;
+  name: string;
+  website: string;
+  logo_url: string;
+  category: CompetitorCategory;
+  practice_areas: string[];
+  description: string;
+  location: string;
+  is_active: boolean;
+  latest_scores: Partial<Record<CompetitorDimension, number>>;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CompetitorInput = {
+  name: string;
+  website?: string;
+  logo_url?: string;
+  category?: CompetitorCategory;
+  practice_areas?: string[];
+  description?: string;
+  location?: string;
+  is_active?: boolean;
+};
+
+export type ScoreInput = {
+  competitor: number;
+  dimension: CompetitorDimension;
+  score: number;
+  raw_value?: string;
+  source?: ScoreSource;
+  period: string; // YYYY-MM-DD (use first day of month)
+  notes?: string;
+};
+
+export type AdObservationInput = {
+  competitor: number;
+  platform: AdPlatform;
+  creative_url?: string;
+  headline?: string;
+  message?: string;
+  cta?: string;
+  differentiator?: string;
+  observed_date: string;
+  is_active?: boolean;
+  notes?: string;
+};
+
+export type InsightInput = {
+  competitor?: number | null;
+  insight_type: InsightType;
+  impact: InsightImpact;
+  title: string;
+  description: string;
+  action_items?: string[];
+};
+
+export const competitorsApi = {
+  list() {
+    return apiJSON<{ results: ApiCompetitorList[]; count: number }>('/api/competitors/competitors/');
+  },
+  get(id: number) {
+    return apiJSON<ApiCompetitor>(`/api/competitors/competitors/${id}/`);
+  },
+  radarData() {
+    return apiJSON<ApiCompetitorList[]>('/api/competitors/competitors/radar-data/');
+  },
+  create(data: CompetitorInput) {
+    return apiJSON<ApiCompetitor>('/api/competitors/competitors/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  update(id: number, data: Partial<CompetitorInput>) {
+    return apiJSON<ApiCompetitor>(`/api/competitors/competitors/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+  delete(id: number) {
+    return apiFetch(`/api/competitors/competitors/${id}/`, { method: 'DELETE' });
+  },
+
+  // Scores
+  listScores(competitorId?: number) {
+    const qs = competitorId ? `?competitor=${competitorId}` : '';
+    return apiJSON<{ results: ApiCompetitorScore[]; count: number }>(`/api/competitors/scores/${qs}`);
+  },
+  createScore(data: ScoreInput) {
+    return apiJSON<ApiCompetitorScore>('/api/competitors/scores/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  updateScore(id: number, data: Partial<ScoreInput>) {
+    return apiJSON<ApiCompetitorScore>(`/api/competitors/scores/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Ads
+  listAds(competitorId?: number, platform?: AdPlatform) {
+    const qs = new URLSearchParams();
+    if (competitorId) qs.set('competitor', String(competitorId));
+    if (platform) qs.set('platform', platform);
+    return apiJSON<{ results: ApiAdObservation[]; count: number }>(`/api/competitors/ads/${qs.toString() ? '?' + qs : ''}`);
+  },
+  createAd(data: AdObservationInput) {
+    return apiJSON<ApiAdObservation>('/api/competitors/ads/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  updateAd(id: number, data: Partial<AdObservationInput>) {
+    return apiJSON<ApiAdObservation>(`/api/competitors/ads/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  },
+  deleteAd(id: number) {
+    return apiFetch(`/api/competitors/ads/${id}/`, { method: 'DELETE' });
+  },
+
+  // Insights
+  listInsights(competitorId?: number) {
+    const qs = competitorId ? `?competitor=${competitorId}` : '';
+    return apiJSON<{ results: ApiCompetitorInsight[]; count: number }>(`/api/competitors/insights/${qs}`);
+  },
+  createInsight(data: InsightInput) {
+    return apiJSON<ApiCompetitorInsight>('/api/competitors/insights/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  deleteInsight(id: number) {
+    return apiFetch(`/api/competitors/insights/${id}/`, { method: 'DELETE' });
+  },
+};
