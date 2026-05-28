@@ -44,7 +44,7 @@ class CustomerAvatarSerializer(serializers.ModelSerializer):
             'updated_at',
             'updated_at_display',
         ]
-        read_only_fields = ['created_at', 'updated_at', 'updated_at_display']
+        read_only_fields = ['created_by', 'created_at', 'updated_at', 'updated_at_display']
 
     def get_updated_at_display(self, obj):
         if not obj.updated_at:

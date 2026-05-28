@@ -652,7 +652,7 @@ function AvatarCanvas({
   const handleSave = async () => {
     setSaving(true);
     try { await onSave(draft); setEditing(false); }
-    catch { alert('Error al guardar'); }
+    catch (err: any) { alert(`Error al guardar: ${err.message || 'Error desconocido'}`); }
     finally { setSaving(false); }
   };
 
