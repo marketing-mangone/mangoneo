@@ -9,8 +9,69 @@ import {
   Download, Eye, Clock, FolderOpen, BookOpen,
   Palette, Type, Layers, X, AlertCircle, Trash2,
   CheckCircle, Loader2, CloudUpload, Maximize2,
+  Edit3, Plus, Users,
 } from 'lucide-react';
 import { documentsApi, ApiDocument } from '@/lib/api';
+
+// ── Avatar types ──────────────────────────────────────────────────────────────
+
+interface ApiCustomerAvatar {
+  id: number;
+  name: string;
+  description: string;
+  emoji: string;
+  quote: string;
+  color: string;
+  age_range: string;
+  location: string;
+  origin_country: string;
+  family_situation: string;
+  occupation: string;
+  immigration_status: string;
+  education: string;
+  income_range: string;
+  goals: string[];
+  pain_points: string[];
+  values: string[];
+  dreams: string[];
+  interests: string[];
+  favorite_brands: string[];
+  media_channels: string[];
+  objections: string[];
+  triggers: string[];
+  is_primary: boolean;
+  is_active: boolean;
+  updated_at: string;
+  updated_at_display: string;
+}
+
+// ── Avatar API helpers ────────────────────────────────────────────────────────
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+async function avatarFetch(path: string, options: RequestInit = {}) {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> ?? {}),
+  };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  return fetch(`${API_BASE}${path}`, { ...options, headers, credentials: 'include' });
+}
+
+async function avatarJSON<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const res = await avatarFetch(path, options);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+const avatarsApi = {
+  list: () => avatarJSON<{ results: ApiCustomerAvatar[]; count: number }>('/api/avatars/customer-avatars/'),
+  create: (data: Partial<ApiCustomerAvatar>) => avatarJSON<ApiCustomerAvatar>('/api/avatars/customer-avatars/', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: number, data: Partial<ApiCustomerAvatar>) => avatarJSON<ApiCustomerAvatar>(`/api/avatars/customer-avatars/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  delete: (id: number) => avatarFetch(`/api/avatars/customer-avatars/${id}/`, { method: 'DELETE' }),
+  setPrimary: (id: number) => avatarJSON<ApiCustomerAvatar>(`/api/avatars/customer-avatars/${id}/set_primary/`, { method: 'POST' }),
+};
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -436,10 +497,493 @@ function DeleteModal({
   );
 }
 
+// ── AvatarSection ─────────────────────────────────────────────────────────────
+
+function AvatarSection({
+  title,
+  icon,
+  items,
+  bgColor,
+  textColor,
+  editing,
+  onUpdate,
+  placeholder,
+}: {
+  title: string;
+  icon: string;
+  items: string[];
+  bgColor: string;
+  textColor: string;
+  editing: boolean;
+  onUpdate: (items: string[]) => void;
+  placeholder: string;
+}) {
+  const [newItem, setNewItem] = useState('');
+
+  const addItem = () => {
+    const val = newItem.trim();
+    if (!val) return;
+    onUpdate([...items, val]);
+    setNewItem('');
+  };
+
+  const removeItem = (i: number) => onUpdate(items.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="rounded-xl p-4 h-full flex flex-col" style={{ background: bgColor }}>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-base">{icon}</span>
+        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: textColor }}>{title}</p>
+      </div>
+      <div className="flex-1 space-y-1.5">
+        {items.length === 0 && !editing && (
+          <p className="text-xs opacity-40 italic" style={{ color: textColor }}>Sin información</p>
+        )}
+        {items.map((item, i) => (
+          <div key={i} className="flex items-start gap-1.5 group">
+            <span className="text-[10px] mt-0.5 flex-shrink-0 opacity-60" style={{ color: textColor }}>→</span>
+            <p className="text-xs leading-snug flex-1" style={{ color: textColor }}>{item}</p>
+            {editing && (
+              <button onClick={() => removeItem(i)}
+                className="opacity-0 group-hover:opacity-100 w-4 h-4 rounded flex items-center justify-center transition-opacity flex-shrink-0">
+                <X className="w-2.5 h-2.5" style={{ color: textColor }} />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+      {editing && (
+        <div className="mt-3 flex gap-1">
+          <input
+            value={newItem}
+            onChange={e => setNewItem(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addItem())}
+            placeholder={placeholder}
+            className="flex-1 text-xs px-2 py-1.5 rounded-lg border-0 outline-none"
+            style={{ background: 'rgba(255,255,255,0.3)', color: textColor }}
+          />
+          <button onClick={addItem}
+            className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{ background: 'rgba(255,255,255,0.3)', color: textColor }}>
+            <Plus className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── DemographicsCard ──────────────────────────────────────────────────────────
+
+function DemographicsCard({
+  avatar,
+  editing,
+  onChange,
+}: {
+  avatar: ApiCustomerAvatar;
+  editing: boolean;
+  onChange: (field: keyof ApiCustomerAvatar, value: string) => void;
+}) {
+  const fields = [
+    { key: 'age_range' as const, label: 'Edad', placeholder: 'ej. 25–45 años' },
+    { key: 'origin_country' as const, label: 'Origen', placeholder: 'ej. México, Guatemala...' },
+    { key: 'location' as const, label: 'Ciudad/Estado EE.UU.', placeholder: 'ej. New Jersey' },
+    { key: 'immigration_status' as const, label: 'Status migratorio', placeholder: 'ej. Indocumentado, TPS...' },
+    { key: 'occupation' as const, label: 'Ocupación', placeholder: 'ej. Construcción, Limpieza...' },
+    { key: 'family_situation' as const, label: 'Familia', placeholder: 'ej. Casado, 2 hijos...' },
+    { key: 'income_range' as const, label: 'Ingreso aprox.', placeholder: 'ej. $30K–$50K/año' },
+    { key: 'education' as const, label: 'Educación', placeholder: 'ej. Secundaria completa' },
+  ];
+
+  return (
+    <div className="rounded-xl p-4 h-full flex flex-col" style={{ background: '#0C2054' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-base">📊</span>
+        <p className="text-xs font-bold uppercase tracking-wide text-white/80">Datos demográficos</p>
+      </div>
+      <div className="flex-1 space-y-1.5">
+        {fields.map(({ key, label, placeholder }) => (
+          <div key={key} className="flex gap-2 items-baseline">
+            <span className="text-[10px] text-white/40 w-20 flex-shrink-0 leading-none pt-0.5">{label}</span>
+            {editing ? (
+              <input
+                value={avatar[key] as string}
+                onChange={e => onChange(key, e.target.value)}
+                placeholder={placeholder}
+                className="flex-1 text-xs text-white bg-white/10 rounded px-2 py-1 outline-none border border-white/10 focus:border-white/30 placeholder:text-white/20"
+              />
+            ) : (
+              <span className="text-xs text-white font-medium leading-snug">
+                {(avatar[key] as string) || <span className="text-white/25 italic">—</span>}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── AvatarCanvas ──────────────────────────────────────────────────────────────
+
+function AvatarCanvas({
+  avatar,
+  onSave,
+  onDelete,
+  onSetPrimary,
+}: {
+  avatar: ApiCustomerAvatar;
+  onSave: (data: Partial<ApiCustomerAvatar>) => Promise<void>;
+  onDelete: () => Promise<void>;
+  onSetPrimary: () => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<ApiCustomerAvatar>(avatar);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { setDraft(avatar); }, [avatar]);
+
+  const updateList = (field: keyof ApiCustomerAvatar, items: string[]) =>
+    setDraft(d => ({ ...d, [field]: items }));
+
+  const updateField = (field: keyof ApiCustomerAvatar, value: string) =>
+    setDraft(d => ({ ...d, [field]: value }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    try { await onSave(draft); setEditing(false); }
+    catch { alert('Error al guardar'); }
+    finally { setSaving(false); }
+  };
+
+  const handleCancel = () => { setDraft(avatar); setEditing(false); };
+
+  const SECTION_COLORS = {
+    goals:          { bg: 'rgba(16,185,129,0.12)',  text: '#065f46', icon: '🎯', title: 'Metas y Objetivos',       placeholder: 'Agregar meta...' },
+    pain_points:    { bg: 'rgba(239,68,68,0.10)',   text: '#7f1d1d', icon: '😓', title: 'Dolores y Frustraciones',  placeholder: 'Agregar dolor...' },
+    values:         { bg: 'rgba(247,156,49,0.12)',  text: '#78350f', icon: '💛', title: 'Valores',                 placeholder: 'Agregar valor...' },
+    dreams:         { bg: 'rgba(139,92,246,0.10)',  text: '#4c1d95', icon: '✨', title: 'Sueños y Aspiraciones',   placeholder: 'Agregar sueño...' },
+    interests:      { bg: 'rgba(6,182,212,0.10)',   text: '#164e63', icon: '🎵', title: 'Intereses y Hobbies',     placeholder: 'Agregar interés...' },
+    favorite_brands:{ bg: 'rgba(236,72,153,0.10)', text: '#831843', icon: '⭐', title: 'Marcas y Medios',          placeholder: 'Agregar marca...' },
+    objections:     { bg: 'rgba(107,114,128,0.10)', text: '#1f2937', icon: '🚧', title: 'Objeciones',              placeholder: 'Agregar objeción...' },
+    triggers:       { bg: 'rgba(247,156,49,0.10)',  text: '#78350f', icon: '⚡', title: 'Detonadores de Acción',    placeholder: 'Agregar detonador...' },
+    media_channels: { bg: 'rgba(12,32,84,0.08)',    text: '#0C2054', icon: '📱', title: 'Canales de Información',   placeholder: 'Agregar canal...' },
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Avatar header */}
+      <div className="bg-white rounded-2xl border border-[#e8eaf0] p-5">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 border-2"
+              style={{ background: `${draft.color}15`, borderColor: `${draft.color}30` }}>
+              {editing ? (
+                <input value={draft.emoji} onChange={e => updateField('emoji', e.target.value)}
+                  className="w-12 text-center text-3xl bg-transparent outline-none" maxLength={2} />
+              ) : draft.emoji}
+            </div>
+            <div className="flex-1 min-w-0">
+              {editing ? (
+                <div className="space-y-2">
+                  <input value={draft.name} onChange={e => updateField('name', e.target.value)}
+                    className="w-full text-lg font-bold text-[#0C2054] border border-[#e5e7eb] rounded-lg px-3 py-1.5 outline-none focus:border-[#0C2054]"
+                    placeholder="Nombre del avatar..." />
+                  <input value={draft.description} onChange={e => updateField('description', e.target.value)}
+                    className="w-full text-sm text-[#6b7280] border border-[#e5e7eb] rounded-lg px-3 py-1.5 outline-none focus:border-[#0C2054]"
+                    placeholder="Descripción breve..." />
+                  <input value={draft.quote} onChange={e => updateField('quote', e.target.value)}
+                    className="w-full text-sm italic border border-[#e5e7eb] rounded-lg px-3 py-1.5 outline-none focus:border-[#F79C31]"
+                    placeholder='"Frase que representa al avatar..."' />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-[#0C2054]">{avatar.name}</h3>
+                    {avatar.is_primary && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F79C31] text-[#0C2054]">PRINCIPAL</span>
+                    )}
+                  </div>
+                  {avatar.description && <p className="text-sm text-[#6b7280] mt-0.5">{avatar.description}</p>}
+                  {avatar.quote && (
+                    <p className="text-sm italic text-[#374151] mt-1 border-l-2 border-[#F79C31] pl-3">
+                      "{avatar.quote}"
+                    </p>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {!avatar.is_primary && !editing && (
+              <button onClick={onSetPrimary}
+                className="text-xs text-[#6b7280] border border-[#e5e7eb] px-3 py-1.5 rounded-lg hover:bg-[#f9fafb] transition-colors">
+                Marcar como principal
+              </button>
+            )}
+            {editing ? (
+              <>
+                <button onClick={handleCancel}
+                  className="text-xs text-[#6b7280] border border-[#e5e7eb] px-3 py-1.5 rounded-lg hover:bg-[#f9fafb] transition-colors">
+                  Cancelar
+                </button>
+                <button onClick={handleSave} disabled={saving}
+                  className="text-xs font-semibold text-white bg-[#0C2054] px-4 py-1.5 rounded-lg hover:bg-[#1a3a7a] disabled:opacity-50 transition-colors flex items-center gap-1.5">
+                  {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                  Guardar
+                </button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => setEditing(true)}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] border border-[#0C2054]/20 bg-[#0C2054]/5 px-3 py-1.5 rounded-lg hover:bg-[#0C2054]/10 transition-colors">
+                  <Edit3 className="w-3.5 h-3.5" /> Editar
+                </button>
+                <button onClick={onDelete}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9ca3af] hover:text-red-500 hover:bg-red-50 transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Canvas grid */}
+      <div className="grid grid-cols-3 gap-3">
+        {/* Row 1: Metas | Demografía | Dolores */}
+        <div className="min-h-[180px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.goals.bg}
+            textColor={SECTION_COLORS.goals.text}
+            icon={SECTION_COLORS.goals.icon}
+            title={SECTION_COLORS.goals.title}
+            placeholder={SECTION_COLORS.goals.placeholder}
+            items={draft.goals}
+            editing={editing}
+            onUpdate={items => updateList('goals', items)}
+          />
+        </div>
+        <div className="row-span-2 min-h-[380px]">
+          <DemographicsCard avatar={draft} editing={editing} onChange={updateField} />
+        </div>
+        <div className="min-h-[180px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.pain_points.bg}
+            textColor={SECTION_COLORS.pain_points.text}
+            icon={SECTION_COLORS.pain_points.icon}
+            title={SECTION_COLORS.pain_points.title}
+            placeholder={SECTION_COLORS.pain_points.placeholder}
+            items={draft.pain_points}
+            editing={editing}
+            onUpdate={items => updateList('pain_points', items)}
+          />
+        </div>
+
+        {/* Row 2: Valores | [demog. continúa] | Sueños */}
+        <div className="min-h-[180px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.values.bg}
+            textColor={SECTION_COLORS.values.text}
+            icon={SECTION_COLORS.values.icon}
+            title={SECTION_COLORS.values.title}
+            placeholder={SECTION_COLORS.values.placeholder}
+            items={draft.values}
+            editing={editing}
+            onUpdate={items => updateList('values', items)}
+          />
+        </div>
+        <div className="min-h-[180px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.dreams.bg}
+            textColor={SECTION_COLORS.dreams.text}
+            icon={SECTION_COLORS.dreams.icon}
+            title={SECTION_COLORS.dreams.title}
+            placeholder={SECTION_COLORS.dreams.placeholder}
+            items={draft.dreams}
+            editing={editing}
+            onUpdate={items => updateList('dreams', items)}
+          />
+        </div>
+
+        {/* Row 3: Intereses | Marcas y Medios | Canales */}
+        <div className="min-h-[160px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.interests.bg}
+            textColor={SECTION_COLORS.interests.text}
+            icon={SECTION_COLORS.interests.icon}
+            title={SECTION_COLORS.interests.title}
+            placeholder={SECTION_COLORS.interests.placeholder}
+            items={draft.interests}
+            editing={editing}
+            onUpdate={items => updateList('interests', items)}
+          />
+        </div>
+        <div className="min-h-[160px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.favorite_brands.bg}
+            textColor={SECTION_COLORS.favorite_brands.text}
+            icon={SECTION_COLORS.favorite_brands.icon}
+            title={SECTION_COLORS.favorite_brands.title}
+            placeholder={SECTION_COLORS.favorite_brands.placeholder}
+            items={draft.favorite_brands}
+            editing={editing}
+            onUpdate={items => updateList('favorite_brands', items)}
+          />
+        </div>
+        <div className="min-h-[160px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.media_channels.bg}
+            textColor={SECTION_COLORS.media_channels.text}
+            icon={SECTION_COLORS.media_channels.icon}
+            title={SECTION_COLORS.media_channels.title}
+            placeholder={SECTION_COLORS.media_channels.placeholder}
+            items={draft.media_channels}
+            editing={editing}
+            onUpdate={items => updateList('media_channels', items)}
+          />
+        </div>
+
+        {/* Row 4: Objeciones (2 cols) + Triggers */}
+        <div className="col-span-2 min-h-[130px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.objections.bg}
+            textColor={SECTION_COLORS.objections.text}
+            icon={SECTION_COLORS.objections.icon}
+            title={SECTION_COLORS.objections.title}
+            placeholder={SECTION_COLORS.objections.placeholder}
+            items={draft.objections}
+            editing={editing}
+            onUpdate={items => updateList('objections', items)}
+          />
+        </div>
+        <div className="min-h-[130px]">
+          <AvatarSection
+            bgColor={SECTION_COLORS.triggers.bg}
+            textColor={SECTION_COLORS.triggers.text}
+            icon={SECTION_COLORS.triggers.icon}
+            title={SECTION_COLORS.triggers.title}
+            placeholder={SECTION_COLORS.triggers.placeholder}
+            items={draft.triggers}
+            editing={editing}
+            onUpdate={items => updateList('triggers', items)}
+          />
+        </div>
+      </div>
+
+      <p className="text-xs text-[#9ca3af] text-right">Última actualización: {avatar.updated_at_display}</p>
+    </div>
+  );
+}
+
+// ── CreateAvatarModal ─────────────────────────────────────────────────────────
+
+function CreateAvatarModal({ open, onClose, onCreate }: {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (data: Partial<ApiCustomerAvatar>) => Promise<void>;
+}) {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [emoji, setEmoji] = useState('👤');
+  const [color, setColor] = useState('#0C2054');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  if (!open) return null;
+
+  const COLORS = ['#0C2054', '#F79C31', '#10b981', '#ef4444', '#8b5cf6', '#06b6d4', '#f59e0b'];
+  const EMOJIS = ['👤', '👩', '👨', '👩‍👧', '👨‍👩‍👧', '👩🏽', '👨🏽', '🧑🏽', '👵🏽', '👴🏽'];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) { setError('El nombre es requerido'); return; }
+    setLoading(true);
+    setError('');
+    try {
+      await onCreate({ name: name.trim(), description: description.trim(), emoji, color });
+      onClose();
+      setName(''); setDescription(''); setEmoji('👤'); setColor('#0C2054');
+    } catch { setError('Error al crear el avatar'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f0f2f8]">
+          <h2 className="font-bold text-[#0C2054] text-lg">Nuevo Avatar</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#f0f2f8] transition-all">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          {error && <div className="bg-red-50 text-red-600 text-sm rounded-xl px-4 py-3">{error}</div>}
+
+          <div className="flex items-center gap-3">
+            <div className="w-14 h-14 rounded-xl flex items-center justify-center text-3xl flex-shrink-0 border-2" style={{ background: `${color}15`, borderColor: `${color}30` }}>
+              {emoji}
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-[#374151] mb-1.5">Emoji</p>
+              <div className="flex gap-1.5 flex-wrap">
+                {EMOJIS.map(e => (
+                  <button key={e} type="button" onClick={() => setEmoji(e)}
+                    className={`w-8 h-8 rounded-lg text-base flex items-center justify-center transition-all ${emoji === e ? 'bg-[#0C2054]/10 ring-2 ring-[#0C2054]' : 'hover:bg-[#f0f2f8]'}`}>
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-[#374151] mb-1.5">Nombre del avatar *</label>
+            <input value={name} onChange={e => setName(e.target.value)}
+              placeholder="ej. María - La Madre Inmigrante"
+              className="w-full border border-[#e5e7eb] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2054]/20" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-[#374151] mb-1.5">Descripción breve</label>
+            <input value={description} onChange={e => setDescription(e.target.value)}
+              placeholder="ej. Madre de 35 años buscando regularizar su estatus..."
+              className="w-full border border-[#e5e7eb] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2054]/20" />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-[#374151] mb-1.5">Color de acento</label>
+            <div className="flex gap-2">
+              {COLORS.map(c => (
+                <button key={c} type="button" onClick={() => setColor(c)}
+                  className={`w-8 h-8 rounded-full transition-all ${color === c ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : 'hover:scale-105'}`}
+                  style={{ background: c }} />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 border border-[#e5e7eb] text-[#374151] rounded-xl py-2.5 text-sm font-medium hover:bg-[#f9fafb] transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" disabled={loading}
+              className="flex-1 bg-[#0C2054] text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-[#1a3a7a] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+              Crear avatar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function RecursosPage() {
-  const [activeTab, setActiveTab] = useState<'docs' | 'brand'>('docs');
+  const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar'>('docs');
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [docs, setDocs] = useState<ApiDocument[]>([]);
@@ -448,6 +992,10 @@ export default function RecursosPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ApiDocument | null>(null);
   const [manualOpen, setManualOpen] = useState(false);
+  const [avatars, setAvatars] = useState<ApiCustomerAvatar[]>([]);
+  const [selectedAvatarId, setSelectedAvatarId] = useState<number | null>(null);
+  const [avatarLoading, setAvatarLoading] = useState(false);
+  const [showCreateAvatar, setShowCreateAvatar] = useState(false);
 
   const loadDocs = useCallback(async () => {
     setLoading(true);
@@ -465,6 +1013,26 @@ export default function RecursosPage() {
   useEffect(() => {
     if (activeTab === 'docs') loadDocs();
   }, [activeTab, loadDocs]);
+
+  const loadAvatars = useCallback(async () => {
+    setAvatarLoading(true);
+    try {
+      const res = await avatarsApi.list();
+      setAvatars(res.results);
+      if (res.results.length > 0 && !selectedAvatarId) {
+        const primary = res.results.find(a => a.is_primary) ?? res.results[0];
+        setSelectedAvatarId(primary.id);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setAvatarLoading(false);
+    }
+  }, [selectedAvatarId]);
+
+  useEffect(() => {
+    if (activeTab === 'avatar') loadAvatars();
+  }, [activeTab, loadAvatars]);
 
   const handleView = async (doc: ApiDocument) => {
     try {
@@ -539,10 +1107,11 @@ export default function RecursosPage() {
           {[
             { key: 'docs', label: 'Biblioteca de Documentos', icon: FolderOpen },
             { key: 'brand', label: 'Brand Center', icon: Palette },
+            { key: 'avatar', label: 'Avatar del Cliente', icon: Users },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key as 'docs' | 'brand')}
+              onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === key ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
               }`}
@@ -651,7 +1220,7 @@ export default function RecursosPage() {
           </div>
         )}
 
-        {/* ── Brand Tab ───────────────────────────────────────────────────────── */}
+        {/* ── Brand Tab ──────────────────────────────────────────────────────── */}
         {activeTab === 'brand' && (
           <div className="space-y-8">
             {/* Hero */}
@@ -809,6 +1378,102 @@ export default function RecursosPage() {
                 ))}
               </div>
             </div>
+          </div>
+        )}
+        {/* ── Avatar Tab ──────────────────────────────────────────────────────── */}
+        {activeTab === 'avatar' && (
+          <div className="space-y-6">
+            {/* Header del tab */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-[#0C2054]">Avatar del Cliente</h2>
+                <p className="text-sm text-[#8888a8] mt-0.5">Perfil detallado de tu cliente ideal de Mangone Law Firm</p>
+              </div>
+              <div className="flex items-center gap-2">
+                {avatars.length > 1 && (
+                  <div className="flex gap-1 bg-white border border-[#e8eaf0] rounded-xl p-1">
+                    {avatars.map(a => (
+                      <button
+                        key={a.id}
+                        onClick={() => setSelectedAvatarId(a.id)}
+                        title={a.name}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          selectedAvatarId === a.id
+                            ? 'bg-[#0C2054] text-white'
+                            : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+                        }`}
+                      >
+                        <span>{a.emoji}</span>
+                        <span className="max-w-[100px] truncate">{a.name.split(' ')[0]}</span>
+                        {a.is_primary && <span className="text-[9px] font-bold opacity-60">★</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <button
+                  onClick={() => setShowCreateAvatar(true)}
+                  className="flex items-center gap-2 bg-[#0C2054] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#1a3a7a] transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Nuevo avatar
+                </button>
+              </div>
+            </div>
+
+            {avatarLoading ? (
+              <div className="flex items-center justify-center py-24">
+                <Loader2 className="w-8 h-8 text-[#F79C31] animate-spin" />
+              </div>
+            ) : avatars.length === 0 ? (
+              <div className="bg-white rounded-2xl border border-[#e8eaf0] p-16 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-[#f0f2f8] flex items-center justify-center mx-auto mb-4 text-3xl">
+                  👤
+                </div>
+                <h3 className="font-bold text-[#0C2054] text-lg mb-2">Sin avatar definido</h3>
+                <p className="text-[#6b7280] text-sm mb-6 max-w-sm mx-auto">
+                  Crea el perfil de tu cliente ideal para que todo el equipo tenga claro a quién le habla Mangone Law Firm.
+                </p>
+                <button
+                  onClick={() => setShowCreateAvatar(true)}
+                  className="inline-flex items-center gap-2 bg-[#0C2054] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1a3a7a] transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Crear primer avatar
+                </button>
+              </div>
+            ) : (
+              (() => {
+                const selected = avatars.find(a => a.id === selectedAvatarId) ?? avatars[0];
+                return (
+                  <AvatarCanvas
+                    avatar={selected}
+                    onSave={async (data) => {
+                      await avatarsApi.update(selected.id, data);
+                      await loadAvatars();
+                    }}
+                    onDelete={async () => {
+                      if (!confirm(`¿Eliminar el avatar "${selected.name}"?`)) return;
+                      await avatarsApi.delete(selected.id);
+                      setSelectedAvatarId(null);
+                      await loadAvatars();
+                    }}
+                    onSetPrimary={async () => {
+                      await avatarsApi.setPrimary(selected.id);
+                      await loadAvatars();
+                    }}
+                  />
+                );
+              })()
+            )}
+
+            <CreateAvatarModal
+              open={showCreateAvatar}
+              onClose={() => setShowCreateAvatar(false)}
+              onCreate={async (data) => {
+                await avatarsApi.create(data);
+                await loadAvatars();
+              }}
+            />
           </div>
         )}
       </div>

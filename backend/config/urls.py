@@ -28,6 +28,7 @@ urlpatterns = [
     path('api/calendar/', include('tasks_app.urls_calendar')),
     path('api/dashboard/', include('dashboard.urls')),
     path('api/competitors/', include('competitors.urls')),
+    path('api/avatars/', include('customer_avatars.urls')),
 ]
 
 if settings.DEBUG:

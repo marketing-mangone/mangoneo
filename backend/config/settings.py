@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'tasks_app',
     'dashboard',
     'competitors',
+    'customer_avatars',
 ]
 
 MIDDLEWARE = [
