@@ -11,67 +11,7 @@ import {
   CheckCircle, Loader2, CloudUpload, Maximize2,
   Edit3, Plus, Users,
 } from 'lucide-react';
-import { documentsApi, ApiDocument } from '@/lib/api';
-
-// ── Avatar types ──────────────────────────────────────────────────────────────
-
-interface ApiCustomerAvatar {
-  id: number;
-  name: string;
-  description: string;
-  emoji: string;
-  quote: string;
-  color: string;
-  age_range: string;
-  location: string;
-  origin_country: string;
-  family_situation: string;
-  occupation: string;
-  immigration_status: string;
-  education: string;
-  income_range: string;
-  goals: string[];
-  pain_points: string[];
-  values: string[];
-  dreams: string[];
-  interests: string[];
-  favorite_brands: string[];
-  media_channels: string[];
-  objections: string[];
-  triggers: string[];
-  is_primary: boolean;
-  is_active: boolean;
-  updated_at: string;
-  updated_at_display: string;
-}
-
-// ── Avatar API helpers ────────────────────────────────────────────────────────
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-
-async function avatarFetch(path: string, options: RequestInit = {}) {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string> ?? {}),
-  };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return fetch(`${API_BASE}${path}`, { ...options, headers, credentials: 'include' });
-}
-
-async function avatarJSON<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const res = await avatarFetch(path, options);
-  if (!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-const avatarsApi = {
-  list: () => avatarJSON<{ results: ApiCustomerAvatar[]; count: number }>('/api/avatars/customer-avatars/'),
-  create: (data: Partial<ApiCustomerAvatar>) => avatarJSON<ApiCustomerAvatar>('/api/avatars/customer-avatars/', { method: 'POST', body: JSON.stringify(data) }),
-  update: (id: number, data: Partial<ApiCustomerAvatar>) => avatarJSON<ApiCustomerAvatar>(`/api/avatars/customer-avatars/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
-  delete: (id: number) => avatarFetch(`/api/avatars/customer-avatars/${id}/`, { method: 'DELETE' }),
-  setPrimary: (id: number) => avatarJSON<ApiCustomerAvatar>(`/api/avatars/customer-avatars/${id}/set_primary/`, { method: 'POST' }),
-};
+import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar } from '@/lib/api';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 

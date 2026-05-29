@@ -530,6 +530,59 @@ export const usersApi = {
   },
 };
 
+// ── Customer Avatars API ──────────────────────────────────────────────────────
+
+export interface ApiCustomerAvatar {
+  id: number;
+  name: string;
+  description: string;
+  emoji: string;
+  quote: string;
+  color: string;
+  age_range: string;
+  location: string;
+  origin_country: string;
+  family_situation: string;
+  occupation: string;
+  immigration_status: string;
+  education: string;
+  income_range: string;
+  goals: string[];
+  pain_points: string[];
+  values: string[];
+  dreams: string[];
+  interests: string[];
+  favorite_brands: string[];
+  media_channels: string[];
+  objections: string[];
+  triggers: string[];
+  is_primary: boolean;
+  is_active: boolean;
+  updated_at: string;
+  updated_at_display: string;
+}
+
+export const avatarsApi = {
+  list: () =>
+    apiJSON<{ results: ApiCustomerAvatar[]; count: number }>('/api/avatars/customer-avatars/'),
+  create: (data: Partial<ApiCustomerAvatar>) =>
+    apiJSON<ApiCustomerAvatar>('/api/avatars/customer-avatars/', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  update: (id: number, data: Partial<ApiCustomerAvatar>) =>
+    apiJSON<ApiCustomerAvatar>(`/api/avatars/customer-avatars/${id}/`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  delete: (id: number) =>
+    apiFetch(`/api/avatars/customer-avatars/${id}/`, { method: 'DELETE' }),
+  setPrimary: (id: number) =>
+    apiJSON<ApiCustomerAvatar>(`/api/avatars/customer-avatars/${id}/set_primary/`, {
+      method: 'POST',
+    }),
+};
+
 // ── Competitors API ───────────────────────────────────────────────────────────
 
 export type CompetitorCategory = 'direct' | 'indirect';
