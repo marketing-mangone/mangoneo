@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import {
@@ -47,10 +47,8 @@ function isOverdue(dueDate: string | null, status: ApiTask['status']) {
 
 // ── Roadmap helpers ───────────────────────────────────────────────────────────
 
-const ROADMAP_WEEKS = 8;
-const WEEK_PX       = 150;                       // px por columna de semana
-const TIMELINE_PX   = ROADMAP_WEEKS * WEEK_PX;   // 1200 px — siempre desborda, fuerza scroll
-const LABEL_PX      = 208;                        // w-52
+const DAY_PX   = 22;   // px por día — 1 semana = 154px, scrolleable libremente
+const LABEL_PX = 208;  // ancho columna de nombres (sticky)
 
 function getMonday(d: Date): Date {
   const r = new Date(d);
@@ -516,51 +514,79 @@ function KanbanColumn({
 // ── Roadmap View ──────────────────────────────────────────────────────────────
 
 function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask) => void }) {
-  const [weekOffset, setWeekOffset] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const viewStart = addDays(getMonday(today), weekOffset * ROADMAP_WEEKS * 7);
-  const totalDays = ROADMAP_WEEKS * 7;
+  // Date range: año actual + año siguiente (≈730 días × 22px = ~16 060px de timeline)
+  const today      = new Date(); today.setHours(0, 0, 0, 0);
+  const rangeStart = new Date(today.getFullYear(), 0, 1);
+  const rangeEnd   = new Date(today.getFullYear() + 2, 0, 1);   // exclusivo
+  const totalDays  = Math.round((rangeEnd.getTime() - rangeStart.getTime()) / 86400000);
+  const timelinePx = totalDays * DAY_PX;
 
-  // Week header labels
-  const weekHeaders = Array.from({ length: ROADMAP_WEEKS }, (_, i) => {
-    const d = addDays(viewStart, i * 7);
-    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
-  });
+  // Offset en px donde cae "hoy"
+  const todayPx = Math.round((today.getTime() - rangeStart.getTime()) / 86400000) * DAY_PX;
 
-  // Today's position as % within the view
-  const todayMs = today.getTime() - viewStart.getTime();
-  const todayPct = (todayMs / (1000 * 60 * 60 * 24)) / totalDays * 100;
+  // Al montar, scrollear para que "hoy" quede cerca del inicio visible
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = Math.max(0, todayPx - 160);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  // Compute bar position for a task
-  function getBar(task: ApiTask): { leftPct: number; widthPct: number; hasSoft: boolean } | null {
-    const end = task.due_date ? parseLocalDate(task.due_date) : null;
-    const hasSoft = !task.start_date && !!end; // start inferred, not set
-    const start = task.start_date
-      ? parseLocalDate(task.start_date)
-      : end ? addDays(end, -2) : null;
+  const scrollToToday = () => {
+    scrollRef.current?.scrollTo({ left: Math.max(0, todayPx - 160), behavior: 'smooth' });
+  };
 
-    if (!start || !end) return null;
-
-    const startDay = (start.getTime() - viewStart.getTime()) / (1000 * 60 * 60 * 24);
-    const endDay   = (end.getTime()   - viewStart.getTime()) / (1000 * 60 * 60 * 24) + 1;
-
-    if (endDay < 0 || startDay > totalDays) return null;
-
-    const rawLeft  = startDay / totalDays * 100;
-    const rawRight = endDay   / totalDays * 100;
-    const leftPct  = Math.max(0, rawLeft);
-    const rightPct = Math.min(100, rawRight);
-
-    return { leftPct, widthPct: Math.max(rightPct - leftPct, 0.5), hasSoft };
+  // Cabeceras de año
+  const years: { year: number; startPx: number; widthPx: number }[] = [];
+  for (let y = rangeStart.getFullYear(); y < rangeEnd.getFullYear(); y++) {
+    const ys = new Date(y, 0, 1);
+    const ye = new Date(y + 1, 0, 1);
+    const s  = Math.max(0, (ys.getTime() - rangeStart.getTime()) / 86400000) * DAY_PX;
+    const e  = Math.min(timelinePx, (ye.getTime() - rangeStart.getTime()) / 86400000 * DAY_PX);
+    if (e > s) years.push({ year: y, startPx: s, widthPx: e - s });
   }
 
-  // Group tasks by project (only tasks that have at least one date)
+  // Cabeceras de mes + posiciones de líneas de cuadrícula
+  type MonthItem = { label: string; startPx: number; widthPx: number };
+  const months: MonthItem[] = [];
+  {
+    let cur = new Date(rangeStart.getFullYear(), rangeStart.getMonth(), 1);
+    while (cur < rangeEnd) {
+      const next = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+      const s = (cur.getTime() - rangeStart.getTime()) / 86400000 * DAY_PX;
+      const e = Math.min(timelinePx, (next.getTime() - rangeStart.getTime()) / 86400000 * DAY_PX);
+      months.push({
+        label:   cur.toLocaleDateString('es-ES', { month: 'short' }),
+        startPx: Math.max(0, s),
+        widthPx: e - Math.max(0, s),
+      });
+      cur = next;
+    }
+  }
+  const monthBoundaries = months.map(m => m.startPx);
+
+  // Posición y ancho de una barra (en px absolutos dentro del timeline)
+  function getBarPx(task: ApiTask): { leftPx: number; widthPx: number; hasSoft: boolean } | null {
+    const end     = task.due_date   ? parseLocalDate(task.due_date)   : null;
+    const hasSoft = !task.start_date && !!end;
+    const start   = task.start_date ? parseLocalDate(task.start_date) : (end ? addDays(end, -2) : null);
+    if (!start || !end) return null;
+
+    const s = (start.getTime() - rangeStart.getTime()) / 86400000;
+    const e = (end.getTime()   - rangeStart.getTime()) / 86400000 + 1;
+    if (e < 0 || s > totalDays) return null;
+
+    const leftPx  = Math.max(0, s * DAY_PX);
+    const rightPx = Math.min(timelinePx, e * DAY_PX);
+    return { leftPx, widthPx: Math.max(rightPx - leftPx, DAY_PX), hasSoft };
+  }
+
+  // Agrupar tareas
   const withDates    = tasks.filter(t => t.due_date || t.start_date);
   const withoutDates = tasks.filter(t => !t.due_date && !t.start_date);
-
-  const projectMap = new Map<string, ApiTask[]>();
+  const projectMap   = new Map<string, ApiTask[]>();
   for (const task of withDates) {
     const key = task.project || 'Sin proyecto';
     if (!projectMap.has(key)) projectMap.set(key, []);
@@ -568,93 +594,119 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
   }
   const groups = Array.from(projectMap.entries()).map(([name, grpTasks]) => ({ name, tasks: grpTasks }));
 
-  const gridLines = Array.from({ length: ROADMAP_WEEKS }, (_, i) => (i / ROADMAP_WEEKS) * 100);
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  // Helper: lane de timeline (grid lines + today line) — reutilizado en cada fila
+  const TodayLine = () => (
+    <div className="absolute top-0 bottom-0 w-0.5 bg-red-400 z-10" style={{ left: todayPx }} />
+  );
+  const GridLines = () => (
+    <>
+      {monthBoundaries.map((px, i) => (
+        <div key={i} className="absolute top-0 bottom-0 w-px bg-[#f0f0f0]" style={{ left: px }} />
+      ))}
+    </>
+  );
 
   return (
     <div className="bg-white rounded-2xl border border-[#e8e8f0] overflow-hidden">
-      {/* Navigation bar */}
+
+      {/* Barra superior: rango visible + botón Hoy */}
       <div className="flex items-center justify-between px-5 py-3 border-b border-[#f0f0f0] bg-[#fafafe]">
+        <span className="text-xs text-[#8888a8] font-medium">
+          {rangeStart.getFullYear()} – {rangeEnd.getFullYear() - 1}
+          <span className="ml-2 text-[#c0c0d0]">· Arrastra para navegar</span>
+        </span>
         <button
-          onClick={() => setWeekOffset(w => w - 1)}
-          className="flex items-center gap-1 text-xs font-semibold text-[#4a4a6a] px-3 py-1.5 rounded-lg border border-[#e8e8f0] hover:bg-white transition-colors"
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          8 sem
-        </button>
-        <button
-          onClick={() => setWeekOffset(0)}
+          onClick={scrollToToday}
           className="text-xs font-semibold text-[#F79C31] px-3 py-1.5 rounded-lg border border-[#F79C31]/40 hover:bg-[#F79C31]/5 transition-colors"
         >
           Hoy
         </button>
-        <button
-          onClick={() => setWeekOffset(w => w + 1)}
-          className="flex items-center gap-1 text-xs font-semibold text-[#4a4a6a] px-3 py-1.5 rounded-lg border border-[#e8e8f0] hover:bg-white transition-colors"
-        >
-          8 sem
-          <ChevronRight className="w-3.5 h-3.5" />
-        </button>
       </div>
 
-      <div className="overflow-x-auto">
-        <div style={{ width: `${LABEL_PX + TIMELINE_PX}px` }}>
+      {/* Canvas scrollable */}
+      <div ref={scrollRef} className="overflow-x-auto overflow-y-visible">
+        <div style={{ width: `${LABEL_PX + timelinePx}px` }}>
 
-          {/* Header row */}
-          <div className="flex border-b border-[#e8e8f0] bg-[#fafafe]">
-            <div className="flex-shrink-0 px-4 py-2.5 text-[10px] font-bold text-[#8888a8] uppercase tracking-wider" style={{ width: LABEL_PX }}>
-              Tarea
-            </div>
-            <div className="flex border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }}>
-              {weekHeaders.map((label, i) => (
+          {/* Fila año */}
+          <div className="flex border-b border-[#dde0ea] bg-[#eef0f7]" style={{ height: 28 }}>
+            <div className="flex-shrink-0 border-r border-[#dde0ea]" style={{ width: LABEL_PX }} />
+            <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
+              {years.map(y => (
                 <div
-                  key={i}
-                  className="text-center text-[11px] font-semibold text-[#8888a8] py-2.5 border-l border-[#f0f0f0] first:border-l-0 flex-shrink-0"
-                  style={{ width: WEEK_PX }}
+                  key={y.year}
+                  className="absolute top-0 bottom-0 border-l border-[#cdd0de] flex items-center justify-center"
+                  style={{ left: y.startPx, width: y.widthPx }}
                 >
-                  {label}
+                  <span className="text-[11px] font-bold text-[#4a4a6a] tracking-wide">{y.year}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Groups */}
+          {/* Fila mes */}
+          <div className="flex border-b border-[#e8e8f0] bg-[#fafafe]" style={{ height: 30 }}>
+            <div
+              className="flex-shrink-0 border-r border-[#e8e8f0] px-4 flex items-center"
+              style={{ width: LABEL_PX }}
+            >
+              <span className="text-[10px] font-bold text-[#8888a8] uppercase tracking-wider">Tarea</span>
+            </div>
+            <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
+              {months.map((m, i) => (
+                <div
+                  key={i}
+                  className="absolute top-0 bottom-0 border-l border-[#ebebeb] flex items-center justify-center overflow-hidden"
+                  style={{ left: m.startPx, width: m.widthPx }}
+                >
+                  <span className="text-[11px] font-semibold text-[#8888a8] capitalize select-none">{m.label}</span>
+                </div>
+              ))}
+              {/* Línea hoy en cabecera */}
+              <TodayLine />
+            </div>
+          </div>
+
+          {/* Estado vacío */}
           {groups.length === 0 && withoutDates.length === 0 && (
             <div className="py-16 text-center text-[#8888a8] text-sm">
-              No hay tareas con fechas asignadas. Edita las tareas para agregar fechas de inicio y límite.
+              No hay tareas con fechas. Edita las tareas para agregar fechas de inicio y límite.
             </div>
           )}
 
+          {/* Grupos */}
           {groups.map(group => (
             <div key={group.name}>
-              {/* Group header */}
-              <div className="flex bg-[#f7f8fc] border-b border-[#f0f0f0]">
-                <div className="flex-shrink-0 px-4 py-2 text-[10px] font-bold text-[#4a4a6a] uppercase tracking-wider truncate" style={{ width: LABEL_PX }}>
-                  {group.name}
+              {/* Cabecera de grupo */}
+              <div className="flex bg-[#f7f8fc] border-b border-[#edeef5]" style={{ height: 28 }}>
+                <div
+                  className="flex-shrink-0 px-4 flex items-center border-r border-[#e8e8f0] sticky left-0 bg-[#f7f8fc] z-10"
+                  style={{ width: LABEL_PX }}
+                >
+                  <span className="text-[10px] font-bold text-[#4a4a6a] uppercase tracking-wider truncate">{group.name}</span>
                 </div>
-                <div className="relative flex-shrink-0 border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }}>
-                  {gridLines.map((pct, i) => (
-                    <div key={i} className="absolute top-0 bottom-0 w-px bg-[#ebebeb]" style={{ left: `${pct}%` }} />
-                  ))}
-                  {todayPct >= 0 && todayPct <= 100 && (
-                    <div className="absolute top-0 bottom-0 w-0.5 bg-red-300/60 z-10" style={{ left: `${todayPct}%` }} />
-                  )}
+                <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
+                  <GridLines />
+                  <div className="absolute top-0 bottom-0 w-0.5 bg-red-300/50 z-10" style={{ left: todayPx }} />
                 </div>
               </div>
 
-              {/* Task rows */}
+              {/* Filas de tareas */}
               {group.tasks.map(task => {
-                const bar     = getBar(task);
-                const stCfg   = STATUS_CONFIG[task.status];
-                const overdue = isOverdue(task.due_date, task.status);
+                const bar      = getBarPx(task);
+                const stCfg    = STATUS_CONFIG[task.status];
+                const overdue  = isOverdue(task.due_date, task.status);
                 const avatarBg = AVATAR_COLORS[task.assignee_name ?? ''] ?? '#8888a8';
 
                 return (
-                  <div
-                    key={task.id}
-                    className="flex h-12 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group"
-                  >
-                    {/* Task label */}
-                    <div className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors" style={{ width: LABEL_PX }}>
+                  <div key={task.id} className="flex h-12 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group">
+
+                    {/* Nombre (sticky) */}
+                    <div
+                      className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors border-r border-[#f0f0f0]"
+                      style={{ width: LABEL_PX }}
+                    >
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${stCfg.bar}`} />
                       <span
                         className={`text-xs font-medium truncate ${task.status === 'done' ? 'line-through text-[#8888a8]' : 'text-[#1a1a2e]'}`}
@@ -664,63 +716,31 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
                       </span>
                     </div>
 
-                    {/* Timeline lane */}
-                    <div className="relative flex-shrink-0 border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }}>
-                      {/* Grid lines */}
-                      {gridLines.map((pct, i) => (
-                        <div key={i} className="absolute top-0 bottom-0 w-px bg-[#f0f0f0]" style={{ left: `${pct}%` }} />
-                      ))}
+                    {/* Lane timeline */}
+                    <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
+                      <GridLines />
+                      <TodayLine />
 
-                      {/* Today line */}
-                      {todayPct >= 0 && todayPct <= 100 && (
-                        <div className="absolute top-0 bottom-0 w-0.5 bg-red-400 z-10" style={{ left: `${todayPct}%` }} />
-                      )}
-
-                      {/* Task bar */}
+                      {/* Barra de tarea */}
                       {bar && (
                         <button
                           onClick={() => onEdit(task)}
                           title={`${task.title}${task.start_date ? ` · Inicio: ${formatDate(task.start_date)}` : ''}${task.due_date ? ` · Límite: ${formatDate(task.due_date)}` : ''}`}
-                          className={`absolute top-1/2 -translate-y-1/2 h-6 rounded-md ${stCfg.bar} hover:opacity-80 transition-opacity flex items-center overflow-hidden cursor-pointer ${bar.hasSoft ? 'border-l-4 border-white/40' : ''} ${overdue ? 'ring-2 ring-red-400 ring-offset-1' : ''}`}
-                          style={{ left: `${bar.leftPct}%`, width: `${bar.widthPct}%` }}
+                          className={`absolute top-1/2 -translate-y-1/2 h-6 rounded-md ${stCfg.bar} hover:opacity-80 transition-opacity flex items-center overflow-hidden cursor-pointer ${overdue ? 'ring-2 ring-red-400 ring-offset-1' : ''}`}
+                          style={{ left: bar.leftPx, width: bar.widthPx }}
                         >
-                          {/* Progress fill */}
                           {task.progress > 0 && (
-                            <div
-                              className="absolute left-0 top-0 bottom-0 rounded-l-md bg-white/25"
-                              style={{ width: `${task.progress}%` }}
-                            />
+                            <div className="absolute left-0 top-0 bottom-0 bg-white/25 rounded-l-md" style={{ width: `${task.progress}%` }} />
                           )}
-                          <span className="relative z-10 text-[9px] font-bold text-white truncate px-1.5 leading-none">
-                            {task.title}
-                          </span>
+                          <span className="relative z-10 text-[9px] font-bold text-white truncate px-1.5 leading-none">{task.title}</span>
                         </button>
                       )}
 
-                      {/* Out-of-window arrow indicators */}
-                      {!bar && task.due_date && (() => {
-                        const end = parseLocalDate(task.due_date);
-                        const endDay = (end.getTime() - viewStart.getTime()) / (1000 * 60 * 60 * 24);
-                        if (endDay < 0) return (
-                          <div className="absolute left-1 top-1/2 -translate-y-1/2 text-[#8888a8] flex items-center gap-1">
-                            <ChevronLeft className="w-3 h-3" />
-                            <span className="text-[9px]">{formatDate(task.due_date)}</span>
-                          </div>
-                        );
-                        if (endDay > totalDays) return (
-                          <div className="absolute right-1 top-1/2 -translate-y-1/2 text-[#8888a8] flex items-center gap-1">
-                            <span className="text-[9px]">{formatDate(task.due_date)}</span>
-                            <ChevronRight className="w-3 h-3" />
-                          </div>
-                        );
-                        return null;
-                      })()}
-
-                      {/* Avatar */}
-                      {task.assignee_name && (
+                      {/* Avatar del responsable */}
+                      {task.assignee_name && bar && (
                         <div
-                          className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-white flex-shrink-0 opacity-60"
-                          style={{ background: avatarBg }}
+                          className="absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-white opacity-70 z-20"
+                          style={{ left: bar.leftPx + bar.widthPx + 3, background: avatarBg }}
                         >
                           {getInitials(task.assignee_name)}
                         </div>
@@ -732,33 +752,35 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
             </div>
           ))}
 
-          {/* Tasks without dates */}
+          {/* Sin fechas */}
           {withoutDates.length > 0 && (
             <div>
-              <div className="flex bg-[#f7f8fc] border-b border-[#f0f0f0]">
-                <div className="flex-shrink-0 px-4 py-2 text-[10px] font-bold text-[#8888a8] uppercase tracking-wider" style={{ width: LABEL_PX }}>
-                  Sin fechas
+              <div className="flex bg-[#f7f8fc] border-b border-[#edeef5]" style={{ height: 28 }}>
+                <div
+                  className="flex-shrink-0 px-4 flex items-center border-r border-[#e8e8f0] sticky left-0 bg-[#f7f8fc] z-10"
+                  style={{ width: LABEL_PX }}
+                >
+                  <span className="text-[10px] font-bold text-[#8888a8] uppercase tracking-wider">Sin fechas</span>
                 </div>
-                <div className="flex-shrink-0 border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }} />
+                <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
+                  <GridLines />
+                </div>
               </div>
               {withoutDates.map(task => {
                 const stCfg = STATUS_CONFIG[task.status];
                 return (
-                  <div
-                    key={task.id}
-                    className="flex h-10 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group"
-                  >
-                    <div className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors" style={{ width: LABEL_PX }}>
+                  <div key={task.id} className="flex h-10 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group">
+                    <div
+                      className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors border-r border-[#f0f0f0]"
+                      style={{ width: LABEL_PX }}
+                    >
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${stCfg.bar}`} />
-                      <button
-                        onClick={() => onEdit(task)}
-                        className="text-xs text-[#8888a8] truncate hover:text-[#4a4a6a] transition-colors"
-                      >
+                      <button onClick={() => onEdit(task)} className="text-xs text-[#8888a8] truncate hover:text-[#4a4a6a] transition-colors">
                         {task.title}
                       </button>
                     </div>
-                    <div className="flex-shrink-0 border-l border-[#e8e8f0] flex items-center px-3" style={{ width: TIMELINE_PX }}>
-                      <span className="text-[10px] text-[#8888a8] italic">Sin fechas asignadas</span>
+                    <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
+                      <GridLines />
                     </div>
                   </div>
                 );
@@ -766,42 +788,33 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
             </div>
           )}
 
-          {/* Today label at bottom */}
-          {todayPct >= 0 && todayPct <= 100 && (
-            <div className="flex h-7 bg-[#fafafe] border-t border-[#f0f0f0]">
-              <div className="flex-shrink-0 border-r border-[#e8e8f0]" style={{ width: LABEL_PX }} />
-              <div className="relative flex-shrink-0" style={{ width: TIMELINE_PX }}>
-                <div
-                  className="absolute top-0 bottom-0 w-0.5 bg-red-400"
-                  style={{ left: `${todayPct}%` }}
-                />
-                <div
-                  className="absolute top-1 text-[9px] font-bold text-red-500 bg-red-50 px-1.5 rounded -translate-x-1/2"
-                  style={{ left: `${todayPct}%` }}
-                >
-                  Hoy
-                </div>
+          {/* Fila inferior con label "Hoy" */}
+          <div className="flex bg-[#fafafe] border-t border-[#f0f0f0]" style={{ height: 22 }}>
+            <div className="flex-shrink-0 border-r border-[#e8e8f0]" style={{ width: LABEL_PX }} />
+            <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
+              <div className="absolute top-0 bottom-0 w-0.5 bg-red-400" style={{ left: todayPx }} />
+              <div
+                className="absolute text-[9px] font-bold text-red-500 bg-red-50 border border-red-200/70 px-1.5 rounded-sm -translate-x-1/2 leading-tight"
+                style={{ left: todayPx, top: 3 }}
+              >
+                Hoy
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* Legend */}
+      {/* Leyenda */}
       <div className="flex items-center gap-4 px-5 py-3 border-t border-[#f0f0f0] flex-wrap">
-        {(Object.entries(STATUS_CONFIG) as [string, typeof STATUS_CONFIG[keyof typeof STATUS_CONFIG]][]).map(([key, cfg]) => (
-          <span key={key} className="flex items-center gap-1.5 text-[11px] text-[#8888a8]">
+        {(Object.entries(STATUS_CONFIG) as [string, typeof STATUS_CONFIG[keyof typeof STATUS_CONFIG]][]).map(([, cfg]) => (
+          <span key={cfg.label} className="flex items-center gap-1.5 text-[11px] text-[#8888a8]">
             <span className={`w-2.5 h-2.5 rounded-sm inline-block ${cfg.bar}`} />
             {cfg.label}
           </span>
         ))}
-        <span className="flex items-center gap-1.5 text-[11px] text-[#8888a8] ml-2 pl-2 border-l border-[#e8e8f0]">
+        <span className="flex items-center gap-1.5 text-[11px] text-[#8888a8] ml-auto">
           <span className="w-2.5 h-1 bg-red-400 inline-block rounded" />
           Hoy
-        </span>
-        <span className="flex items-center gap-1.5 text-[11px] text-[#8888a8]">
-          <span className="w-2.5 h-2.5 rounded-sm inline-block bg-amber-400 border-l-2 border-white/60" />
-          Inicio inferido (sin fecha de inicio)
         </span>
       </div>
     </div>
