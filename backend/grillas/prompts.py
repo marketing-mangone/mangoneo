@@ -181,3 +181,29 @@ La estructura es:
 
 Genera exactamente 21 objetos en el array "posts": 3 por cada día de la semana (day_of_week 0 al 6).
 """
+
+
+def build_uscis_angles() -> str:
+    return """
+
+═══════════════════════════════════════════════════════════
+ÁNGULOS ESPECIALES — TEMA USCIS NOTICIAS
+═══════════════════════════════════════════════════════════
+
+Cuando el tema es "USCIS – Noticias", cada día debe abordar una noticia o novedad reciente de USCIS
+y explicar qué significa para la comunidad inmigrante latina. Adapta los ángulos así:
+
+Día 0 (Lunes):    ¿Qué anunció USCIS? — Explica la noticia en español claro y accesible
+Día 1 (Martes):   ¿A quién afecta? — Perfil de los inmigrantes impactados por este cambio
+Día 2 (Miércoles): ¿Qué tienes que hacer ahora? — Pasos concretos que debe seguir la comunidad
+Día 3 (Jueves):   Mitos y confusiones comunes sobre esta noticia
+Día 4 (Viernes):  Preguntas frecuentes sobre el cambio o anuncio
+Día 5 (Sábado):   Historia emotiva — cómo este cambio puede transformar la vida de una familia
+Día 6 (Domingo):  Por qué actuar ahora — urgencia, fechas límite, CTA fuerte
+
+IMPORTANTE para posts de USCIS:
+- Cita la fuente: "Según USCIS..." o "De acuerdo con el anuncio oficial de USCIS..."
+- No especules sobre resultados: solo explica lo que USCIS declaró oficialmente
+- Si hay fechas o plazos en la noticia, inclúyelos claramente
+- Recuerda siempre el disclaimer educativo: las noticias no reemplazan la consulta con un abogado
+"""

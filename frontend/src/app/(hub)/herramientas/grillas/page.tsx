@@ -20,21 +20,22 @@ const TEMAS = [
   { value: 'sijs',             label: 'SIJS' },
   { value: 'ajuste_estatus',   label: 'Ajuste de Estatus' },
   { value: 'proceso_consular', label: 'Proceso Consular' },
+  { value: 'uscis',            label: 'USCIS – Noticias' },
 ];
 
 const DAYS       = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const DAYS_SHORT = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 const SLOT_CONFIG = {
-  carousel: { label: 'Carrusel / Post',  border: 'border-blue-700/50',   header: 'bg-blue-900/30',  badge: 'bg-blue-800/60 text-blue-200',   Icon: LayoutGrid },
-  foto:     { label: 'Foto',             border: 'border-purple-700/50', header: 'bg-purple-900/30',badge: 'bg-purple-800/60 text-purple-200', Icon: ImageIcon  },
-  reel:     { label: 'Reel',             border: 'border-orange-700/50', header: 'bg-orange-900/30',badge: 'bg-orange-800/60 text-orange-200', Icon: Film       },
+  carousel: { label: 'Carrusel / Post',  border: 'border-blue-500',   header: 'bg-blue-900',  badge: 'bg-blue-700 text-blue-100',   Icon: LayoutGrid },
+  foto:     { label: 'Foto',             border: 'border-purple-500', header: 'bg-purple-900',badge: 'bg-purple-700 text-purple-100', Icon: ImageIcon  },
+  reel:     { label: 'Reel',             border: 'border-orange-500', header: 'bg-orange-900',badge: 'bg-orange-700 text-orange-100', Icon: Film       },
 } as const;
 
 const STATUS_CONFIG = {
-  borrador: { label: 'Borrador',           cls: 'bg-zinc-700 text-zinc-200' },
-  lista:    { label: 'Lista para revisar', cls: 'bg-emerald-700 text-emerald-100' },
-  publicada:{ label: 'Publicada',          cls: 'bg-blue-700 text-blue-100' },
+  borrador: { label: 'Borrador',           cls: 'bg-zinc-600 text-white' },
+  lista:    { label: 'Lista para revisar', cls: 'bg-emerald-600 text-white' },
+  publicada:{ label: 'Publicada',          cls: 'bg-blue-600 text-white' },
 } as const;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -105,8 +106,8 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
     const next = [...arr(f)]; next[i] = v; setDraft(d => ({ ...d, [f]: next }));
   };
 
-  const textareaClass = "w-full bg-black/30 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-zinc-500 resize-none";
-  const inputClass    = "w-full bg-black/30 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-200 focus:outline-none focus:border-zinc-500";
+  const textareaClass = "w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-400 resize-none";
+  const inputClass    = "w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-400";
 
   return (
     <div className={`rounded-xl border ${cfg.border} overflow-hidden`}>
@@ -136,12 +137,12 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
         {post.slot === 'carousel' && (
           <>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Headline de la imagen</label>
+              <label className="text-xs text-zinc-300 block mb-1">Headline de la imagen</label>
               <textarea rows={2} value={val('headline')} onChange={e => setDraft(d => ({ ...d, headline: e.target.value }))} className={textareaClass} placeholder="Texto para la gráfica…" />
             </div>
             {post.format === 'carousel' && arr('slide_titles').length > 0 && (
               <div>
-                <label className="text-xs text-zinc-400 block mb-1">Títulos de slides (para Sara)</label>
+                <label className="text-xs text-zinc-300 block mb-1">Títulos de slides (para Sara)</label>
                 <div className="space-y-1.5">
                   {arr('slide_titles').map((t, i) => (
                     <div key={i} className="flex items-center gap-2">
@@ -158,7 +159,7 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
         {/* Foto */}
         {post.slot === 'foto' && (
           <div>
-            <label className="text-xs text-zinc-400 block mb-1">Sugerencia de foto</label>
+            <label className="text-xs text-zinc-300 block mb-1">Sugerencia de foto</label>
             <textarea rows={2} value={val('photo_suggestion')} onChange={e => setDraft(d => ({ ...d, photo_suggestion: e.target.value }))} className={textareaClass} placeholder="Ej: Auguy en oficina mirando a cámara, traje azul…" />
           </div>
         )}
@@ -167,12 +168,12 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
         {post.slot === 'reel' && (
           <>
             <div>
-              <label className="text-xs text-zinc-400 block mb-1">Título en pantalla</label>
+              <label className="text-xs text-zinc-300 block mb-1">Título en pantalla</label>
               <input value={val('video_title')} onChange={e => setDraft(d => ({ ...d, video_title: e.target.value }))} className={inputClass} placeholder="Texto corto para el inicio del video…" />
             </div>
             {arr('script_points').length > 0 && (
               <div>
-                <label className="text-xs text-zinc-400 block mb-1">Guión para Gloriana</label>
+                <label className="text-xs text-zinc-300 block mb-1">Guión para Gloriana</label>
                 <div className="space-y-1.5">
                   {arr('script_points').map((p, i) => (
                     <div key={i} className="flex items-start gap-2">
@@ -428,7 +429,11 @@ export default function GrillasPage() {
           {generating && (
             <div className="bg-blue-950/40 border border-blue-800 rounded-lg px-4 py-4 text-center">
               <Loader2 size={24} className="animate-spin mx-auto mb-2 text-blue-400" />
-              <p className="text-sm text-blue-300 font-medium">Generando 21 posts con IA…</p>
+              <p className="text-sm text-blue-300 font-medium">
+                {form.tema === 'uscis'
+                  ? 'Consultando noticias de USCIS y generando 21 posts…'
+                  : 'Generando 21 posts con IA…'}
+              </p>
               <p className="text-xs text-blue-500 mt-1">Esto puede tomar 20–40 segundos</p>
             </div>
           )}

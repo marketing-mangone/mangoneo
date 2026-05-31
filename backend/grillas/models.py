@@ -11,6 +11,7 @@ TEMA_CHOICES = [
     ('sijs', 'SIJS'),
     ('ajuste_estatus', 'Ajuste de Estatus'),
     ('proceso_consular', 'Proceso Consular'),
+    ('uscis', 'USCIS – Noticias'),
 ]
 
 STATUS_CHOICES = [
