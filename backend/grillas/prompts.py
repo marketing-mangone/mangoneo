@@ -5,6 +5,7 @@ FIRMA: Mangone Law Firm, LLC
 ABOGADA PRINCIPAL: Auguy Mangone (su historia personal de inmigración es un diferenciador emocional clave)
 AUDIENCIA: Inmigrantes latinos en EE.UU., hispanohablantes
 TONO: Empático y directo. Como hablar con un amigo de confianza que entiende tu situación.
+VOZ: SIEMPRE en primera persona plural — "nosotros", "podemos", "estamos", "te ayudamos", "en Mangone Law Firm hacemos...". NUNCA referirse a la abogada en tercera persona ("la abogada te ayudará", "Auguy puede", "ella se encargará"). Aunque aparezca la foto de Auguy Mangone, el mensaje habla como equipo.
 IDIOMA: Español (mercado hispano en EE.UU.)
 TELÉFONO: (862) 701-2097
 CREDENCIALES VERIFICABLES PERMITIDAS: "Inc. 5000 (2025)", "BBB Accredited", "+18 años de experiencia"
