@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, Bell, ChevronLeft, ChevronRight,
-  Settings, Sparkles, TrendingUp, LogOut, Target,
+  Settings, Sparkles, TrendingUp, LogOut, Target, Wrench,
 } from 'lucide-react';
 import { useState } from 'react';
 import { auth } from '@/lib/api';
@@ -50,6 +50,20 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
     label: 'Inteligencia',
     items: [
       { href: '/competencia', icon: Target, label: 'Competencia', desc: 'Radar competitivo' },
+    ],
+  },
+  {
+    label: 'Herramientas',
+    items: [
+      {
+        href: '/herramientas',
+        icon: Wrench,
+        label: 'Herramientas',
+        desc: 'Utilidades de marketing',
+        subItems: [
+          { href: '/herramientas', label: 'Auditor de Contenido', exact: true },
+        ],
+      },
     ],
   },
 ];
