@@ -43,6 +43,7 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
     assignee = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name='assigned_tasks')
+    start_date = models.DateField(null=True, blank=True, help_text="Fecha de inicio de la tarea")
     due_date = models.DateField(null=True, blank=True)
     project = models.CharField(max_length=100, blank=True)
     progress = models.IntegerField(default=0)

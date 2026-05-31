@@ -364,6 +364,7 @@ export interface ApiTask {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   assignee: number | null;
   assignee_name: string | null;
+  start_date: string | null;
   due_date: string | null;
   project: string;
   progress: number;
