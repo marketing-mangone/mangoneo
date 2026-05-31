@@ -48,6 +48,9 @@ function isOverdue(dueDate: string | null, status: ApiTask['status']) {
 // ── Roadmap helpers ───────────────────────────────────────────────────────────
 
 const ROADMAP_WEEKS = 8;
+const WEEK_PX       = 150;                       // px por columna de semana
+const TIMELINE_PX   = ROADMAP_WEEKS * WEEK_PX;   // 1200 px — siempre desborda, fuerza scroll
+const LABEL_PX      = 208;                        // w-52
 
 function getMonday(d: Date): Date {
   const r = new Date(d);
@@ -594,18 +597,19 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
       </div>
 
       <div className="overflow-x-auto">
-        <div style={{ minWidth: '900px' }}>
+        <div style={{ width: `${LABEL_PX + TIMELINE_PX}px` }}>
 
           {/* Header row */}
           <div className="flex border-b border-[#e8e8f0] bg-[#fafafe]">
-            <div className="w-52 flex-shrink-0 px-4 py-2.5 text-[10px] font-bold text-[#8888a8] uppercase tracking-wider">
+            <div className="flex-shrink-0 px-4 py-2.5 text-[10px] font-bold text-[#8888a8] uppercase tracking-wider" style={{ width: LABEL_PX }}>
               Tarea
             </div>
-            <div className="flex-1 flex border-l border-[#e8e8f0]">
+            <div className="flex border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }}>
               {weekHeaders.map((label, i) => (
                 <div
                   key={i}
-                  className="flex-1 text-center text-[11px] font-semibold text-[#8888a8] py-2.5 border-l border-[#f0f0f0] first:border-l-0"
+                  className="text-center text-[11px] font-semibold text-[#8888a8] py-2.5 border-l border-[#f0f0f0] first:border-l-0 flex-shrink-0"
+                  style={{ width: WEEK_PX }}
                 >
                   {label}
                 </div>
@@ -624,10 +628,10 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
             <div key={group.name}>
               {/* Group header */}
               <div className="flex bg-[#f7f8fc] border-b border-[#f0f0f0]">
-                <div className="w-52 flex-shrink-0 px-4 py-2 text-[10px] font-bold text-[#4a4a6a] uppercase tracking-wider truncate">
+                <div className="flex-shrink-0 px-4 py-2 text-[10px] font-bold text-[#4a4a6a] uppercase tracking-wider truncate" style={{ width: LABEL_PX }}>
                   {group.name}
                 </div>
-                <div className="flex-1 relative border-l border-[#e8e8f0]">
+                <div className="relative flex-shrink-0 border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }}>
                   {gridLines.map((pct, i) => (
                     <div key={i} className="absolute top-0 bottom-0 w-px bg-[#ebebeb]" style={{ left: `${pct}%` }} />
                   ))}
@@ -650,7 +654,7 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
                     className="flex h-12 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group"
                   >
                     {/* Task label */}
-                    <div className="w-52 flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors">
+                    <div className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors" style={{ width: LABEL_PX }}>
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${stCfg.bar}`} />
                       <span
                         className={`text-xs font-medium truncate ${task.status === 'done' ? 'line-through text-[#8888a8]' : 'text-[#1a1a2e]'}`}
@@ -661,7 +665,7 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
                     </div>
 
                     {/* Timeline lane */}
-                    <div className="flex-1 relative border-l border-[#e8e8f0]">
+                    <div className="relative flex-shrink-0 border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }}>
                       {/* Grid lines */}
                       {gridLines.map((pct, i) => (
                         <div key={i} className="absolute top-0 bottom-0 w-px bg-[#f0f0f0]" style={{ left: `${pct}%` }} />
@@ -732,10 +736,10 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
           {withoutDates.length > 0 && (
             <div>
               <div className="flex bg-[#f7f8fc] border-b border-[#f0f0f0]">
-                <div className="w-52 flex-shrink-0 px-4 py-2 text-[10px] font-bold text-[#8888a8] uppercase tracking-wider">
+                <div className="flex-shrink-0 px-4 py-2 text-[10px] font-bold text-[#8888a8] uppercase tracking-wider" style={{ width: LABEL_PX }}>
                   Sin fechas
                 </div>
-                <div className="flex-1 border-l border-[#e8e8f0]" />
+                <div className="flex-shrink-0 border-l border-[#e8e8f0]" style={{ width: TIMELINE_PX }} />
               </div>
               {withoutDates.map(task => {
                 const stCfg = STATUS_CONFIG[task.status];
@@ -744,7 +748,7 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
                     key={task.id}
                     className="flex h-10 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group"
                   >
-                    <div className="w-52 flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors">
+                    <div className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors" style={{ width: LABEL_PX }}>
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${stCfg.bar}`} />
                       <button
                         onClick={() => onEdit(task)}
@@ -753,7 +757,7 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
                         {task.title}
                       </button>
                     </div>
-                    <div className="flex-1 border-l border-[#e8e8f0] flex items-center px-3">
+                    <div className="flex-shrink-0 border-l border-[#e8e8f0] flex items-center px-3" style={{ width: TIMELINE_PX }}>
                       <span className="text-[10px] text-[#8888a8] italic">Sin fechas asignadas</span>
                     </div>
                   </div>
@@ -765,8 +769,8 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
           {/* Today label at bottom */}
           {todayPct >= 0 && todayPct <= 100 && (
             <div className="flex h-7 bg-[#fafafe] border-t border-[#f0f0f0]">
-              <div className="w-52 flex-shrink-0 border-r border-[#e8e8f0]" />
-              <div className="flex-1 relative">
+              <div className="flex-shrink-0 border-r border-[#e8e8f0]" style={{ width: LABEL_PX }} />
+              <div className="relative flex-shrink-0" style={{ width: TIMELINE_PX }}>
                 <div
                   className="absolute top-0 bottom-0 w-0.5 bg-red-400"
                   style={{ left: `${todayPct}%` }}
