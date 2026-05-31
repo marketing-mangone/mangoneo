@@ -9,17 +9,17 @@ import {
 import {
   TrendingUp, RefreshCw, ArrowUpRight, ArrowDownRight,
   Download, PlaySquare, Eye, Clock, UserPlus, Users,
-  ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight, BarChart3, Globe, MousePointerClick,
 } from 'lucide-react';
 import {
   MOCK_KPIS, MOCK_LEADS_SERIES, MOCK_SESIONES_SERIES,
   MOCK_AD_SPEND_SERIES, MOCK_CHANNEL_DATA,
 } from '@/lib/mock-data';
 import { formatNumber, formatCurrency, calcChange } from '@/lib/utils';
-import { dashboardApi, youtubeApi, type DashboardSummary, type YouTubeWeeklyData } from '@/lib/api';
+import { dashboardApi, youtubeApi, ga4Api, type DashboardSummary, type YouTubeWeeklyData, type GA4Summary, type GA4Slug } from '@/lib/api';
 
 const PERIODS = ['Este mes', 'Último trimestre', 'Últimos 6 meses', 'Este año'];
-const TABS = ['Departamentales', 'YouTube'];
+const TABS = ['Departamentales', 'Google Analytics', 'YouTube'];
 
 function fmtWatchTime(minutes: number): string {
   if (minutes >= 60) return `${(minutes / 60).toFixed(1)}h`;
@@ -150,11 +150,14 @@ export default function MetricasPage() {
                   : 'border-transparent text-[#8888a8] hover:text-[#4a4a6a]'
               }`}
             >
-              {tab === 'YouTube' && <PlaySquare className="w-3.5 h-3.5 text-red-500" />}
+              {tab === 'YouTube'          && <PlaySquare className="w-3.5 h-3.5 text-red-500" />}
+              {tab === 'Google Analytics' && <BarChart3   className="w-3.5 h-3.5 text-blue-500" />}
               {tab}
             </button>
           ))}
         </div>
+
+        {activeTab === 'Google Analytics' && <GA4Section />}
 
         {activeTab === 'YouTube' && (
           <YouTubeSection subscribersTotal={ytData?.['youtube-subscribers-total']?.value ?? null} />
@@ -310,6 +313,163 @@ export default function MetricasPage() {
             </div>
           </Card>
         </>}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Google Analytics 4 Section ─── */
+
+const GA4_STATS: {
+  slug: GA4Slug;
+  label: string;
+  icon: React.ReactNode;
+  fmt: (v: number) => string;
+  goodUp: boolean;
+}[] = [
+  { slug: 'ga4-sessions',             label: 'Sesiones',              icon: <Globe className="w-5 h-5" />,            fmt: formatNumber,                           goodUp: true  },
+  { slug: 'ga4-active-users',         label: 'Usuarios Activos',      icon: <Users className="w-5 h-5" />,            fmt: formatNumber,                           goodUp: true  },
+  { slug: 'ga4-new-users',            label: 'Usuarios Nuevos',       icon: <UserPlus className="w-5 h-5" />,         fmt: formatNumber,                           goodUp: true  },
+  { slug: 'ga4-pageviews',            label: 'Vistas de Página',      icon: <Eye className="w-5 h-5" />,              fmt: formatNumber,                           goodUp: true  },
+  { slug: 'ga4-engagement-rate',      label: 'Tasa de Interacción',   icon: <TrendingUp className="w-5 h-5" />,       fmt: v => `${(v * 100).toFixed(1)}%`,        goodUp: true  },
+  { slug: 'ga4-avg-session-duration', label: 'Duración Media',        icon: <Clock className="w-5 h-5" />,            fmt: v => `${Math.round(v)}s`,               goodUp: true  },
+  { slug: 'ga4-conversions',          label: 'Conversiones',          icon: <MousePointerClick className="w-5 h-5" />, fmt: formatNumber,                          goodUp: true  },
+];
+
+function GA4Section() {
+  const [viewMode, setViewMode]   = useState<'monthly' | 'weekly'>('monthly');
+  const [weekStr,  setWeekStr]    = useState(getCurrentISOWeek());
+  const [data,     setData]       = useState<GA4Summary | null>(null);
+  const [loading,  setLoading]    = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    const call = viewMode === 'monthly'
+      ? ga4Api.monthly()
+      : ga4Api.weekly(weekStr);
+    call
+      .then(setData)
+      .catch(() => setData(null))
+      .finally(() => setLoading(false));
+  }, [viewMode, weekStr]);
+
+  const currentWeek = getCurrentISOWeek();
+  const sessions = data?.metrics['ga4-sessions']?.value;
+
+  return (
+    <div className="space-y-8">
+
+      {/* Hero — sesiones totales */}
+      <div className="rounded-2xl p-6 flex items-center justify-between gap-5 flex-wrap"
+        style={{ background: 'linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%)' }}>
+        <div className="flex items-center gap-5">
+          <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+            <BarChart3 className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">
+              {viewMode === 'monthly' ? 'Sesiones — últimos 28 días' : `Sesiones — ${weekStr}`}
+            </p>
+            <p className="text-white text-4xl font-extrabold leading-none">
+              {sessions !== null && sessions !== undefined ? formatNumber(sessions) : '—'}
+            </p>
+          </div>
+        </div>
+        {data?.period_start && (
+          <p className="text-white/50 text-xs">
+            {data.period_start} → {data.period_end ?? ''}
+          </p>
+        )}
+      </div>
+
+      {/* Controles de período */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex gap-1 bg-white border border-[#e8e8f0] rounded-lg p-1">
+          {(['monthly', 'weekly'] as const).map(m => (
+            <button
+              key={m}
+              onClick={() => setViewMode(m)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all ${
+                viewMode === m ? 'bg-[#0C2054] text-white' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+              }`}
+            >
+              {m === 'monthly' ? '28 días' : 'Por semana'}
+            </button>
+          ))}
+        </div>
+
+        {viewMode === 'weekly' && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setWeekStr(w => addWeeks(w, -1))}
+              className="w-8 h-8 rounded-lg border border-[#e5e7eb] flex items-center justify-center text-[#6b7280] hover:border-[#0C2054] hover:text-[#0C2054] transition-all"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-sm font-bold text-[#111827] min-w-[80px] text-center">
+              {weekStr}
+            </span>
+            <button
+              onClick={() => setWeekStr(w => addWeeks(w, 1))}
+              disabled={weekStr === currentWeek}
+              className="w-8 h-8 rounded-lg border border-[#e5e7eb] flex items-center justify-center text-[#6b7280] hover:border-[#0C2054] hover:text-[#0C2054] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {loading && <span className="text-xs text-[#9ca3af] animate-pulse ml-2">Cargando...</span>}
+      </div>
+
+      {/* Tarjetas de métricas */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        {GA4_STATS.map(({ slug, label, icon, fmt, goodUp }) => {
+          const entry     = data?.metrics[slug];
+          const value     = entry?.value ?? null;
+          const changePct = entry?.change_pct ?? null;
+          const isPos     = changePct !== null && (goodUp ? changePct >= 0 : changePct <= 0);
+
+          return (
+            <Card key={slug} className="p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+                  {icon}
+                </div>
+                {changePct !== null && (
+                  <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full ${
+                    isPos ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+                  }`}>
+                    {isPos ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                    {Math.abs(changePct).toFixed(1)}%
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-[0.08em] mb-1.5">{label}</p>
+              {value !== null ? (
+                <p className="text-2xl font-extrabold text-[#111827] leading-none tracking-tight">
+                  {fmt(value)}
+                </p>
+              ) : (
+                <p className="text-base font-semibold text-[#d1d5db] leading-none">Sin datos</p>
+              )}
+              {entry?.prev_value != null && (
+                <p className="text-[10px] text-[#9ca3af] mt-1.5">
+                  Anterior: {fmt(entry.prev_value)}
+                </p>
+              )}
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Top pages note */}
+      <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-xs text-blue-700 flex items-center gap-2">
+        <Globe className="w-4 h-4 flex-shrink-0" />
+        <span>
+          <strong>Páginas más visitadas</strong> (últimos 28 días): asesoria-migratoria, arregla-tus-papeles, visa-t-requisitos, vawa-landing.
+          Sincronización diaria a las 6:00am.
+        </span>
       </div>
     </div>
   );

@@ -501,6 +501,43 @@ export const youtubeApi = {
   },
 };
 
+// ── Google Analytics 4 ────────────────────────────────────────────────────────
+
+export type GA4Metric = {
+  value: number | null;
+  prev_value: number | null;
+  change_pct: number | null;
+  period_start?: string | null;
+  period_end?: string | null;
+};
+
+export type GA4Slug =
+  | 'ga4-sessions'
+  | 'ga4-active-users'
+  | 'ga4-new-users'
+  | 'ga4-pageviews'
+  | 'ga4-engagement-rate'
+  | 'ga4-avg-session-duration'
+  | 'ga4-conversions';
+
+export type GA4Summary = {
+  period_type: 'monthly' | 'weekly';
+  week?: string;
+  period_start?: string;
+  period_end?: string;
+  metrics: Record<GA4Slug, GA4Metric>;
+};
+
+export const ga4Api = {
+  monthly() {
+    return apiJSON<GA4Summary>('/api/metrics/ga4-summary/?period=monthly');
+  },
+  weekly(week?: string) {
+    const params = week ? `?period=weekly&week=${week}` : '?period=weekly';
+    return apiJSON<GA4Summary>(`/api/metrics/ga4-summary/${params}`);
+  },
+};
+
 export const usersApi = {
   list() {
     return apiJSON<{ results: ApiUserManagement[]; count: number }>('/api/accounts/users/');
