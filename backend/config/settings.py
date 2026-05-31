@@ -185,3 +185,9 @@ YOUTUBE_CLIENT_ID     = config('YOUTUBE_CLIENT_ID', default='')
 YOUTUBE_CLIENT_SECRET = config('YOUTUBE_CLIENT_SECRET', default='')
 YOUTUBE_REFRESH_TOKEN = config('YOUTUBE_REFRESH_TOKEN', default='')
 YOUTUBE_CHANNEL_ID    = config('YOUTUBE_CHANNEL_ID', default='')
+
+# ── Google Analytics 4 ────────────────────────────────────────────────────────
+GA4_CLIENT_ID      = config('GA4_CLIENT_ID', default='')
+GA4_CLIENT_SECRET  = config('GA4_CLIENT_SECRET', default='')
+GA4_REFRESH_TOKEN  = config('GA4_REFRESH_TOKEN', default='')
+GA4_PROPERTY_ID    = config('GA4_PROPERTY_ID', default='')   # solo el número, ej: 123456789
