@@ -1,10 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { Header } from '@/components/layout/Header';
 import {
   CheckCircle2, XCircle, AlertTriangle, ClipboardCheck,
   Trash2, ChevronDown, ChevronUp, Wand2, ShieldAlert,
+  FileText, ImageIcon, Upload, ArrowRight, RotateCcw, ScanText,
 } from 'lucide-react';
+
+type InputMode = 'text' | 'image';
+type OcrStatus = 'idle' | 'processing' | 'done' | 'error';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type ContentType = 'organic' | 'video' | 'paid' | 'blog' | 'print';
@@ -562,11 +566,22 @@ function PlatformIcon({ id, size = 16, color = 'currentColor' }: { id: string; s
 // MAIN PAGE
 // ─────────────────────────────────────────────────────────────────────────────
 export default function HerramientasPage() {
+  // ── Text auditor state ────────────────────────────────────────────────────
   const [text, setText] = useState('');
   const [contentType, setContentType] = useState<ContentType>('organic');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['instagram', 'facebook', 'linkedin']);
   const [results, setResults] = useState<AnalysisResult[] | null>(null);
   const [expandedPlatforms, setExpandedPlatforms] = useState<Set<string>>(new Set());
+
+  // ── Image / OCR state ─────────────────────────────────────────────────────
+  const [inputMode, setInputMode] = useState<InputMode>('text');
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [ocrStatus, setOcrStatus] = useState<OcrStatus>('idle');
+  const [ocrProgress, setOcrProgress] = useState(0);
+  const [ocrText, setOcrText] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const charCount = text.length;
   const hashtagCount = (text.match(/#[\wÀ-ſ]+/g) || []).length;
@@ -602,7 +617,75 @@ export default function HerramientasPage() {
     setExpandedPlatforms(new Set(newResults.map(r => r.platformId)));
   };
 
-  const reset = () => { setText(''); setResults(null); setExpandedPlatforms(new Set()); };
+  const reset = () => {
+    setText('');
+    setResults(null);
+    setExpandedPlatforms(new Set());
+  };
+
+  // ── OCR helpers ───────────────────────────────────────────────────────────
+  const loadImage = useCallback((file: File) => {
+    if (!file.type.startsWith('image/')) return;
+    setImageFile(file);
+    setOcrText('');
+    setOcrStatus('idle');
+    setOcrProgress(0);
+    const reader = new FileReader();
+    reader.onload = e => setImagePreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }, []);
+
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) loadImage(file);
+  }, [loadImage]);
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) loadImage(file);
+  }, [loadImage]);
+
+  const runOcr = useCallback(async () => {
+    if (!imagePreview) return;
+    setOcrStatus('processing');
+    setOcrProgress(0);
+    setOcrText('');
+    try {
+      // Dynamic import avoids SSR issues with Tesseract's web workers
+      const { createWorker } = await import('tesseract.js');
+      const worker = await createWorker(['spa', 'eng'], 1, {
+        logger: (m: { status: string; progress: number }) => {
+          if (m.status === 'recognizing text') {
+            setOcrProgress(Math.round(m.progress * 100));
+          }
+        },
+      });
+      const { data: { text: extracted } } = await worker.recognize(imagePreview);
+      await worker.terminate();
+      const cleaned = extracted.trim();
+      setOcrText(cleaned);
+      setOcrStatus(cleaned ? 'done' : 'error');
+    } catch {
+      setOcrStatus('error');
+    }
+  }, [imagePreview]);
+
+  const useOcrText = useCallback(() => {
+    if (!ocrText) return;
+    setText(ocrText);
+    setInputMode('text');
+  }, [ocrText]);
+
+  const resetImage = useCallback(() => {
+    setImageFile(null);
+    setImagePreview(null);
+    setOcrText('');
+    setOcrStatus('idle');
+    setOcrProgress(0);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
 
   const charPct = Math.min((charCount / 2200) * 100, 100);
   const barColor = charCount > 2200 ? 'bg-red-500' : charCount > 1800 ? 'bg-amber-400' : 'bg-emerald-500';
@@ -661,34 +744,188 @@ export default function HerramientasPage() {
               </div>
             </div>
 
-            {/* Text area */}
-            <div className="bg-white rounded-2xl border border-[#e8e8f0] p-6 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-[15px] font-bold text-[#1a1a3e]">Contenido a auditar</h2>
-                <div className="flex items-center gap-3 text-[12px] text-[#9898bb]">
-                  <span><span className={charCount > 0 ? 'font-bold text-[#1a1a3e]' : ''}>{charCount.toLocaleString('es')}</span> chars</span>
-                  {hashtagCount > 0 && <span className="font-semibold text-[#F79C31]">{hashtagCount} #</span>}
-                  {mentionCount > 0 && <span className="font-semibold text-[#0C2054]">{mentionCount} @</span>}
-                  {linkCount > 0 && <span className="font-semibold text-blue-500">{linkCount} link{linkCount !== 1 ? 's' : ''}</span>}
-                </div>
-              </div>
-              <textarea
-                value={text}
-                onChange={e => setText(e.target.value)}
-                placeholder="Pega aquí el caption, descripción, guión o texto que quieres auditar…"
-                className="w-full h-48 resize-none text-[14px] text-[#1a1a3e] placeholder:text-[#c0c0d8] border border-[#e8e8f0] rounded-xl p-4 focus:outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/8 transition-all leading-relaxed"
-              />
-              <div className="flex items-center justify-between">
-                <button onClick={reset} className="flex items-center gap-1.5 text-[12px] text-[#9898bb] hover:text-red-500 transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" /> Limpiar
+            {/* Contenido — tabs Texto / Imagen */}
+            <div className="bg-white rounded-2xl border border-[#e8e8f0] shadow-sm overflow-hidden">
+              {/* Mode toggle header */}
+              <div className="flex items-center gap-0 border-b border-[#e8e8f0]">
+                <button
+                  onClick={() => setInputMode('text')}
+                  className={`flex items-center gap-2 flex-1 justify-center px-4 py-3.5 text-[13px] font-semibold transition-all border-b-2 ${
+                    inputMode === 'text'
+                      ? 'text-[#0C2054] border-[#0C2054] bg-white'
+                      : 'text-[#9898bb] border-transparent hover:text-[#4a4a6a] bg-[#f7f8fc]'
+                  }`}
+                >
+                  <FileText className="w-4 h-4" /> Pegar texto
                 </button>
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-[#c0c0d8]">Límite IG</span>
-                  <div className="w-24 h-1.5 bg-[#e8e8f0] rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all duration-300 ${barColor}`} style={{ width: `${charPct}%` }} />
-                  </div>
-                  <span className="text-[11px] text-[#c0c0d8]">2,200</span>
-                </div>
+                <button
+                  onClick={() => setInputMode('image')}
+                  className={`flex items-center gap-2 flex-1 justify-center px-4 py-3.5 text-[13px] font-semibold transition-all border-b-2 ${
+                    inputMode === 'image'
+                      ? 'text-[#0C2054] border-[#0C2054] bg-white'
+                      : 'text-[#9898bb] border-transparent hover:text-[#4a4a6a] bg-[#f7f8fc]'
+                  }`}
+                >
+                  <ImageIcon className="w-4 h-4" /> Analizar imagen
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {/* ── TEXT MODE ── */}
+                {inputMode === 'text' && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="text-[13px] font-semibold text-[#4a4a6a]">Contenido a auditar</p>
+                      <div className="flex items-center gap-3 text-[12px] text-[#9898bb]">
+                        <span><span className={charCount > 0 ? 'font-bold text-[#1a1a3e]' : ''}>{charCount.toLocaleString('es')}</span> chars</span>
+                        {hashtagCount > 0 && <span className="font-semibold text-[#F79C31]">{hashtagCount} #</span>}
+                        {mentionCount > 0 && <span className="font-semibold text-[#0C2054]">{mentionCount} @</span>}
+                        {linkCount > 0 && <span className="font-semibold text-blue-500">{linkCount} link{linkCount !== 1 ? 's' : ''}</span>}
+                      </div>
+                    </div>
+                    <textarea
+                      value={text}
+                      onChange={e => setText(e.target.value)}
+                      placeholder="Pega aquí el caption, descripción, guión o texto que quieres auditar…"
+                      className="w-full h-48 resize-none text-[14px] text-[#1a1a3e] placeholder:text-[#c0c0d8] border border-[#e8e8f0] rounded-xl p-4 focus:outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/8 transition-all leading-relaxed"
+                    />
+                    <div className="flex items-center justify-between">
+                      <button onClick={reset} className="flex items-center gap-1.5 text-[12px] text-[#9898bb] hover:text-red-500 transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" /> Limpiar
+                      </button>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-[#c0c0d8]">Límite IG</span>
+                        <div className="w-24 h-1.5 bg-[#e8e8f0] rounded-full overflow-hidden">
+                          <div className={`h-full rounded-full transition-all duration-300 ${barColor}`} style={{ width: `${charPct}%` }} />
+                        </div>
+                        <span className="text-[11px] text-[#c0c0d8]">2,200</span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* ── IMAGE MODE ── */}
+                {inputMode === 'image' && (
+                  <>
+                    {/* Hidden file input */}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileChange}
+                    />
+
+                    {/* Drop zone / preview */}
+                    {!imagePreview ? (
+                      <div
+                        onDragOver={e => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={handleDrop}
+                        onClick={() => fileInputRef.current?.click()}
+                        className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                          isDragging
+                            ? 'border-[#0C2054] bg-[#0C2054]/4'
+                            : 'border-[#e8e8f0] hover:border-[#0C2054]/40 hover:bg-[#f7f8fc]'
+                        }`}
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-[#f0f2ff] flex items-center justify-center mb-4">
+                          <Upload className="w-6 h-6 text-[#0C2054]" />
+                        </div>
+                        <p className="text-[14px] font-semibold text-[#1a1a3e] mb-1">
+                          {isDragging ? 'Suelta la imagen aquí' : 'Arrastra una imagen o haz clic'}
+                        </p>
+                        <p className="text-[12px] text-[#9898bb] text-center">
+                          PNG, JPG, WEBP, GIF · Flyers, graphics de Canva,<br />capturas de anuncios, posts con texto
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {/* Image preview + change button */}
+                        <div className="relative rounded-xl overflow-hidden border border-[#e8e8f0] bg-[#f7f8fc]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={imagePreview}
+                            alt="Imagen a auditar"
+                            className="w-full max-h-52 object-contain"
+                          />
+                          <button
+                            onClick={resetImage}
+                            className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-white/90 shadow flex items-center justify-center text-[#9898bb] hover:text-red-500 transition-colors"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* OCR action */}
+                        {ocrStatus === 'idle' && (
+                          <button
+                            onClick={runOcr}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0C2054] text-white text-[13px] font-bold shadow-sm hover:bg-[#0f2860] transition-all"
+                          >
+                            <ScanText className="w-4 h-4" />
+                            Extraer texto de la imagen
+                          </button>
+                        )}
+
+                        {/* Progress */}
+                        {ocrStatus === 'processing' && (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-[12px]">
+                              <span className="text-[#4a4a6a] font-medium">Extrayendo texto (ES + EN)…</span>
+                              <span className="font-bold text-[#0C2054]">{ocrProgress}%</span>
+                            </div>
+                            <div className="h-2 bg-[#e8e8f0] rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-[#0C2054] rounded-full transition-all duration-200"
+                                style={{ width: `${ocrProgress}%` }}
+                              />
+                            </div>
+                            <p className="text-[11px] text-[#9898bb]">Procesando en el navegador — sin enviar datos externos</p>
+                          </div>
+                        )}
+
+                        {/* OCR error */}
+                        {ocrStatus === 'error' && (
+                          <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                            <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-[13px] font-semibold text-amber-700">No se detectó texto legible</p>
+                              <p className="text-[12px] text-amber-600 mt-0.5">Verifica que la imagen tenga texto visible y nítido. Las imágenes con texto muy pequeño o estilizado pueden tener baja precisión.</p>
+                              <button onClick={runOcr} className="mt-2 text-[12px] font-semibold text-amber-700 underline">Reintentar</button>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Extracted text */}
+                        {ocrStatus === 'done' && ocrText && (
+                          <div className="space-y-3">
+                            <div className="bg-[#f7f8fc] rounded-xl border border-[#e8e8f0] p-4">
+                              <div className="flex items-center justify-between mb-2">
+                                <p className="text-[11px] font-bold text-[#9898bb] uppercase tracking-wider">Texto extraído</p>
+                                <span className="text-[11px] text-[#c0c0d8]">{ocrText.length} chars</span>
+                              </div>
+                              <p className="text-[13px] text-[#4a4a6a] whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto">
+                                {ocrText}
+                              </p>
+                            </div>
+                            <button
+                              onClick={useOcrText}
+                              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0C2054] text-white text-[13px] font-bold shadow-sm hover:bg-[#0f2860] transition-all"
+                            >
+                              <ArrowRight className="w-4 h-4" />
+                              Usar texto extraído para auditar
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <p className="text-[11px] text-[#c0c0d8] text-center">
+                      OCR local con Tesseract.js · Español + Inglés · Sin envío de datos a servidores externos
+                    </p>
+                  </>
+                )}
               </div>
             </div>
 
