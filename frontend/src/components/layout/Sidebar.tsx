@@ -62,6 +62,7 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
         desc: 'Utilidades de marketing',
         subItems: [
           { href: '/herramientas', label: 'Auditor de Contenido', exact: true },
+          { href: '/herramientas/grillas', label: 'Generador de Grillas' },
         ],
       },
     ],

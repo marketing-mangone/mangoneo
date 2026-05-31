@@ -16,6 +16,9 @@ celery>=5.3
 redis>=5.0
 django-celery-beat>=2.6
 
+# AI
+groq>=0.9
+
 # Google / YouTube APIs
 google-api-python-client>=2.120
 google-auth>=2.28

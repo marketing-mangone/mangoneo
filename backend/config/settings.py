@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'dashboard',
     'competitors',
     'customer_avatars',
+    'grillas',
 ]
 
 MIDDLEWARE = [
@@ -175,6 +176,9 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# ── Groq API ─────────────────────────────────────────────────────────────────
+GROQ_API_KEY = config('GROQ_API_KEY', default='')
 
 # ── YouTube API ───────────────────────────────────────────────────────────────
 YOUTUBE_CLIENT_ID     = config('YOUTUBE_CLIENT_ID', default='')

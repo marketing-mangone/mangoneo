@@ -29,6 +29,7 @@ urlpatterns = [
     path('api/dashboard/', include('dashboard.urls')),
     path('api/competitors/', include('competitors.urls')),
     path('api/avatars/', include('customer_avatars.urls')),
+    path('api/grillas/', include('grillas.urls')),
 ]
 
 if settings.DEBUG:

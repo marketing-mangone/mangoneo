@@ -795,3 +795,54 @@ export const competitorsApi = {
     return apiFetch(`/api/competitors/insights/${id}/`, { method: 'DELETE' });
   },
 };
+
+// ── Grillas ───────────────────────────────────────────────────────────────────
+
+export type GridPost = {
+  id: number;
+  grid: number;
+  day_of_week: number;
+  slot: 'carousel' | 'foto' | 'reel';
+  format: 'carousel' | 'static' | 'foto' | 'reel';
+  headline: string;
+  slide_titles: string[];
+  copy: string;
+  cta: string;
+  hashtags: string;
+  caption: string;
+  photo_suggestion: string;
+  video_title: string;
+  script_points: string[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type ContentGrid = {
+  id: number;
+  week_start: string;
+  tema: string;
+  tema_display: string;
+  status: 'borrador' | 'lista' | 'publicada';
+  status_display: string;
+  created_by: number | null;
+  created_by_name: string | null;
+  created_at: string;
+  updated_at: string;
+  posts: GridPost[];
+};
+
+export type ContentGridList = Omit<ContentGrid, 'posts'> & { post_count: number };
+
+export const grillasApi = {
+  list: () => apiJSON<{ results: ContentGridList[]; count: number }>('/api/grillas/'),
+  create: (data: { week_start: string; tema: string }) =>
+    apiJSON<ContentGrid>('/api/grillas/', { method: 'POST', body: JSON.stringify(data) }),
+  get: (id: number) => apiJSON<ContentGrid>(`/api/grillas/${id}/`),
+  update: (id: number, data: { status?: string }) =>
+    apiJSON<ContentGrid>(`/api/grillas/${id}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  generate: (id: number) =>
+    apiJSON<ContentGrid>(`/api/grillas/${id}/generate/`, { method: 'POST' }),
+  updatePost: (postId: number, data: Partial<GridPost>) =>
+    apiJSON<GridPost>(`/api/grillas/posts/${postId}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  delete: (id: number) => apiFetch(`/api/grillas/${id}/`, { method: 'DELETE' }),
+};
