@@ -565,6 +565,28 @@ function PlatformIcon({ id, size = 16, color = 'currentColor' }: { id: string; s
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIN PAGE
 // ─────────────────────────────────────────────────────────────────────────────
+// ── Spell-check types ─────────────────────────────────────────────────────────
+type SpellMatch = {
+  message: string;
+  replacements: { value: string }[];
+  offset: number;
+  length: number;
+  context: { text: string; offset: number; length: number };
+  rule: { id: string; description: string; category: { id: string; name: string } };
+  original: string;
+};
+type SpellStatus = 'idle' | 'checking' | 'done' | 'error';
+
+const SPELL_CATEGORY_LABEL: Record<string, string> = {
+  TYPOS: 'Ortografía',
+  GRAMMAR: 'Gramática',
+  PUNCTUATION: 'Puntuación',
+  CASING: 'Mayúsculas',
+  CONFUSED_WORDS: 'Palabra incorrecta',
+  STYLE: 'Estilo',
+  TYPOGRAPHY: 'Tipografía',
+};
+
 export default function HerramientasPage() {
   // ── Text auditor state ────────────────────────────────────────────────────
   const [text, setText] = useState('');
@@ -572,6 +594,10 @@ export default function HerramientasPage() {
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(['instagram', 'facebook', 'linkedin']);
   const [results, setResults] = useState<AnalysisResult[] | null>(null);
   const [expandedPlatforms, setExpandedPlatforms] = useState<Set<string>>(new Set());
+
+  // ── Spell-check state ─────────────────────────────────────────────────────
+  const [spellMatches, setSpellMatches] = useState<SpellMatch[]>([]);
+  const [spellStatus, setSpellStatus] = useState<SpellStatus>('idle');
 
   // ── Image / OCR state ─────────────────────────────────────────────────────
   const [inputMode, setInputMode] = useState<InputMode>('text');
@@ -621,7 +647,74 @@ export default function HerramientasPage() {
     setText('');
     setResults(null);
     setExpandedPlatforms(new Set());
+    setSpellMatches([]);
+    setSpellStatus('idle');
   };
+
+  // ── Spell-check functions ─────────────────────────────────────────────────
+  const checkSpelling = useCallback(async () => {
+    if (!text.trim()) return;
+    setSpellStatus('checking');
+    setSpellMatches([]);
+    try {
+      const res = await fetch('https://api.languagetool.org/v2/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          text,
+          language: 'es',      // Español principal; detecta inglés automáticamente
+          enabledOnly: 'false',
+          level: 'picky',
+        }),
+      });
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      const matches: SpellMatch[] = (data.matches || []).map((m: SpellMatch) => ({
+        ...m,
+        original: text.substring(m.offset, m.offset + m.length),
+      }));
+      setSpellMatches(matches);
+      setSpellStatus('done');
+    } catch {
+      setSpellStatus('error');
+    }
+  }, [text]);
+
+  const applyCorrection = useCallback((match: SpellMatch, replacement: string) => {
+    const newText =
+      text.substring(0, match.offset) +
+      replacement +
+      text.substring(match.offset + match.length);
+    setText(newText);
+    // Adjust remaining offsets after this one
+    const diff = replacement.length - match.length;
+    setSpellMatches(prev =>
+      prev
+        .filter(m => m.offset !== match.offset)
+        .map(m => m.offset > match.offset ? { ...m, offset: m.offset + diff } : m)
+    );
+  }, [text]);
+
+  const dismissCorrection = useCallback((offset: number) => {
+    setSpellMatches(prev => prev.filter(m => m.offset !== offset));
+  }, []);
+
+  const applyAllCorrections = useCallback(() => {
+    // Apply from end to start to preserve earlier offsets
+    const sorted = [...spellMatches]
+      .filter(m => m.replacements.length > 0)
+      .sort((a, b) => b.offset - a.offset);
+    let newText = text;
+    for (const m of sorted) {
+      newText =
+        newText.substring(0, m.offset) +
+        m.replacements[0].value +
+        newText.substring(m.offset + m.length);
+    }
+    setText(newText);
+    setSpellMatches([]);
+    setSpellStatus('idle');
+  }, [text, spellMatches]);
 
   // ── OCR helpers ───────────────────────────────────────────────────────────
   const loadImage = useCallback((file: File) => {
@@ -785,7 +878,14 @@ export default function HerramientasPage() {
                     </div>
                     <textarea
                       value={text}
-                      onChange={e => setText(e.target.value)}
+                      onChange={e => {
+                        setText(e.target.value);
+                        // Invalidate spell results when user edits manually
+                        if (spellMatches.length > 0) {
+                          setSpellMatches([]);
+                          setSpellStatus('idle');
+                        }
+                      }}
                       placeholder="Pega aquí el caption, descripción, guión o texto que quieres auditar…"
                       className="w-full h-48 resize-none text-[14px] text-[#1a1a3e] placeholder:text-[#c0c0d8] border border-[#e8e8f0] rounded-xl p-4 focus:outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/8 transition-all leading-relaxed"
                     />
@@ -801,6 +901,132 @@ export default function HerramientasPage() {
                         <span className="text-[11px] text-[#c0c0d8]">2,200</span>
                       </div>
                     </div>
+
+                    {/* ── Spell-check button ── */}
+                    <button
+                      onClick={checkSpelling}
+                      disabled={!text.trim() || spellStatus === 'checking'}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-[#e8e8f0] text-[13px] font-semibold text-[#4a4a6a] hover:border-[#0C2054]/30 hover:text-[#0C2054] hover:bg-[#f0f2ff] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      {spellStatus === 'checking' ? (
+                        <>
+                          <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z"/>
+                          </svg>
+                          Revisando ortografía…
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>
+                            <circle cx="18" cy="18" r="3"/><path d="M18 16v2l1 1"/>
+                          </svg>
+                          {spellStatus === 'done'
+                            ? `Revisar de nuevo${spellMatches.length > 0 ? ` (${spellMatches.length} encontrado${spellMatches.length !== 1 ? 's' : ''})` : ''}`
+                            : 'Revisar ortografía y gramática'}
+                        </>
+                      )}
+                    </button>
+
+                    {/* ── Spell error: API fail ── */}
+                    {spellStatus === 'error' && (
+                      <div className="flex items-center gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-[12px] text-red-600">
+                        <XCircle className="w-4 h-4 flex-shrink-0" />
+                        No se pudo conectar con LanguageTool. Verifica tu conexión e intenta de nuevo.
+                      </div>
+                    )}
+
+                    {/* ── Spell results: no errors ── */}
+                    {spellStatus === 'done' && spellMatches.length === 0 && (
+                      <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-[12px] text-emerald-700 font-semibold">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        Sin errores ortográficos ni gramaticales detectados ✓
+                      </div>
+                    )}
+
+                    {/* ── Spell results: corrections list ── */}
+                    {spellStatus === 'done' && spellMatches.length > 0 && (
+                      <div className="border border-[#e8e8f0] rounded-xl overflow-hidden">
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-4 py-3 bg-[#f7f8fc] border-b border-[#e8e8f0]">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] font-bold text-[#1a1a3e]">
+                              {spellMatches.length} corrección{spellMatches.length !== 1 ? 'es' : ''} sugerida{spellMatches.length !== 1 ? 's' : ''}
+                            </span>
+                            <span className="text-[11px] text-[#9898bb]">· LanguageTool</span>
+                          </div>
+                          {spellMatches.some(m => m.replacements.length > 0) && (
+                            <button
+                              onClick={applyAllCorrections}
+                              className="text-[12px] font-semibold text-[#0C2054] hover:underline"
+                            >
+                              Aplicar todas
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Corrections */}
+                        <div className="divide-y divide-[#f0f0f8] max-h-72 overflow-y-auto">
+                          {spellMatches.map(match => {
+                            const catLabel = SPELL_CATEGORY_LABEL[match.rule.category.id] ?? 'Sugerencia';
+                            const isTypo = match.rule.category.id === 'TYPOS';
+                            // Highlight the error inside the context string
+                            const ctxBefore = match.context.text.substring(0, match.context.offset);
+                            const ctxError  = match.context.text.substring(match.context.offset, match.context.offset + match.context.length);
+                            const ctxAfter  = match.context.text.substring(match.context.offset + match.context.length);
+
+                            return (
+                              <div key={match.offset} className="px-4 py-3 space-y-2">
+                                {/* Category + message */}
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
+                                      isTypo ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                                    }`}>
+                                      {catLabel}
+                                    </span>
+                                    <span className="text-[12px] text-[#4a4a6a]">{match.message}</span>
+                                  </div>
+                                  <button
+                                    onClick={() => dismissCorrection(match.offset)}
+                                    className="text-[#c0c0d8] hover:text-[#8888aa] flex-shrink-0 text-[14px] leading-none"
+                                    title="Ignorar"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+
+                                {/* Context with error underlined */}
+                                <p className="text-[12px] text-[#8888aa] font-mono">
+                                  …{ctxBefore}
+                                  <span className={`font-semibold underline decoration-wavy ${isTypo ? 'text-red-600 decoration-red-500' : 'text-amber-600 decoration-amber-500'}`}>
+                                    {ctxError}
+                                  </span>
+                                  {ctxAfter}…
+                                </p>
+
+                                {/* Suggestions */}
+                                {match.replacements.length > 0 && (
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="text-[11px] text-[#9898bb]">Sugerencias:</span>
+                                    {match.replacements.slice(0, 4).map(r => (
+                                      <button
+                                        key={r.value}
+                                        onClick={() => applyCorrection(match, r.value)}
+                                        className="text-[12px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded-lg border border-emerald-200 transition-colors"
+                                      >
+                                        {r.value}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 
