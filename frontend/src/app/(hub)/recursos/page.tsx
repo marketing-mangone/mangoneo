@@ -9,7 +9,7 @@ import {
   Download, Eye, Clock, FolderOpen, BookOpen,
   Palette, Type, Layers, X, AlertCircle, Trash2,
   CheckCircle, Loader2, CloudUpload, Maximize2,
-  Edit3, Plus, Users,
+  Edit3, Plus, Users, Lightbulb, Heart, Tag,
 } from 'lucide-react';
 import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar } from '@/lib/api';
 
@@ -46,6 +46,451 @@ const statusConfig: Record<string, { label: string; color: string }> = {
   draft: { label: 'Borrador', color: 'bg-amber-50 text-amber-700' },
   archived: { label: 'Archivado', color: 'bg-gray-100 text-gray-500' },
 };
+
+// ── Brainstorming ─────────────────────────────────────────────────────────────
+
+interface BrainstormingIdea {
+  id: string;
+  title: string;
+  description: string;
+  author: string;
+  color: string;
+  category: string;
+  created_at: string;
+  likes: number;
+  liked: boolean;
+}
+
+const BRAINSTORM_COLORS = [
+  { bg: '#FEF3C7', text: '#92400E', border: '#FDE68A' },
+  { bg: '#DBEAFE', text: '#1E40AF', border: '#BFDBFE' },
+  { bg: '#D1FAE5', text: '#065F46', border: '#A7F3D0' },
+  { bg: '#FCE7F3', text: '#9D174D', border: '#FBCFE8' },
+  { bg: '#EDE9FE', text: '#4C1D95', border: '#DDD6FE' },
+  { bg: '#FEE2E2', text: '#991B1B', border: '#FECACA' },
+  { bg: '#ECFDF5', text: '#064E3B', border: '#A7F3D0' },
+  { bg: '#FFF7ED', text: '#7C2D12', border: '#FED7AA' },
+];
+
+const BRAINSTORM_CATEGORIES = [
+  'Contenido', 'Campaña', 'SEO', 'Diseño', 'Video', 'CRM', 'General',
+];
+
+const TEAM_MEMBERS = [
+  { name: 'Sebas', role: 'Director' },
+  { name: 'Alejandra', role: 'Content' },
+  { name: 'Sara', role: 'Diseño' },
+  { name: 'Gloriana', role: 'Video' },
+  { name: 'Andrés', role: 'Web/SEO' },
+  { name: 'Jesús', role: 'HubSpot' },
+];
+
+const MEMBER_INITIALS: Record<string, string> = {
+  Sebas: 'SE', Alejandra: 'AL', Sara: 'SA', Gloriana: 'GL', Andrés: 'AN', Jesús: 'JE',
+};
+
+const MEMBER_COLORS: Record<string, string> = {
+  Sebas: '#0C2054', Alejandra: '#F79C31', Sara: '#ec4899',
+  Gloriana: '#8b5cf6', Andrés: '#10b981', Jesús: '#06b6d4',
+};
+
+const BRAINSTORM_STORAGE_KEY = 'mangone_brainstorming_ideas';
+
+function loadIdeas(): BrainstormingIdea[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(BRAINSTORM_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+
+function saveIdeas(ideas: BrainstormingIdea[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(BRAINSTORM_STORAGE_KEY, JSON.stringify(ideas));
+}
+
+// ── AddIdeaModal ──────────────────────────────────────────────────────────────
+
+function AddIdeaModal({ open, onClose, onCreate }: {
+  open: boolean;
+  onClose: () => void;
+  onCreate: (idea: BrainstormingIdea) => void;
+}) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [author, setAuthor] = useState(TEAM_MEMBERS[0].name);
+  const [category, setCategory] = useState(BRAINSTORM_CATEGORIES[6]);
+  const [colorIdx, setColorIdx] = useState(0);
+  const [error, setError] = useState('');
+
+  if (!open) return null;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) { setError('El título es requerido'); return; }
+    const idea: BrainstormingIdea = {
+      id: `idea-${Date.now()}-${Math.floor(Math.random() * 9999)}`,
+      title: title.trim(),
+      description: description.trim(),
+      author,
+      color: BRAINSTORM_COLORS[colorIdx].bg,
+      category,
+      created_at: new Date().toISOString(),
+      likes: 0,
+      liked: false,
+    };
+    onCreate(idea);
+    setTitle(''); setDescription(''); setAuthor(TEAM_MEMBERS[0].name);
+    setCategory(BRAINSTORM_CATEGORIES[6]); setColorIdx(0); setError('');
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f0f0f0]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#F79C31]/10 flex items-center justify-center">
+              <Lightbulb className="w-5 h-5 text-[#F79C31]" />
+            </div>
+            <h3 className="font-bold text-[#1a1a2e]">Nueva idea</h3>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#f7f8fc] text-[#8888a8] transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          {error && (
+            <div className="flex items-center gap-2 text-red-600 bg-red-50 rounded-lg px-3 py-2 text-xs">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
+            </div>
+          )}
+
+          {/* Title */}
+          <div>
+            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Título <span className="text-red-400">*</span></label>
+            <input
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="¿Cuál es la idea?"
+              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Descripción <span className="text-[#8888a8] font-normal">(opcional)</span></label>
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Desarrolla la idea con más detalle..."
+              rows={3}
+              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors resize-none"
+            />
+          </div>
+
+          {/* Author + Category */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Autor</label>
+              <select
+                value={author}
+                onChange={e => setAuthor(e.target.value)}
+                className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] bg-white transition-colors"
+              >
+                {TEAM_MEMBERS.map(m => (
+                  <option key={m.name} value={m.name}>{m.name} — {m.role}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Categoría</label>
+              <select
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] bg-white transition-colors"
+              >
+                {BRAINSTORM_CATEGORIES.map(c => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Color */}
+          <div>
+            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Color de nota</label>
+            <div className="flex gap-2">
+              {BRAINSTORM_COLORS.map((c, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setColorIdx(i)}
+                  className={`w-8 h-8 rounded-lg transition-all flex-shrink-0 border-2 ${colorIdx === i ? 'scale-110 border-gray-400' : 'border-transparent hover:scale-105'}`}
+                  style={{ background: c.bg }}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-1">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg hover:bg-[#f7f8fc] transition-colors">
+              Cancelar
+            </button>
+            <button type="submit" className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#F79C31] rounded-lg hover:bg-[#e08a20] transition-colors shadow-sm">
+              <Plus className="w-4 h-4" /> Agregar idea
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── IdeaCard ──────────────────────────────────────────────────────────────────
+
+function IdeaCard({ idea, onLike, onDelete }: {
+  idea: BrainstormingIdea;
+  onLike: () => void;
+  onDelete: () => void;
+}) {
+  const colorDef = BRAINSTORM_COLORS.find(c => c.bg === idea.color) ?? BRAINSTORM_COLORS[0];
+
+  const dateLabel = (() => {
+    const diff = Date.now() - new Date(idea.created_at).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `hace ${mins}m`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `hace ${hrs}h`;
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return `hace ${days}d`;
+    return new Date(idea.created_at).toLocaleDateString('es-US', { month: 'short', day: 'numeric' });
+  })();
+
+  return (
+    <div
+      className="rounded-xl p-4 flex flex-col gap-3 shadow-sm hover:shadow-md transition-all group border"
+      style={{ background: colorDef.bg, borderColor: colorDef.border }}
+    >
+      {/* Category + delete */}
+      <div className="flex items-center justify-between">
+        <span
+          className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+          style={{ background: `${colorDef.text}15`, color: colorDef.text }}
+        >
+          {idea.category}
+        </span>
+        <button
+          onClick={onDelete}
+          className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg flex items-center justify-center transition-opacity hover:bg-red-100"
+          style={{ color: colorDef.text }}
+        >
+          <X className="w-3 h-3" />
+        </button>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1">
+        <p className="text-sm font-bold leading-snug" style={{ color: colorDef.text }}>{idea.title}</p>
+        {idea.description && (
+          <p className="text-xs mt-1.5 leading-relaxed opacity-75" style={{ color: colorDef.text }}>{idea.description}</p>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <div
+            className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
+            style={{ background: MEMBER_COLORS[idea.author] ?? '#0C2054' }}
+          >
+            {MEMBER_INITIALS[idea.author] ?? idea.author.slice(0, 2).toUpperCase()}
+          </div>
+          <span className="text-[11px] font-medium" style={{ color: colorDef.text, opacity: 0.7 }}>{idea.author}</span>
+          <span className="text-[10px]" style={{ color: colorDef.text, opacity: 0.4 }}>· {dateLabel}</span>
+        </div>
+        <button
+          onClick={onLike}
+          className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-all text-[11px] font-semibold ${idea.liked ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
+          style={{ color: colorDef.text }}
+        >
+          <Heart className={`w-3 h-3 ${idea.liked ? 'fill-current' : ''}`} />
+          {idea.likes > 0 && <span>{idea.likes}</span>}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── BrainstormingTab ──────────────────────────────────────────────────────────
+
+function BrainstormingTab() {
+  const [ideas, setIdeas] = useState<BrainstormingIdea[]>([]);
+  const [addOpen, setAddOpen] = useState(false);
+  const [filterCategory, setFilterCategory] = useState('Todos');
+  const [filterAuthor, setFilterAuthor] = useState('Todos');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setIdeas(loadIdeas());
+    setMounted(true);
+  }, []);
+
+  const persist = (updated: BrainstormingIdea[]) => {
+    setIdeas(updated);
+    saveIdeas(updated);
+  };
+
+  const handleCreate = (idea: BrainstormingIdea) => persist([idea, ...ideas]);
+
+  const handleLike = (id: string) => {
+    persist(ideas.map(idea =>
+      idea.id === id
+        ? { ...idea, liked: !idea.liked, likes: idea.liked ? idea.likes - 1 : idea.likes + 1 }
+        : idea
+    ));
+  };
+
+  const handleDelete = (id: string) => {
+    if (!confirm('¿Eliminar esta idea?')) return;
+    persist(ideas.filter(i => i.id !== id));
+  };
+
+  const filtered = ideas.filter(i => {
+    if (filterCategory !== 'Todos' && i.category !== filterCategory) return false;
+    if (filterAuthor !== 'Todos' && i.author !== filterAuthor) return false;
+    return true;
+  });
+
+  const totalLikes = ideas.reduce((s, i) => s + i.likes, 0);
+
+  return (
+    <div className="space-y-6">
+      <AddIdeaModal open={addOpen} onClose={() => setAddOpen(false)} onCreate={handleCreate} />
+
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#0C2054] to-[#1a3a7a] rounded-xl p-6 relative overflow-hidden">
+        <div className="absolute top-[-40px] right-[-40px] w-40 h-40 rounded-full bg-[#F79C31]/10" />
+        <div className="absolute bottom-[-30px] left-[200px] w-28 h-28 rounded-full bg-white/5" />
+        <p className="text-[#F79C31] text-xs font-semibold uppercase tracking-widest mb-2">Board colaborativo</p>
+        <h2 className="text-white text-2xl font-bold mb-1.5">Brainstorming</h2>
+        <p className="text-white/60 text-sm max-w-xl">
+          Espacio para que el equipo capture y comparta ideas libremente. Agrega, vota y filtra ideas de todos los miembros.
+        </p>
+        <div className="flex items-center gap-6 mt-4">
+          <div>
+            <p className="text-white text-xl font-bold">{ideas.length}</p>
+            <p className="text-white/50 text-xs">Ideas totales</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div>
+            <p className="text-white text-xl font-bold">{totalLikes}</p>
+            <p className="text-white/50 text-xs">Likes acumulados</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div>
+            <p className="text-white text-xl font-bold">{new Set(ideas.map(i => i.author)).size}</p>
+            <p className="text-white/50 text-xs">Colaboradores activos</p>
+          </div>
+          <button
+            onClick={() => setAddOpen(true)}
+            className="ml-auto flex items-center gap-2 bg-[#F79C31] text-[#0C2054] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[#e08a20] transition-colors shadow-md"
+          >
+            <Lightbulb className="w-4 h-4" /> Nueva idea
+          </button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-1.5">
+          <Tag className="w-3.5 h-3.5 text-[#8888a8]" />
+          <span className="text-xs font-semibold text-[#4a4a6a]">Categoría:</span>
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          {['Todos', ...BRAINSTORM_CATEGORIES].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setFilterCategory(cat)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                filterCategory === cat
+                  ? 'bg-[#0C2054] text-white border-[#0C2054]'
+                  : 'bg-white text-[#4a4a6a] border-[#e8e8f0] hover:border-[#d0d0e0]'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        <div className="ml-4 flex items-center gap-1.5">
+          <Users className="w-3.5 h-3.5 text-[#8888a8]" />
+          <span className="text-xs font-semibold text-[#4a4a6a]">Autor:</span>
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          {['Todos', ...TEAM_MEMBERS.map(m => m.name)].map(name => (
+            <button
+              key={name}
+              onClick={() => setFilterAuthor(name)}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
+                filterAuthor === name
+                  ? 'text-white border-transparent'
+                  : 'bg-white text-[#4a4a6a] border-[#e8e8f0] hover:border-[#d0d0e0]'
+              }`}
+              style={filterAuthor === name && name !== 'Todos' ? { background: MEMBER_COLORS[name] ?? '#0C2054', borderColor: 'transparent' } : filterAuthor === name ? { background: '#0C2054' } : {}}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Board */}
+      {!mounted ? null : filtered.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-[#e8eaf0] p-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[#FEF3C7] flex items-center justify-center mx-auto mb-4">
+            <Lightbulb className="w-8 h-8 text-[#F79C31]" />
+          </div>
+          <h3 className="font-bold text-[#0C2054] text-lg mb-2">
+            {ideas.length === 0 ? 'El board está vacío' : 'Sin ideas con estos filtros'}
+          </h3>
+          <p className="text-[#6b7280] text-sm mb-6 max-w-sm mx-auto">
+            {ideas.length === 0
+              ? 'Sé el primero en agregar una idea al board del equipo.'
+              : 'Prueba cambiando los filtros para ver más ideas.'}
+          </p>
+          {ideas.length === 0 && (
+            <button
+              onClick={() => setAddOpen(true)}
+              className="inline-flex items-center gap-2 bg-[#F79C31] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e08a20] transition-all"
+            >
+              <Plus className="w-4 h-4" /> Agregar primera idea
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-0">
+          {filtered.map(idea => (
+            <div key={idea.id} className="break-inside-avoid mb-4">
+              <IdeaCard
+                idea={idea}
+                onLike={() => handleLike(idea.id)}
+                onDelete={() => handleDelete(idea.id)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {filtered.length > 0 && (
+        <p className="text-xs text-[#8888a8] text-right">
+          Mostrando {filtered.length} de {ideas.length} idea{ideas.length !== 1 ? 's' : ''}
+        </p>
+      )}
+    </div>
+  );
+}
 
 const BRAND_COLORS = [
   { name: 'Naranja Mangone', hex: '#F79C31', rgb: '247, 156, 49', cmyk: '0, 53, 86, 0' },
@@ -923,7 +1368,7 @@ function CreateAvatarModal({ open, onClose, onCreate }: {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function RecursosPage() {
-  const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar'>('docs');
+  const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar' | 'brainstorming'>('docs');
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [docs, setDocs] = useState<ApiDocument[]>([]);
@@ -1048,10 +1493,11 @@ export default function RecursosPage() {
             { key: 'docs', label: 'Biblioteca de Documentos', icon: FolderOpen },
             { key: 'brand', label: 'Brand Center', icon: Palette },
             { key: 'avatar', label: 'Avatar del Cliente', icon: Users },
+            { key: 'brainstorming', label: 'Brainstorming', icon: Lightbulb },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar')}
+              onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar' | 'brainstorming')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === key ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
               }`}
@@ -1417,6 +1863,9 @@ export default function RecursosPage() {
           </div>
         )}
       </div>
+
+        {/* ── Brainstorming Tab ────────────────────────────────────────────── */}
+        {activeTab === 'brainstorming' && <BrainstormingTab />}
 
       {/* ── Manual viewer modal ─────────────────────────────────────────── */}
       {manualOpen && (
