@@ -60,6 +60,10 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
+        # Enforce visibility: only admin/leadership can see leadership-only docs
+        role = getattr(getattr(self.request.user, 'profile', None), 'role', None)
+        if role not in ('admin', 'leadership'):
+            qs = qs.filter(visibility__in=['team', 'all'])
         category = self.request.query_params.get('category')
         status_  = self.request.query_params.get('status')
         ftype    = self.request.query_params.get('file_type')

@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from accounts.views import IsAdminRole
 
 from .models import Competitor, CompetitorScore, AdObservation, CompetitorInsight
 from .serializers import (
@@ -13,12 +14,17 @@ from .serializers import (
 )
 
 
+READ_ACTIONS = ('list', 'retrieve', 'radar_data')
+
+
 class CompetitorViewSet(viewsets.ModelViewSet):
     queryset = Competitor.objects.filter(is_active=True)
-    permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'location', 'description']
     ordering_fields = ['name', 'created_at', 'category']
+
+    def get_permissions(self):
+        return [IsAuthenticated()] if self.action in READ_ACTIONS else [IsAdminRole()]
 
     def get_queryset(self):
         qs = Competitor.objects.all()
@@ -45,9 +51,11 @@ class CompetitorViewSet(viewsets.ModelViewSet):
 
 class CompetitorScoreViewSet(viewsets.ModelViewSet):
     queryset = CompetitorScore.objects.all()
-    permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['period', 'dimension', 'score']
+
+    def get_permissions(self):
+        return [IsAuthenticated()] if self.action in READ_ACTIONS else [IsAdminRole()]
 
     def get_queryset(self):
         qs = CompetitorScore.objects.select_related('competitor')
@@ -62,10 +70,12 @@ class CompetitorScoreViewSet(viewsets.ModelViewSet):
 
 class AdObservationViewSet(viewsets.ModelViewSet):
     queryset = AdObservation.objects.all()
-    permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['headline', 'message', 'differentiator']
     ordering_fields = ['observed_date', 'platform']
+
+    def get_permissions(self):
+        return [IsAuthenticated()] if self.action in READ_ACTIONS else [IsAdminRole()]
 
     def get_queryset(self):
         qs = AdObservation.objects.select_related('competitor', 'created_by')
@@ -86,10 +96,12 @@ class AdObservationViewSet(viewsets.ModelViewSet):
 
 class CompetitorInsightViewSet(viewsets.ModelViewSet):
     queryset = CompetitorInsight.objects.all()
-    permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description']
     ordering_fields = ['created_at', 'impact', 'insight_type']
+
+    def get_permissions(self):
+        return [IsAuthenticated()] if self.action in READ_ACTIONS else [IsAdminRole()]
 
     def get_queryset(self):
         qs = CompetitorInsight.objects.select_related('competitor', 'created_by')

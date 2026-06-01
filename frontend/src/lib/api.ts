@@ -81,15 +81,17 @@ export const auth = {
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) throw new Error('Credenciales incorrectas');
-    // Cookies are set by the server (httpOnly). Only cache non-sensitive user info.
-    // Fetch and cache user info
+    // Server sets httpOnly cookies. Read token from body ONCE to fetch user profile
+    // immediately — token is used for one request and never stored in localStorage.
+    const data = await res.json().catch(() => ({}));
     try {
-      const me = await fetch(`${API_BASE}/api/accounts/me/`, {
+      const meRes = await fetch(`${API_BASE}/api/accounts/me/`, {
         credentials: 'include',
-      }).then(r => r.json());
-      saveCurrentUser(me);
+        headers: data.access ? { Authorization: `Bearer ${data.access}` } : {},
+      });
+      if (meRes.ok) saveCurrentUser(await meRes.json());
     } catch {
-      // Non-fatal: user info will be fetched on next load
+      // Non-fatal: session will be validated on next navigation
     }
   },
   async logout() {

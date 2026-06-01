@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from accounts.views import IsAdminRole
 
 from .models import CustomerAvatar
 from .serializers import CustomerAvatarSerializer
@@ -10,7 +11,11 @@ from .serializers import CustomerAvatarSerializer
 class CustomerAvatarViewSet(viewsets.ModelViewSet):
     queryset = CustomerAvatar.objects.all()
     serializer_class = CustomerAvatarSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ('list', 'retrieve'):
+            return [IsAuthenticated()]
+        return [IsAdminRole()]
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
