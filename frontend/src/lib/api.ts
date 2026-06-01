@@ -11,21 +11,13 @@ function clearSession() {
 }
 
 // ── Base fetch ────────────────────────────────────────────────────────────────
-// Always sends credentials (httpOnly cookies). Falls back to localStorage
-// Authorization header for local dev where cross-origin cookies don't work.
+// Authentication relies exclusively on httpOnly cookies (SameSite=None; Secure
+// in production). Tokens are never stored in localStorage.
 
 async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string> ?? {}),
   };
-
-  // Dev fallback: include legacy Authorization header if token still in localStorage
-  if (typeof window !== 'undefined') {
-    const legacyToken = localStorage.getItem('access_token');
-    if (legacyToken && !headers['Authorization']) {
-      headers['Authorization'] = `Bearer ${legacyToken}`;
-    }
-  }
 
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -34,21 +26,13 @@ async function apiFetch(path: string, options: RequestInit = {}): Promise<Respon
   });
 
   if (res.status === 401) {
-    // Try silent refresh — send refresh token via cookie or localStorage fallback
-    const storedRefresh = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+    // Try silent refresh via httpOnly refresh cookie
     const refreshRes = await fetch(`${API_BASE}/api/auth/refresh/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
-      body: JSON.stringify(storedRefresh ? { refresh: storedRefresh } : {}),
     });
     if (refreshRes.ok) {
-      const refreshData = await refreshRes.json().catch(() => ({}));
-      if (refreshData.access) {
-        localStorage.setItem('access_token', refreshData.access);
-        headers['Authorization'] = `Bearer ${refreshData.access}`;
-      }
-      if (refreshData.refresh) localStorage.setItem('refresh_token', refreshData.refresh);
       return fetch(`${API_BASE}${path}`, { ...options, headers, credentials: 'include' });
     }
     // Session truly expired
@@ -97,16 +81,11 @@ export const auth = {
       body: JSON.stringify({ username, password }),
     });
     if (!res.ok) throw new Error('Credenciales incorrectas');
-    // Save tokens to localStorage as fallback for cross-origin deployments
-    // where httpOnly cookies are blocked by the browser (different domains)
-    const data = await res.json().catch(() => ({}));
-    if (data.access)  localStorage.setItem('access_token',  data.access);
-    if (data.refresh) localStorage.setItem('refresh_token', data.refresh);
+    // Cookies are set by the server (httpOnly). Only cache non-sensitive user info.
     // Fetch and cache user info
     try {
       const me = await fetch(`${API_BASE}/api/accounts/me/`, {
         credentials: 'include',
-        headers: data.access ? { Authorization: `Bearer ${data.access}` } : {},
       }).then(r => r.json());
       saveCurrentUser(me);
     } catch {

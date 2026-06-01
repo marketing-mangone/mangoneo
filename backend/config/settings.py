@@ -5,8 +5,8 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='dev-secret-key-change-in-production-immediately')
-DEBUG = config('DEBUG', default=True, cast=bool)
+SECRET_KEY = config('SECRET_KEY', default='dev-secret-key-change-in-production-immediately')  # noqa: S105
+DEBUG = config('DEBUG', default=False, cast=bool)
 _allowed = config('ALLOWED_HOSTS', default='')
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()] or (['localhost', '127.0.0.1'] if DEBUG else [])
 
@@ -89,6 +89,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 12}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
 
 # ── Cloudflare R2 / S3 Storage ────────────────────────────────────────────────
 # Cuando estas variables están en .env / Railway, los uploads van directo a R2.

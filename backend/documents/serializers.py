@@ -29,7 +29,33 @@ class DocumentSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+ALLOWED_CONTENT_TYPES = {
+    'application/pdf', 'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'image/png', 'image/jpeg', 'image/webp', 'image/gif',
+    'video/mp4', 'video/quicktime',
+}
+
+MAX_UPLOAD_BYTES = 52_428_800  # 50 MB
+
+
 class UploadURLSerializer(serializers.Serializer):
     file_name    = serializers.CharField(max_length=255)
     content_type = serializers.CharField(max_length=100)
-    file_size    = serializers.IntegerField(min_value=1)
+    file_size    = serializers.IntegerField(min_value=1, max_value=MAX_UPLOAD_BYTES)
+
+    def validate_content_type(self, value):
+        if value not in ALLOWED_CONTENT_TYPES:
+            raise serializers.ValidationError(
+                f'Tipo de archivo no permitido. Permitidos: PDF, Word, PowerPoint, Excel, imágenes, video MP4.'
+            )
+        return value
+
+    def validate_file_name(self, value):
+        import re
+        sanitized = re.sub(r'["\r\n\x00-\x1f]', '', value)
+        return sanitized

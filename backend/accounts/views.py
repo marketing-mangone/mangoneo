@@ -80,7 +80,14 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         return response
 
 
+class RefreshThrottle(AnonRateThrottle):
+    rate = '20/minute'
+    scope = 'refresh'
+
+
 class CookieTokenRefreshView(TokenRefreshView):
+    throttle_classes = [RefreshThrottle]
+
     def post(self, request, *args, **kwargs):
         # Read refresh token from cookie if not in body
         if 'refresh' not in request.data:
