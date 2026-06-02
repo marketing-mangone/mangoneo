@@ -2,10 +2,21 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // ── Session helpers (non-sensitive only) ─────────────────────────────────────
 
+function setSessionIndicator() {
+  // Non-sensitive indicator cookie so Next.js middleware can gate routes
+  // without seeing the actual httpOnly token (which lives on the API domain).
+  document.cookie = 'mh_session=1; path=/; max-age=259200; SameSite=Lax';
+}
+
+function clearSessionIndicator() {
+  document.cookie = 'mh_session=; path=/; max-age=0; SameSite=Lax';
+}
+
 function clearSession() {
   if (typeof window === 'undefined') return;
   localStorage.removeItem('current_user');
-  // Legacy cleanup (tokens moved to httpOnly cookies)
+  clearSessionIndicator();
+  // Legacy cleanup
   localStorage.removeItem('access_token');
   localStorage.removeItem('refresh_token');
 }
@@ -89,7 +100,10 @@ export const auth = {
         credentials: 'include',
         headers: data.access ? { Authorization: `Bearer ${data.access}` } : {},
       });
-      if (meRes.ok) saveCurrentUser(await meRes.json());
+      if (meRes.ok) {
+        saveCurrentUser(await meRes.json());
+        setSessionIndicator();
+      }
     } catch {
       // Non-fatal: session will be validated on next navigation
     }

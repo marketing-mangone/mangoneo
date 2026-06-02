@@ -10,9 +10,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for httpOnly access cookie set by the Django backend
-  const token = request.cookies.get('mh_access');
-  if (!token) {
+  // mh_session is a non-sensitive indicator cookie set by the frontend on login.
+  // The actual httpOnly mh_access token lives on the API domain (Railway) and
+  // is invisible to this middleware — we use mh_session purely for routing.
+  const session = request.cookies.get('mh_session');
+  if (!session) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('next', pathname);
     return NextResponse.redirect(loginUrl);
