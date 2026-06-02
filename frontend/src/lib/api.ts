@@ -1,10 +1,19 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-// ── Session helpers (non-sensitive only) ─────────────────────────────────────
+// ── In-memory token store ─────────────────────────────────────────────────────
+// Access token lives only in this module variable — never in localStorage.
+// It's reset on every page load; a silent refresh via httpOnly cookie restores it.
+// This prevents XSS token theft while supporting cross-origin deployments.
+
+let _memToken: string | null = null;
+
+function setMemToken(token: string) { _memToken = token; }
+function clearMemToken() { _memToken = null; }
+
+// ── Session helpers ───────────────────────────────────────────────────────────
 
 function setSessionIndicator() {
-  // Non-sensitive indicator cookie so Next.js middleware can gate routes
-  // without seeing the actual httpOnly token (which lives on the API domain).
+  // Non-sensitive indicator cookie so Next.js middleware can gate hub routes.
   document.cookie = 'mh_session=1; path=/; max-age=259200; SameSite=Lax';
 }
 
@@ -14,41 +23,59 @@ function clearSessionIndicator() {
 
 function clearSession() {
   if (typeof window === 'undefined') return;
+  clearMemToken();
   localStorage.removeItem('current_user');
   clearSessionIndicator();
-  // Legacy cleanup
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
 }
 
 // ── Base fetch ────────────────────────────────────────────────────────────────
-// Authentication relies exclusively on httpOnly cookies (SameSite=None; Secure
-// in production). Tokens are never stored in localStorage.
+
+let _refreshing: Promise<boolean> | null = null;
+
+async function _doRefresh(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/refresh/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+    if (!res.ok) return false;
+    const data = await res.json().catch(() => ({}));
+    if (data.access) setMemToken(data.access);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string> ?? {}),
   };
 
-  const res = await fetch(`${API_BASE}${path}`, {
+  // Always try to use the in-memory token (works cross-origin regardless of cookie policy)
+  if (_memToken && !headers['Authorization']) {
+    headers['Authorization'] = `Bearer ${_memToken}`;
+  }
+
+  let res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers,
-    credentials: 'include', // sends httpOnly cookies automatically
+    credentials: 'include',
   });
 
   if (res.status === 401) {
-    // Try silent refresh via httpOnly refresh cookie
-    const refreshRes = await fetch(`${API_BASE}/api/auth/refresh/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-    });
-    if (refreshRes.ok) {
-      return fetch(`${API_BASE}${path}`, { ...options, headers, credentials: 'include' });
+    // Deduplicate concurrent refresh attempts
+    if (!_refreshing) _refreshing = _doRefresh().finally(() => { _refreshing = null; });
+    const ok = await _refreshing;
+
+    if (ok && _memToken) {
+      headers['Authorization'] = `Bearer ${_memToken}`;
+      res = await fetch(`${API_BASE}${path}`, { ...options, headers, credentials: 'include' });
+    } else {
+      clearSession();
+      if (typeof window !== 'undefined') window.location.href = '/login';
     }
-    // Session truly expired
-    clearSession();
-    if (typeof window !== 'undefined') window.location.href = '/login';
   }
 
   return res;
@@ -95,25 +122,23 @@ export const auth = {
     // Server sets httpOnly cookies. Read token from body ONCE to fetch user profile
     // immediately — token is used for one request and never stored in localStorage.
     const data = await res.json().catch(() => ({}));
+    if (data.access) setMemToken(data.access);
     try {
       const meRes = await fetch(`${API_BASE}/api/accounts/me/`, {
         credentials: 'include',
-        headers: data.access ? { Authorization: `Bearer ${data.access}` } : {},
+        headers: _memToken ? { Authorization: `Bearer ${_memToken}` } : {},
       });
       if (meRes.ok) {
         saveCurrentUser(await meRes.json());
         setSessionIndicator();
       }
     } catch {
-      // Non-fatal: session will be validated on next navigation
+      // Non-fatal
     }
   },
   async logout() {
     try {
-      await fetch(`${API_BASE}/api/auth/logout/`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await apiFetch('/api/auth/logout/', { method: 'POST' });
     } catch {
       // Proceed even if request fails
     }
