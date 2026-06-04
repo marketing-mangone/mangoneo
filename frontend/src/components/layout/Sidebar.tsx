@@ -8,7 +8,7 @@ import {
   CheckSquare, Calendar, Bell, ChevronLeft, ChevronRight,
   Settings, Sparkles, TrendingUp, LogOut, Target, Wrench,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { auth } from '@/lib/api';
 
 type SubNavItem = { href: string; label: string; exact?: boolean };
@@ -72,6 +72,29 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
 export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+  // Sub-menus collapsed by default; auto-expand only the active parent route
+  const [openMenus, setOpenMenus] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setOpenMenus(prev => {
+      const next = new Set(prev);
+      for (const group of NAV_MAIN) {
+        for (const item of group.items) {
+          if (item.subItems?.some(s => pathname === s.href || pathname.startsWith(s.href + '/'))) {
+            next.add(item.href);
+          }
+        }
+      }
+      return next;
+    });
+  }, [pathname]);
+
+  const toggleMenu = (href: string) =>
+    setOpenMenus(prev => {
+      const next = new Set(prev);
+      next.has(href) ? next.delete(href) : next.add(href);
+      return next;
+    });
   const currentUser = auth.getCurrentUser();
   const displayName = currentUser?.name || currentUser?.username || 'Usuario';
   const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
@@ -150,52 +173,71 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
             <ul className="space-y-1">
               {group.items.map(({ href, icon: Icon, label, desc, subItems }) => {
                 const active = pathname === href || pathname.startsWith(href + '/');
+                const isOpen = openMenus.has(href);
+                const itemClass = cn(
+                  'group flex items-center rounded-xl transition-all duration-150 relative overflow-hidden',
+                  collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5',
+                  active
+                    ? 'bg-white/12 text-white'
+                    : 'text-white/50 hover:bg-white/6 hover:text-white/80'
+                );
+                const iconClass = cn(
+                  'flex items-center justify-center rounded-lg flex-shrink-0 transition-all',
+                  collapsed ? 'w-9 h-9' : 'w-8 h-8',
+                  active
+                    ? 'bg-[#F79C31] text-[#0C2054] shadow-[0_2px_8px_rgba(247,156,49,0.4)]'
+                    : 'bg-white/6 text-white/60 group-hover:bg-white/10 group-hover:text-white'
+                );
+                const innerContent = (
+                  <>
+                    {active && (
+                      <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-[#F79C31]" />
+                    )}
+                    <div className={iconClass}>
+                      <Icon style={{ width: '16px', height: '16px' }} strokeWidth={active ? 2.5 : 2} />
+                    </div>
+                    {!collapsed && (
+                      <div className="flex-1 min-w-0">
+                        <p className={cn(
+                          'text-[13px] font-semibold leading-tight truncate',
+                          active ? 'text-white' : 'text-white/70 group-hover:text-white/90'
+                        )}>
+                          {label}
+                        </p>
+                        <p className="text-[11px] text-white/30 group-hover:text-white/40 truncate mt-0.5">
+                          {desc}
+                        </p>
+                      </div>
+                    )}
+                    {/* Chevron for items with sub-menus */}
+                    {subItems && !collapsed && (
+                      <ChevronRight className={cn(
+                        'w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 text-white/30',
+                        isOpen && 'rotate-90'
+                      )} />
+                    )}
+                  </>
+                );
+
                 return (
                   <li key={href}>
-                    <Link
-                      href={href}
-                      title={collapsed ? label : undefined}
-                      className={cn(
-                        'group flex items-center rounded-xl transition-all duration-150 relative overflow-hidden',
-                        collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5',
-                        active
-                          ? 'bg-white/12 text-white'
-                          : 'text-white/50 hover:bg-white/6 hover:text-white/80'
-                      )}
-                    >
-                      {/* Active left bar */}
-                      {active && (
-                        <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-[#F79C31]" />
-                      )}
+                    {/* Items with subItems toggle the menu; otherwise navigate directly */}
+                    {subItems && !collapsed ? (
+                      <button
+                        onClick={() => toggleMenu(href)}
+                        title={collapsed ? label : undefined}
+                        className={cn(itemClass, 'w-full text-left')}
+                      >
+                        {innerContent}
+                      </button>
+                    ) : (
+                      <Link href={href} title={collapsed ? label : undefined} className={itemClass}>
+                        {innerContent}
+                      </Link>
+                    )}
 
-                      {/* Icon container */}
-                      <div className={cn(
-                        'flex items-center justify-center rounded-lg flex-shrink-0 transition-all',
-                        collapsed ? 'w-9 h-9' : 'w-8 h-8',
-                        active
-                          ? 'bg-[#F79C31] text-[#0C2054] shadow-[0_2px_8px_rgba(247,156,49,0.4)]'
-                          : 'bg-white/6 text-white/60 group-hover:bg-white/10 group-hover:text-white'
-                      )}>
-                        <Icon style={{ width: '16px', height: '16px' }} strokeWidth={active ? 2.5 : 2} />
-                      </div>
-
-                      {!collapsed && (
-                        <div className="flex-1 min-w-0">
-                          <p className={cn(
-                            'text-[13px] font-semibold leading-tight truncate',
-                            active ? 'text-white' : 'text-white/70 group-hover:text-white/90'
-                          )}>
-                            {label}
-                          </p>
-                          <p className="text-[11px] text-white/30 group-hover:text-white/40 truncate mt-0.5">
-                            {desc}
-                          </p>
-                        </div>
-                      )}
-                    </Link>
-
-                    {/* Sub-items */}
-                    {subItems && !collapsed && (
+                    {/* Sub-items — shown only when open */}
+                    {subItems && !collapsed && isOpen && (
                       <ul className="mt-0.5 mb-1 space-y-0.5 pl-[44px] pr-1">
                         {subItems.map(sub => {
                           const subActive = sub.exact
