@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
+import NextImage from 'next/image';
 import { auth } from '@/lib/api';
 
 export default function LoginPage() {
@@ -34,14 +35,17 @@ export default function LoginPage() {
           <div className="absolute bottom-[-200px] left-[-100px] w-[600px] h-[600px] rounded-full bg-[#F79C31]/5" />
         </div>
         <div className="relative z-10">
-          <div className="flex items-center gap-3 mb-12">
-            <div className="w-10 h-10 rounded-xl bg-[#F79C31] flex items-center justify-center">
-              <span className="font-display text-[#0C2054] text-xl">M</span>
-            </div>
-            <div>
-              <p className="text-white font-bold text-base leading-tight">Mangone Law Firm</p>
-              <p className="text-white/40 text-xs">Marketing Hub</p>
-            </div>
+          {/* Logo */}
+          <div className="mb-12">
+            <NextImage
+              src="/brand/logo-blanco.png"
+              alt="Mangone Law Firm"
+              width={240}
+              height={117}
+              className="object-contain"
+              priority
+            />
+            <p className="text-white/40 text-xs mt-3 tracking-widest uppercase">Marketing Hub</p>
           </div>
 
           <h2 className="font-display text-5xl text-white leading-tight mb-4">
@@ -53,17 +57,7 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10">
-          <blockquote className="border-l-2 border-[#F79C31] pl-5">
-            <p className="text-white/80 text-sm italic leading-relaxed mb-3">
-              "Simplemente todas las herramientas que mi equipo necesita."
-            </p>
-            <footer>
-              <p className="text-white font-semibold text-sm">Sebastian Quijada</p>
-              <p className="text-white/40 text-xs">Director de Marketing</p>
-            </footer>
-          </blockquote>
-
-          <div className="flex items-center gap-6 mt-8 pt-8 border-t border-white/10">
+          <div className="flex items-center gap-6 pt-8 border-t border-white/10">
             {[['284', 'Leads / mes'], ['18.4K', 'Sesiones web'], ['5.2%', 'Engagement']].map(([val, label]) => (
               <div key={label}>
                 <p className="text-[#F79C31] font-display text-2xl">{val}</p>
@@ -78,10 +72,14 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-8 py-12 bg-[#f7f8fc]">
         <div className="w-full max-w-md">
           <div className="lg:hidden flex items-center gap-2 mb-10">
-            <div className="w-8 h-8 rounded-lg bg-[#F79C31] flex items-center justify-center">
-              <span className="font-display text-[#0C2054] text-lg">M</span>
-            </div>
-            <span className="font-bold text-[#0C2054]">Marketing Hub</span>
+            <NextImage
+              src="/brand/logo-negro.png"
+              alt="Mangone Law Firm"
+              width={160}
+              height={78}
+              className="object-contain"
+              priority
+            />
           </div>
 
           <div className="bg-white rounded-2xl border border-[#e8e8f0] shadow-[0_8px_32px_rgba(12,32,84,0.1)] p-8">
