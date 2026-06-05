@@ -10,6 +10,7 @@ import {
   Palette, Type, Layers, X, AlertCircle, Trash2,
   CheckCircle, Loader2, CloudUpload, Maximize2,
   Edit3, Plus, Users, Lightbulb, Heart, Tag,
+  ClipboardList, ChevronDown, ChevronRight, Shield, Wrench,
 } from 'lucide-react';
 import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar } from '@/lib/api';
 
@@ -1365,10 +1366,1963 @@ function CreateAvatarModal({ open, onClose, onCreate }: {
   );
 }
 
+// ── SOPs ──────────────────────────────────────────────────────────────────────
+
+interface SOPStep {
+  num: string;
+  action: string;
+  responsible: string;
+  tool: string;
+}
+
+interface SOPPhase {
+  id: string;
+  num: string;
+  title: string;
+  subtitle: string;
+  steps: SOPStep[];
+}
+
+interface SOPRole {
+  initials: string;
+  name: string;
+  desc: string;
+}
+
+interface SOPData {
+  id: string;
+  name: string;
+  roles: SOPRole[];
+  tools: string[];
+  rules: string[];
+  phases: SOPPhase[];
+}
+
+const SOP_STORAGE_KEY = 'mangone_sops_data';
+
+const INITIAL_SOPS_DATA: SOPData[] = [
+  {
+    "id": "contenido",
+    "name": "Contenido",
+    "roles": [
+      {
+        "initials": "AA",
+        "name": "Alejandra Andrade",
+        "desc": "Community Manager — Planificación editorial, captions, programación, publicación, monitoreo, reportes y análisis"
+      },
+      {
+        "initials": "SC",
+        "name": "Sara Castaño",
+        "desc": "Diseñadora Gráfica — Diseño de piezas para redes sociales y uso interno, edición de video, flyers de eventos de consulta (21 días de anticipación)"
+      },
+      {
+        "initials": "GL",
+        "name": "Gloriana López",
+        "desc": "Creadora de Contenido — Grabación de videos e historias orgánicas, edición y búsqueda de trends"
+      },
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Aprobación de grilla, requerimientos extraordinarios, análisis de datos y coordinación con C-Level"
+      }
+    ],
+    "tools": [
+      "Gemini — Captions y copys",
+      "Canva — Diseño de piezas gráficas",
+      "Dropbox — Almacenamiento de assets",
+      "Meta Business Suite — Programación IG/FB",
+      "TikTok — Carga manual",
+      "YouTube Studio — Carga manual",
+      "LinkedIn — Carga manual"
+    ],
+    "rules": [
+      "Prohibido usar la palabra \"especialistas\" (restricción ética legal)",
+      "Todo caption debe pasar por revisión de cumplimiento legal antes de programarse o publicarse",
+      "Todas las historias deben incluir el disclaimer legal correspondiente",
+      "Todo contenido debe mantener tono empático, esperanzador y no alarmista",
+      "Sara genera el flyer del Evento de Consulta con mínimo 21 días de anticipación",
+      "Todo asset visual se almacena en Dropbox, nunca en carpetas locales",
+      "La grilla se planifica con 2 semanas de anticipación",
+      "Requerimientos extraordinarios de diseño o grabación los asigna Sebastián o C-Level directamente"
+    ],
+    "phases": [
+      {
+        "id": "c-p1",
+        "num": "1",
+        "title": "Planificación Editorial",
+        "subtitle": "Community Manager — Con 2 semanas de anticipación",
+        "steps": [
+          {
+            "num": "1.1",
+            "action": "Revisar noticias de la semana y resultados de la parrilla anterior para definir el contenido próximo",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.2",
+            "action": "Revisar efemérides del período para identificar artes y promociones aplicables a la firma",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.3",
+            "action": "Revisar tendencias de contenido en RRSS que puedan adaptarse a la marca",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.4",
+            "action": "Generar la parrilla semanal con Claude (temas, formatos, plataformas)",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.5",
+            "action": "Redactar captions y copys para cada pieza con Gemini, verificando cumplimiento legal de cada uno antes de incluirlos en la grilla",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.6",
+            "action": "Entregar planificación completa a Sara (diseño) y Gloriana (grabación) para producción",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.7",
+            "action": "Enviar grilla a aprobación de Sebastián Quijada",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.8",
+            "action": "Revisar, aprobar o solicitar ajustes a la grilla",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "c-p2",
+        "num": "2",
+        "title": "Producción de Contenido — Creadora",
+        "subtitle": "Gloriana López — Organización semanal de grabación y edición",
+        "steps": [
+          {
+            "num": "2.1",
+            "action": "Lunes: Buscar ideas, referencias, audios de TikTok y trends virales. Organizar el contenido próximo a grabar según la planificación de CM",
+            "responsible": "Gloriana López",
+            "tool": ""
+          },
+          {
+            "num": "2.2",
+            "action": "Martes (Grabación): Grabar contenido según planificación de Alejandra como prioridad principal",
+            "responsible": "Gloriana López",
+            "tool": ""
+          },
+          {
+            "num": "2.3",
+            "action": "Miércoles: Editar videos informativos. Coordinar textos para videos compartibles",
+            "responsible": "Gloriana López",
+            "tool": ""
+          },
+          {
+            "num": "2.4",
+            "action": "Jueves (Grabación): Terminar planificación pendiente y/o contenido extra: CD, historias, TikTok, YouTube, videos solicitados por Sebastián o C-Level",
+            "responsible": "Gloriana López",
+            "tool": ""
+          },
+          {
+            "num": "2.5",
+            "action": "Viernes: Editar contenido grabado pendiente de la semana",
+            "responsible": "Gloriana López",
+            "tool": ""
+          },
+          {
+            "num": "2.6",
+            "action": "Fin de semana (si aplica): Completar videos compartibles pendientes (principalmente TikTok)",
+            "responsible": "Gloriana López",
+            "tool": ""
+          },
+          {
+            "num": "2.7",
+            "action": "Subir material grabado y editado a Dropbox en carpeta correspondiente",
+            "responsible": "Gloriana López",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "c-p3",
+        "num": "3",
+        "title": "Diseño y Edición — Diseñadora",
+        "subtitle": "Sara Castaño — Piezas gráficas, edición y flyers de eventos",
+        "steps": [
+          {
+            "num": "3.1",
+            "action": "Recibir planificación de CM y requerimientos extraordinarios de Sebastián o C-Level",
+            "responsible": "Sara Castaño",
+            "tool": ""
+          },
+          {
+            "num": "3.2",
+            "action": "Diseñar piezas gráficas (posts, carruseles, artes de efemérides) según planificación aprobada",
+            "responsible": "Sara Castaño",
+            "tool": ""
+          },
+          {
+            "num": "3.3",
+            "action": "Editar videos recibidos de Gloriana (cortes, subtítulos, adaptación por plataforma)",
+            "responsible": "Sara Castaño",
+            "tool": ""
+          },
+          {
+            "num": "3.4",
+            "action": "Generar flyer del próximo Evento de Consulta con 21 días de anticipación",
+            "responsible": "Sara Castaño",
+            "tool": ""
+          },
+          {
+            "num": "3.5",
+            "action": "Subir piezas terminadas a Dropbox y notificar a Alejandra que están listas",
+            "responsible": "Sara Castaño",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "c-p4",
+        "num": "4",
+        "title": "Programación y Publicación",
+        "subtitle": "Community Manager — Distribución en todas las plataformas",
+        "steps": [
+          {
+            "num": "4.1",
+            "action": "Programar posts de Instagram y Facebook con captions y horarios definidos en la grilla",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "4.2",
+            "action": "Cargar manualmente contenido en TikTok con captions, hashtags y configuraciones nativas",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "4.3",
+            "action": "Cargar manualmente Shorts en YouTube",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "4.4",
+            "action": "Publicar manualmente en LinkedIn",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "4.5",
+            "action": "Subir historias diarias manualmente en Instagram y Facebook incluyendo disclaimer legal",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "4.6",
+            "action": "Verificar que todo el contenido programado se publicó correctamente en cada plataforma",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "c-p5",
+        "num": "5",
+        "title": "Monitoreo y Cumplimiento Legal",
+        "subtitle": "Community Manager — Supervisión continua del feed y captions",
+        "steps": [
+          {
+            "num": "5.1",
+            "action": "Revisar periódicamente el feed completo para detectar contenido fuera de cumplimiento legal",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "5.2",
+            "action": "Escalar a Sebastián cualquier pieza que requiera corrección, retiro o posición legal",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "5.3",
+            "action": "Verificar que todas las historias incluyen el disclaimer legal correspondiente",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "c-p6",
+        "num": "6",
+        "title": "Reportes y Análisis",
+        "subtitle": "Community Manager — Reporte semanal, mensual y planificación trimestral",
+        "steps": [
+          {
+            "num": "6.1",
+            "action": "Elaborar reporte semanal de métricas con resultados por plataforma y plan de acción",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "6.2",
+            "action": "Elaborar informe mensual de análisis de la competencia",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "6.3",
+            "action": "Desarrollar planificación estratégica trimestral de contenido",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "6.4",
+            "action": "Presentar reportes y planificación a Sebastián para revisión y aprobación",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "webseo",
+    "name": "Web & SEO",
+    "roles": [
+      {
+        "initials": "AC",
+        "name": "Andrés Coronel",
+        "desc": "Desarrollador Web / SEO — Único acceso a Framer. Construcción, optimización, blogs, landings, tracking y reportes"
+      },
+      {
+        "initials": "FP",
+        "name": "Francisco Parra",
+        "desc": "Paid Media — Define estrategia y estructura de campañas de Google Ads junto con Andrés"
+      },
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Aprobación de páginas nuevas, análisis de métricas web y alineación estratégica"
+      }
+    ],
+    "tools": [
+      "Framer — CMS y desarrollo web (acceso exclusivo: Andrés)",
+      "Alli AI — Optimización SEO continua",
+      "Google Search Console — Indexación y rendimiento orgánico",
+      "Google Analytics — Tráfico y comportamiento",
+      "Google Ads — Campañas vinculadas a landings",
+      "HubSpot — Tracking de eventos e interacciones",
+      "Google PageSpeed — Auditoría técnica",
+      "IA (generación de blogs) — Redacción de contenido SEO"
+    ],
+    "rules": [
+      "Solo Andrés Coronel tiene acceso a Framer — ningún otro miembro del equipo modifica el sitio",
+      "Ninguna página nueva se publica sin aprobación de Marketing y/o Dirección",
+      "Toda landing vinculada a Ads debe tener pixel de conversión verificado antes de activar campaña",
+      "Toda página con formulario o CTA debe tener tracking de HubSpot activo antes de publicarse",
+      "Los blogs se generan con IA pero Andrés revisa y aprueba antes de publicar",
+      "Frecuencia mínima de blog: 2 publicaciones por semana",
+      "Prohibido usar la palabra \"especialistas\" en cualquier página o blog",
+      "Disclaimers legales requeridos en todas las páginas de servicios y landing pages"
+    ],
+    "phases": [
+      {
+        "id": "w-p1",
+        "num": "1",
+        "title": "Creación de Páginas Nuevas",
+        "subtitle": "Por requerimiento de C-Level o necesidad de marketing",
+        "steps": [
+          {
+            "num": "1.1",
+            "action": "Recibir requerimiento de página nueva (C-Level o marketing) y documentarlo",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "1.2",
+            "action": "Definir objetivo de la página: informativa, captación de leads o landing para Ads",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "1.3",
+            "action": "Investigar keywords objetivo y definir estructura SEO de la página",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "1.4",
+            "action": "Redactar copy de la página (títulos, cuerpo, CTAs) alineado a keywords y lineamientos de marca",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "1.5",
+            "action": "Construir la página en Framer integrando copy, assets y estructura SEO",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "1.6",
+            "action": "Configurar tracking de HubSpot en páginas con formularios o interacciones",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "1.7",
+            "action": "Revisar y aprobar página antes de publicar",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "1.8",
+            "action": "Publicar página y verificar indexación en Google Search Console",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "w-p2",
+        "num": "2",
+        "title": "Blog SEO",
+        "subtitle": "2 publicaciones semanales generadas con IA",
+        "steps": [
+          {
+            "num": "2.1",
+            "action": "Identificar keywords con potencial de posicionamiento para los 2 blogs de la semana",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "2.2",
+            "action": "Generar artículo con IA usando keyword objetivo, estructura H1-H3 y longitud adecuada",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "2.3",
+            "action": "Revisar y editar el artículo: precisión legal, tono de marca, cumplimiento y calidad",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "2.4",
+            "action": "Publicar el blog en Framer con metadatos SEO (título, meta descripción, slug, imagen)",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "2.5",
+            "action": "Verificar indexación del artículo en Google Search Console",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "2.6",
+            "action": "Monitorear posicionamiento del artículo a 30-60-90 días",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "w-p3",
+        "num": "3",
+        "title": "SEO On-Page Continuo",
+        "subtitle": "Mejoras proactivas y optimización permanente",
+        "steps": [
+          {
+            "num": "3.1",
+            "action": "Revisar oportunidades de mejora SEO en páginas existentes (keywords, estructura, contenido)",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "3.2",
+            "action": "Optimizar títulos, meta descripciones y headers (H1-H3) según oportunidades detectadas",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "3.3",
+            "action": "Optimizar imágenes: alt text, compresión y nombres de archivo descriptivos",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "3.4",
+            "action": "Revisar y actualizar enlaces internos entre páginas y blogs",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "3.5",
+            "action": "Monitorear backlinks y buscar oportunidades de link building",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "w-p4",
+        "num": "4",
+        "title": "Auditoría Técnica Mensual",
+        "subtitle": "Salud, rendimiento e indexación del sitio",
+        "steps": [
+          {
+            "num": "4.1",
+            "action": "Auditar velocidad de carga y Core Web Vitals",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "4.2",
+            "action": "Verificar indexación correcta de todas las páginas activas",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "4.3",
+            "action": "Detectar y corregir errores de rastreo, enlaces rotos y redirecciones",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "4.4",
+            "action": "Revisar y actualizar sitemap y robots.txt si hay cambios en la estructura del sitio",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "4.5",
+            "action": "Auditar integraciones activas: pixels, HubSpot tracking, Google Tags",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "4.6",
+            "action": "Presentar hallazgos y plan de corrección a Sebastián Quijada",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "w-p5",
+        "num": "5",
+        "title": "Landing Pages + Google Ads",
+        "subtitle": "Andrés Coronel y Francisco Parra — Estrategia y ejecución",
+        "steps": [
+          {
+            "num": "5.1",
+            "action": "Definir estrategia de la campaña y objetivo de conversión de la landing (consulta, formulario, llamada)",
+            "responsible": "Andrés Coronel + Francisco Parra",
+            "tool": ""
+          },
+          {
+            "num": "5.2",
+            "action": "Redactar y construir la landing en Framer optimizada para conversión",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "5.3",
+            "action": "Configurar tracking de HubSpot y pixel de conversión de Google Ads",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "5.4",
+            "action": "Verificar que el pixel de conversión dispara correctamente antes de activar campaña",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "5.5",
+            "action": "Aprobar landing antes de activar la campaña",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "5.6",
+            "action": "Monitorear rendimiento: tasa de conversión, CPL, bounce rate y ajustar según resultados",
+            "responsible": "Andrés Coronel + Francisco Parra",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "w-p6",
+        "num": "6",
+        "title": "Métricas y Reporte",
+        "subtitle": "Análisis semanal compartido con Sebastián Quijada",
+        "steps": [
+          {
+            "num": "6.1",
+            "action": "Extraer métricas semanales: tráfico, fuentes, páginas top, keywords posicionados, CTR",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "6.2",
+            "action": "Extraer rendimiento de landing pages: conversiones, CPL, bounce rate",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "6.3",
+            "action": "Compartir métricas con Sebastián Quijada para análisis conjunto",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "6.4",
+            "action": "Definir ajustes y tareas accionables para la semana siguiente",
+            "responsible": "Andrés Coronel + Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "analitica",
+    "name": "Analítica",
+    "roles": [
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Director de Marketing — Dashboard consolidado de RRSS, informe semanal y recomendaciones"
+      },
+      {
+        "initials": "AA",
+        "name": "Alejandra Andrade",
+        "desc": "Creadora de Contenido — Reporte diario de publicaciones en Slack"
+      },
+      {
+        "initials": "AC",
+        "name": "Andrés Coronel",
+        "desc": "Desarrollador Web / SEO — Análisis de rendimiento web"
+      }
+    ],
+    "tools": [
+      "Claude (Automatización) — Dashboard consolidado de métricas RRSS",
+      "Slack (#Marketing Daily Numbers) — Reporte diario",
+      "Google Analytics — Rendimiento web",
+      "Plataformas nativas — Métricas por red social"
+    ],
+    "rules": [
+      "El reporte diario de publicaciones en Slack es obligatorio todos los días hábiles",
+      "El dashboard de RRSS se genera automáticamente vía Claude",
+      "Todo informe semanal debe incluir recomendaciones accionables",
+      "Las recomendaciones aprobadas se convierten en tareas en Monday.com",
+      "Los datos web son responsabilidad exclusiva de Andrés Coronel"
+    ],
+    "phases": [
+      {
+        "id": "a-p1",
+        "num": "1",
+        "title": "Reporte Diario de Publicaciones",
+        "subtitle": "Desglose diario de contenido publicado por plataforma",
+        "steps": [
+          {
+            "num": "1.1",
+            "action": "Contabilizar todas las publicaciones realizadas en el día por plataforma y formato",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.2",
+            "action": "Enviar desglose diario al canal de Slack #Marketing Daily Numbers",
+            "responsible": "Alejandra Andrade",
+            "tool": ""
+          },
+          {
+            "num": "1.3",
+            "action": "Verificar consistencia del reporte vs. cadencia esperada",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "a-p2",
+        "num": "2",
+        "title": "Recolección de Métricas de RRSS",
+        "subtitle": "Automatización vía Claude — Dashboard consolidado",
+        "steps": [
+          {
+            "num": "2.1",
+            "action": "Ejecutar automatización que extrae métricas de todas las redes sociales",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.2",
+            "action": "Verificar que la data retornada es completa y coherente",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.3",
+            "action": "Consolidar data de todas las plataformas en un único dashboard unificado",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.4",
+            "action": "Identificar tendencias, picos de rendimiento y contenido de bajo desempeño",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "a-p3",
+        "num": "3",
+        "title": "Analítica Web",
+        "subtitle": "Rendimiento del sitio web — Google Analytics",
+        "steps": [
+          {
+            "num": "3.1",
+            "action": "Extraer métricas semanales del sitio: tráfico total, fuentes de tráfico, páginas más visitadas",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "3.2",
+            "action": "Analizar rendimiento de landing pages: tasa de conversión, bounce rate, tiempo en página",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "3.3",
+            "action": "Evaluar posicionamiento orgánico: keywords que generan tráfico, impresiones y CTR",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          },
+          {
+            "num": "3.4",
+            "action": "Identificar páginas con caídas de rendimiento o oportunidades de mejora",
+            "responsible": "Andrés Coronel",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "a-p4",
+        "num": "4",
+        "title": "Informe Semanal Consolidado",
+        "subtitle": "Unificación de datos, análisis y recomendaciones accionables",
+        "steps": [
+          {
+            "num": "4.1",
+            "action": "Consolidar métricas de RRSS (dashboard Claude) + métricas web (Google Analytics) en informe unificado",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.2",
+            "action": "Cruzar datos de publicaciones diarias (Slack) contra rendimiento real",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.3",
+            "action": "Comparar resultados de la semana vs. semana anterior y vs. objetivos",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.4",
+            "action": "Redactar recomendaciones accionables: qué replicar, qué ajustar, qué eliminar",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.5",
+            "action": "Presentar informe en reunión semanal del equipo de marketing",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.6",
+            "action": "Convertir recomendaciones aprobadas en tareas asignadas para la semana siguiente",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "email",
+    "name": "Email Marketing",
+    "roles": [
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Director de Marketing — Estrategia, creación de campañas, grilla de newsletters, definición de segmentos"
+      },
+      {
+        "initials": "J",
+        "name": "Jesús",
+        "desc": "Administración técnica — Gestión técnica de listas, segmentos y configuración en HubSpot"
+      }
+    ],
+    "tools": [
+      "HubSpot — Plataforma central de email marketing",
+      "HubSpot Workflows — Secuencias automatizadas",
+      "HubSpot Lists — Segmentación de contactos",
+      "Monday.com — Gestión de tareas y calendario"
+    ],
+    "rules": [
+      "Todos los emails se redactan exclusivamente en español",
+      "La definición semántica de segmentos la realiza Sebastián; la implementación técnica la ejecuta Jesús",
+      "Todo email debe pasar por prueba interna (móvil + desktop) antes de enviarse",
+      "Todo workflow nuevo debe probarse con contacto de prueba antes de activarse",
+      "Prohibido usar la palabra \"especialistas\" en cualquier email",
+      "Limpieza de listas (inactivos, rebotes, duplicados) se realiza mensualmente"
+    ],
+    "phases": [
+      {
+        "id": "e-p1",
+        "num": "1",
+        "title": "Gestión de Listas y Segmentación",
+        "subtitle": "Definición semántica y administración técnica",
+        "steps": [
+          {
+            "num": "1.1",
+            "action": "Definir criterios de segmentación: tipo de caso, etapa del funnel, fuente de origen, engagement",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "1.2",
+            "action": "Crear y configurar listas y segmentos en HubSpot según criterios definidos",
+            "responsible": "Jesús",
+            "tool": ""
+          },
+          {
+            "num": "1.3",
+            "action": "Limpiar contactos inactivos, rebotados y duplicados (mensual)",
+            "responsible": "Jesús",
+            "tool": ""
+          },
+          {
+            "num": "1.4",
+            "action": "Verificar que nuevos contactos se asignan correctamente a los segmentos activos",
+            "responsible": "Jesús",
+            "tool": ""
+          },
+          {
+            "num": "1.5",
+            "action": "Revisar y validar estado de listas con Sebastián",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "e-p2",
+        "num": "2",
+        "title": "Newsletter Semanal",
+        "subtitle": "Correos informativos recurrentes",
+        "steps": [
+          {
+            "num": "2.1",
+            "action": "Definir grilla semanal de newsletters: temas, ángulo y objetivo de cada envío",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.2",
+            "action": "Redactar copy del email en español (subject, preheader, cuerpo, CTA)",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.3",
+            "action": "Configurar email en HubSpot: template, segmento destinatario, personalización",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.4",
+            "action": "Enviar prueba interna y revisar en móvil y desktop",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.5",
+            "action": "Programar o enviar campaña",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.6",
+            "action": "Monitorear resultados 48h post-envío: open rate, CTR, unsubscribes, conversiones",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "e-p3",
+        "num": "3",
+        "title": "Emails por Requerimiento Particular",
+        "subtitle": "Podcast, eventos, anuncios puntuales",
+        "steps": [
+          {
+            "num": "3.1",
+            "action": "Identificar o recibir el requerimiento: nuevo episodio, evento, anuncio especial",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.2",
+            "action": "Definir segmento destinatario, urgencia y objetivo de conversión",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.3",
+            "action": "Redactar copy del email en español orientado al objetivo específico",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.4",
+            "action": "Configurar, probar y enviar/programar el email",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.5",
+            "action": "Monitorear resultados 48h post-envío",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "e-p4",
+        "num": "4",
+        "title": "Automatizaciones y Workflows",
+        "subtitle": "Cumpleaños, nurturing, re-engagement",
+        "steps": [
+          {
+            "num": "4.1",
+            "action": "Diseñar lógica del workflow: trigger, condiciones, secuencia y tiempos",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.2",
+            "action": "Redactar copy de cada email de la secuencia en español",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.3",
+            "action": "Configurar el workflow técnicamente en HubSpot",
+            "responsible": "Jesús",
+            "tool": ""
+          },
+          {
+            "num": "4.4",
+            "action": "Probar workflow completo con contacto de prueba antes de activar",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.5",
+            "action": "Activar workflow y monitorear primeros disparos",
+            "responsible": "Jesús",
+            "tool": ""
+          },
+          {
+            "num": "4.6",
+            "action": "Monitorear rendimiento de workflows activos semanalmente",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.7",
+            "action": "Optimizar secuencias con bajo rendimiento: A/B test de subjects, CTAs, timing",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "e-p5",
+        "num": "5",
+        "title": "Reporte y Optimización",
+        "subtitle": "Análisis de rendimiento y mejora continua",
+        "steps": [
+          {
+            "num": "5.1",
+            "action": "Consolidar métricas semanales de email: open rate, CTR, unsubscribes, bounces, conversiones",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "5.2",
+            "action": "Identificar emails top performers y de bajo rendimiento",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "5.3",
+            "action": "Incluir hallazgos de email marketing en el informe semanal consolidado",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "5.4",
+            "action": "Ajustar estrategia de contenido, frecuencia y segmentación según resultados",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "reputacion",
+    "name": "Reputación",
+    "roles": [
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Director de Marketing — Monitoreo general, supervisión de automatización y escalamiento"
+      },
+      {
+        "initials": "OF",
+        "name": "Equipo de Oficina",
+        "desc": "Solicitud de reseñas a clientes en interacciones presenciales"
+      },
+      {
+        "initials": "VT",
+        "name": "Equipo de Ventas",
+        "desc": "Solicitud de reseñas durante el proceso comercial"
+      },
+      {
+        "initials": "CX",
+        "name": "Dpto. Customer Experience",
+        "desc": "Evaluación de reviews negativos vinculados a problemas operativos"
+      }
+    ],
+    "tools": [
+      "Google Business Profile — Plataforma principal de reseñas",
+      "Automatización — Respuesta automática a reviews"
+    ],
+    "rules": [
+      "La solicitud de reseñas es responsabilidad de Oficina y Ventas, no de Marketing",
+      "Las respuestas se generan automáticamente — Sebastián supervisa",
+      "Todo review negativo vinculado a un servicio se escala a CX",
+      "Reviews no vinculados a servicios se denuncian en Google",
+      "Nunca responder un review negativo de forma confrontacional"
+    ],
+    "phases": [
+      {
+        "id": "r-p1",
+        "num": "1",
+        "title": "Solicitud de Reseñas",
+        "subtitle": "Generación proactiva por Oficina y Ventas",
+        "steps": [
+          {
+            "num": "1.1",
+            "action": "Identificar clientes con experiencia positiva o caso resuelto satisfactoriamente",
+            "responsible": "Eq. Oficina / Eq. Ventas",
+            "tool": ""
+          },
+          {
+            "num": "1.2",
+            "action": "Solicitar al cliente que deje una reseña en Google Business Profile",
+            "responsible": "Eq. Oficina / Eq. Ventas",
+            "tool": ""
+          },
+          {
+            "num": "1.3",
+            "action": "Facilitar el enlace directo de reseña para simplificar el proceso",
+            "responsible": "Eq. Oficina / Eq. Ventas",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "r-p2",
+        "num": "2",
+        "title": "Respuesta Automatizada a Reviews",
+        "subtitle": "Automatización activa con supervisión de Marketing",
+        "steps": [
+          {
+            "num": "2.1",
+            "action": "La automatización detecta nuevas reseñas y genera respuesta automática",
+            "responsible": "Automático",
+            "tool": ""
+          },
+          {
+            "num": "2.2",
+            "action": "Verificar periódicamente que la automatización funciona correctamente",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.3",
+            "action": "Ajustar parámetros si se detectan respuestas inadecuadas",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "r-p3",
+        "num": "3",
+        "title": "Gestión de Reviews Negativos",
+        "subtitle": "Evaluación, escalamiento a CX y denuncia",
+        "steps": [
+          {
+            "num": "3.1",
+            "action": "Detectar review negativo o que evidencie un problema operativo",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.2",
+            "action": "Evaluar si el review está vinculado a un servicio prestado por la firma",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.3",
+            "action": "Si está vinculado: escalar al Dpto. CX para evaluar qué pasó con el caso",
+            "responsible": "Sebastián Quijada → CX",
+            "tool": ""
+          },
+          {
+            "num": "3.4",
+            "action": "CX investiga el caso y reporta hallazgos a Marketing",
+            "responsible": "Dpto. CX",
+            "tool": ""
+          },
+          {
+            "num": "3.5",
+            "action": "Definir acción a tomar según hallazgos de CX",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.6",
+            "action": "Si NO está vinculado: denunciar el review como inapropiado en Google",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "r-p4",
+        "num": "4",
+        "title": "Monitoreo y Reporte",
+        "subtitle": "Seguimiento continuo de la reputación online",
+        "steps": [
+          {
+            "num": "4.1",
+            "action": "Monitorear volumen de reseñas, rating promedio y tendencia semanal",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.2",
+            "action": "Identificar patrones recurrentes en reviews negativos",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.3",
+            "action": "Incluir métricas de reputación en el informe semanal de marketing",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.4",
+            "action": "Si hay patrones negativos recurrentes: reportar a CX con plan de acción",
+            "responsible": "Sebastián Quijada → CX",
+            "tool": ""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "requerimientos",
+    "name": "Requerimientos",
+    "roles": [
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Director de Marketing — Recepción, evaluación, priorización y asignación"
+      },
+      {
+        "initials": "SC",
+        "name": "Sara Castaño",
+        "desc": "Diseñadora — Ejecución de flyers y piezas gráficas"
+      },
+      {
+        "initials": "GL",
+        "name": "Gloriana López",
+        "desc": "Videógrafa — Ejecución de requerimientos de video"
+      },
+      {
+        "initials": "AC",
+        "name": "Andrés Coronel",
+        "desc": "Desarrollador Web — Ejecución de landing pages"
+      },
+      {
+        "initials": "→",
+        "name": "Solicitantes",
+        "desc": "C-Level, Managers o miembros de otros departamentos"
+      }
+    ],
+    "tools": [
+      "Slack — Canal principal de recepción",
+      "Monday.com — Registro, seguimiento y asignación",
+      "Canva — Diseño de flyers",
+      "Framer — Desarrollo de landing pages",
+      "HubSpot — Correos electrónicos"
+    ],
+    "rules": [
+      "Todo requerimiento pasa por Sebastián Quijada — ningún miembro ejecuta sin asignación formal",
+      "Las solicitudes deben incluir: objetivo, público, fecha deseada y referencias",
+      "Todo requerimiento se registra en Monday.com",
+      "Entregables alineados a los lineamientos de marca sin excepción",
+      "Prohibido usar la palabra \"especialistas\"",
+      "La priorización la define exclusivamente el Director de Marketing",
+      "Pueden solicitar: C-Level, Managers y miembros de otros departamentos"
+    ],
+    "phases": [
+      {
+        "id": "q-p1",
+        "num": "1",
+        "title": "Recepción del Requerimiento",
+        "subtitle": "Ingreso vía Slack o reunión de equipo",
+        "steps": [
+          {
+            "num": "1.1",
+            "action": "Solicitante envía requerimiento por Slack o lo plantea en reunión de equipo",
+            "responsible": "Solicitante",
+            "tool": ""
+          },
+          {
+            "num": "1.2",
+            "action": "Recibir la solicitud y confirmar recepción al solicitante",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "1.3",
+            "action": "Si falta información: solicitar objetivo, público, fecha deseada y materiales de referencia",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "q-p2",
+        "num": "2",
+        "title": "Evaluación y Priorización",
+        "subtitle": "Clasificación, viabilidad y asignación de recursos",
+        "steps": [
+          {
+            "num": "2.1",
+            "action": "Clasificar el requerimiento por tipo: flyer, video, landing page o correo electrónico",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.2",
+            "action": "Evaluar viabilidad según carga de trabajo actual y urgencia",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.3",
+            "action": "Definir prioridad (alta, media, baja) y fecha de entrega estimada",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "2.4",
+            "action": "Comunicar al solicitante la fecha estimada de entrega",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "q-p3",
+        "num": "3",
+        "title": "Asignación y Ejecución",
+        "subtitle": "Delegación al miembro del equipo correspondiente",
+        "steps": [
+          {
+            "num": "3.1",
+            "action": "Crear tarea en Monday.com con brief completo: tipo, objetivo, referencias, fecha y responsable",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.2",
+            "action": "Asignar al ejecutor según tipo: Sara (flyer), Gloriana (video), Andrés (landing), Sebastián (email)",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3.3",
+            "action": "El ejecutor produce el entregable alineado a los lineamientos de marca",
+            "responsible": "Ejecutor asignado",
+            "tool": ""
+          },
+          {
+            "num": "3.4",
+            "action": "Marcar tarea como lista para revisión",
+            "responsible": "Ejecutor asignado",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "q-p4",
+        "num": "4",
+        "title": "Revisión y Aprobación",
+        "subtitle": "Control de calidad y validación",
+        "steps": [
+          {
+            "num": "4.1",
+            "action": "Revisar entregable: calidad, alineación a marca, cumplimiento del brief",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.2",
+            "action": "Si requiere correcciones: devolver con feedback específico",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.3",
+            "action": "Aplicar correcciones y reenviar para revisión",
+            "responsible": "Ejecutor asignado",
+            "tool": ""
+          },
+          {
+            "num": "4.4",
+            "action": "Si amerita: enviar al solicitante para validación",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4.5",
+            "action": "Aprobar entregable final y marcar tarea como completada",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      },
+      {
+        "id": "q-p5",
+        "num": "5",
+        "title": "Entrega y Cierre",
+        "subtitle": "Entrega al solicitante y cierre formal",
+        "steps": [
+          {
+            "num": "5.1",
+            "action": "Entregar producto final al solicitante",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "5.2",
+            "action": "Confirmar con el solicitante que el entregable cumple con lo esperado",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "5.3",
+            "action": "Cerrar tarea en Monday.com con estado final",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          }
+        ]
+      }
+    ]
+  }
+];
+
+function loadSOPs(): SOPData[] {
+  if (typeof window === 'undefined') return INITIAL_SOPS_DATA;
+  try {
+    const raw = localStorage.getItem(SOP_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : INITIAL_SOPS_DATA;
+  } catch { return INITIAL_SOPS_DATA; }
+}
+
+function saveSOPs(sops: SOPData[]) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(SOP_STORAGE_KEY, JSON.stringify(sops));
+}
+
+const MEMBER_COLORS_SOP: Record<string, string> = {
+  AA: '#0C2054', SC: '#ec4899', GL: '#8b5cf6', SQ: '#F79C31',
+  AC: '#10b981', FP: '#ef4444', JE: '#06b6d4', EO: '#6b7280',
+  EV: '#f59e0b', DC: '#3b82f6', SO: '#a855f7',
+};
+
+function getInitialsColor(initials: string): string {
+  return MEMBER_COLORS_SOP[initials] ?? '#0C2054';
+}
+
+// ── SOPPhaseRow ───────────────────────────────────────────────────────────────
+
+function SOPPhaseRow({
+  phase,
+  editing,
+  onUpdateStep,
+  onAddStep,
+  onRemoveStep,
+}: {
+  phase: SOPPhase;
+  editing: boolean;
+  onUpdateStep: (stepIdx: number, field: keyof SOPStep, value: string) => void;
+  onAddStep: () => void;
+  onRemoveStep: (stepIdx: number) => void;
+}) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-[#e8eaf0] overflow-hidden bg-white">
+      {/* Phase header */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-[#f7f8fc] transition-colors"
+      >
+        <div className="w-7 h-7 rounded-lg bg-[#0C2054] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          {phase.num}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-[#1a1a2e]">{phase.title}</p>
+          {phase.subtitle && (
+            <p className="text-xs text-[#8888a8] mt-0.5">{phase.subtitle}</p>
+          )}
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="text-[10px] font-semibold text-[#8888a8] bg-[#f0f0f0] px-2 py-0.5 rounded-full">
+            {phase.steps.length} pasos
+          </span>
+          {open ? (
+            <ChevronDown className="w-4 h-4 text-[#8888a8]" />
+          ) : (
+            <ChevronRight className="w-4 h-4 text-[#8888a8]" />
+          )}
+        </div>
+      </button>
+
+      {/* Steps table */}
+      {open && (
+        <div className="border-t border-[#e8eaf0]">
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="bg-[#f7f8fc]">
+                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold w-12">#</th>
+                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold">Acción</th>
+                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold w-40">Responsable</th>
+                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold w-36">Herramienta</th>
+                  {editing && <th className="w-8" />}
+                </tr>
+              </thead>
+              <tbody>
+                {phase.steps.map((step, si) => (
+                  <tr key={si} className="border-t border-[#f0f0f0] hover:bg-[#fafafa] group">
+                    <td className="px-4 py-2.5">
+                      {editing ? (
+                        <input
+                          value={step.num}
+                          onChange={e => onUpdateStep(si, 'num', e.target.value)}
+                          className="w-10 text-xs border border-[#e8e8f0] rounded px-1.5 py-1 outline-none focus:border-[#F79C31]"
+                        />
+                      ) : (
+                        <span className="text-[#8888a8] font-mono">{step.num}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      {editing ? (
+                        <textarea
+                          value={step.action}
+                          onChange={e => onUpdateStep(si, 'action', e.target.value)}
+                          rows={2}
+                          className="w-full text-xs border border-[#e8e8f0] rounded px-2 py-1 outline-none focus:border-[#F79C31] resize-none"
+                        />
+                      ) : (
+                        <span className="text-[#1a1a2e] leading-relaxed">{step.action}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      {editing ? (
+                        <input
+                          value={step.responsible}
+                          onChange={e => onUpdateStep(si, 'responsible', e.target.value)}
+                          className="w-full text-xs border border-[#e8e8f0] rounded px-1.5 py-1 outline-none focus:border-[#F79C31]"
+                        />
+                      ) : (
+                        <span className="text-[#4a4a6a]">{step.responsible}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5">
+                      {editing ? (
+                        <input
+                          value={step.tool}
+                          onChange={e => onUpdateStep(si, 'tool', e.target.value)}
+                          className="w-full text-xs border border-[#e8e8f0] rounded px-1.5 py-1 outline-none focus:border-[#F79C31]"
+                        />
+                      ) : (
+                        <span className="text-[#8888a8] italic">{step.tool}</span>
+                      )}
+                    </td>
+                    {editing && (
+                      <td className="px-2 py-2.5">
+                        <button
+                          onClick={() => onRemoveStep(si)}
+                          className="w-6 h-6 rounded flex items-center justify-center text-[#c0c0d0] hover:text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {editing && (
+            <div className="px-4 py-3 border-t border-[#f0f0f0]">
+              <button
+                onClick={onAddStep}
+                className="flex items-center gap-1.5 text-xs font-semibold text-[#F79C31] hover:text-[#e08a20] transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" /> Agregar paso
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── SOPsTab ───────────────────────────────────────────────────────────────────
+
+function SOPsTab() {
+  const [sops, setSOPs] = useState<SOPData[]>([]);
+  const [mounted, setMounted] = useState(false);
+  const [activeSOP, setActiveSOP] = useState(0);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState<SOPData | null>(null);
+  const [newTool, setNewTool] = useState('');
+  const [newRule, setNewRule] = useState('');
+  const [activeSection, setActiveSection] = useState<'phases' | 'roles' | 'tools' | 'rules'>('phases');
+
+  useEffect(() => {
+    setSOPs(loadSOPs());
+    setMounted(true);
+  }, []);
+
+  const currentSOP = sops[activeSOP] ?? null;
+
+  const startEdit = () => {
+    if (!currentSOP) return;
+    setDraft(JSON.parse(JSON.stringify(currentSOP)));
+    setEditing(true);
+  };
+
+  const cancelEdit = () => {
+    setDraft(null);
+    setEditing(false);
+    setNewTool('');
+    setNewRule('');
+  };
+
+  const saveEdit = () => {
+    if (!draft) return;
+    const updated = sops.map((s, i) => i === activeSOP ? draft : s);
+    setSOPs(updated);
+    saveSOPs(updated);
+    setDraft(null);
+    setEditing(false);
+    setNewTool('');
+    setNewRule('');
+  };
+
+  const d = editing ? draft : currentSOP;
+
+  // Draft updaters
+  const updatePhaseStep = (phaseIdx: number, stepIdx: number, field: keyof SOPStep, value: string) => {
+    if (!draft) return;
+    const phases = draft.phases.map((ph, pi) =>
+      pi === phaseIdx
+        ? { ...ph, steps: ph.steps.map((st, si) => si === stepIdx ? { ...st, [field]: value } : st) }
+        : ph
+    );
+    setDraft({ ...draft, phases });
+  };
+
+  const addStep = (phaseIdx: number) => {
+    if (!draft) return;
+    const ph = draft.phases[phaseIdx];
+    const lastNum = ph.steps.length > 0 ? ph.steps[ph.steps.length - 1].num : `${ph.num}.0`;
+    const parts = lastNum.split('.');
+    const newNum = parts.length === 2 ? `${parts[0]}.${parseInt(parts[1]) + 1}` : `${ph.num}.${ph.steps.length + 1}`;
+    const phases = draft.phases.map((p, i) =>
+      i === phaseIdx
+        ? { ...p, steps: [...p.steps, { num: newNum, action: '', responsible: '', tool: '' }] }
+        : p
+    );
+    setDraft({ ...draft, phases });
+  };
+
+  const removeStep = (phaseIdx: number, stepIdx: number) => {
+    if (!draft) return;
+    const phases = draft.phases.map((p, i) =>
+      i === phaseIdx ? { ...p, steps: p.steps.filter((_, si) => si !== stepIdx) } : p
+    );
+    setDraft({ ...draft, phases });
+  };
+
+  const addTool = () => {
+    if (!draft || !newTool.trim()) return;
+    setDraft({ ...draft, tools: [...draft.tools, newTool.trim()] });
+    setNewTool('');
+  };
+
+  const removeTool = (i: number) => {
+    if (!draft) return;
+    setDraft({ ...draft, tools: draft.tools.filter((_, idx) => idx !== i) });
+  };
+
+  const addRule = () => {
+    if (!draft || !newRule.trim()) return;
+    setDraft({ ...draft, rules: [...draft.rules, newRule.trim()] });
+    setNewRule('');
+  };
+
+  const removeRule = (i: number) => {
+    if (!draft) return;
+    setDraft({ ...draft, rules: draft.rules.filter((_, idx) => idx !== i) });
+  };
+
+  const updateRule = (i: number, value: string) => {
+    if (!draft) return;
+    setDraft({ ...draft, rules: draft.rules.map((r, idx) => idx === i ? value : r) });
+  };
+
+  const updateRole = (i: number, field: keyof SOPRole, value: string) => {
+    if (!draft) return;
+    setDraft({ ...draft, roles: draft.roles.map((r, idx) => idx === i ? { ...r, [field]: value } : r) });
+  };
+
+  if (!mounted || !d) return null;
+
+  const SECTION_TABS = [
+    { key: 'phases' as const, label: 'Procedimiento', icon: ClipboardList },
+    { key: 'roles' as const, label: 'Roles', icon: Users },
+    { key: 'tools' as const, label: 'Herramientas', icon: Wrench },
+    { key: 'rules' as const, label: 'Reglas', icon: Shield },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-[#0C2054] to-[#1a3a7a] rounded-xl p-6 relative overflow-hidden">
+        <div className="absolute top-[-40px] right-[-40px] w-40 h-40 rounded-full bg-[#F79C31]/10" />
+        <div className="absolute bottom-[-30px] left-[250px] w-28 h-28 rounded-full bg-white/5" />
+        <p className="text-[#F79C31] text-xs font-semibold uppercase tracking-widest mb-2">Procedimientos Operativos</p>
+        <h2 className="text-white text-2xl font-bold mb-1.5">SOPs — Marketing</h2>
+        <p className="text-white/60 text-sm max-w-xl">
+          Guía operativa del equipo. Define cómo se ejecuta cada proceso, quién es responsable y qué herramientas se usan.
+        </p>
+        <div className="flex items-center gap-6 mt-4">
+          <div>
+            <p className="text-white text-xl font-bold">{sops.length}</p>
+            <p className="text-white/50 text-xs">SOPs activos</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div>
+            <p className="text-white text-xl font-bold">{sops.reduce((a, s) => a + s.phases.length, 0)}</p>
+            <p className="text-white/50 text-xs">Fases totales</p>
+          </div>
+          <div className="w-px h-8 bg-white/20" />
+          <div>
+            <p className="text-white text-xl font-bold">{sops.reduce((a, s) => a + s.phases.reduce((b, p) => b + p.steps.length, 0), 0)}</p>
+            <p className="text-white/50 text-xs">Pasos documentados</p>
+          </div>
+        </div>
+      </div>
+
+      {/* SOP sub-tabs */}
+      <div className="flex gap-1 bg-white border border-[#e8e8f0] rounded-xl p-1 w-fit flex-wrap">
+        {sops.map((sop, i) => (
+          <button
+            key={sop.id}
+            onClick={() => { setActiveSOP(i); setEditing(false); setDraft(null); setActiveSection('phases'); }}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+              activeSOP === i ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+            }`}
+          >
+            {sop.name}
+          </button>
+        ))}
+      </div>
+
+      {/* SOP content */}
+      <div className="bg-white rounded-2xl border border-[#e8eaf0] overflow-hidden">
+        {/* SOP header bar */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#f0f0f0]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#0C2054]/10 flex items-center justify-center">
+              <ClipboardList className="w-5 h-5 text-[#0C2054]" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#0C2054] text-base">{d.name}</h3>
+              <p className="text-xs text-[#8888a8]">
+                {d.phases.length} fases · {d.phases.reduce((a, p) => a + p.steps.length, 0)} pasos · {d.roles.length} roles
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {editing ? (
+              <>
+                <button
+                  onClick={cancelEdit}
+                  className="text-xs text-[#6b7280] border border-[#e5e7eb] px-3 py-1.5 rounded-lg hover:bg-[#f9fafb] transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={saveEdit}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-white bg-[#0C2054] px-4 py-1.5 rounded-lg hover:bg-[#1a3a7a] transition-colors"
+                >
+                  <CheckCircle className="w-3.5 h-3.5" /> Guardar cambios
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={startEdit}
+                className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] border border-[#0C2054]/20 bg-[#0C2054]/5 px-3 py-1.5 rounded-lg hover:bg-[#0C2054]/10 transition-colors"
+              >
+                <Edit3 className="w-3.5 h-3.5" /> Editar SOP
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Section tabs */}
+        <div className="flex gap-0 border-b border-[#f0f0f0] px-6">
+          {SECTION_TABS.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setActiveSection(key)}
+              className={`flex items-center gap-1.5 px-4 py-3 text-xs font-semibold border-b-2 transition-all -mb-px ${
+                activeSection === key
+                  ? 'border-[#0C2054] text-[#0C2054]'
+                  : 'border-transparent text-[#8888a8] hover:text-[#4a4a6a]'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" /> {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Section content */}
+        <div className="p-6">
+
+          {/* ── Procedimiento ── */}
+          {activeSection === 'phases' && (
+            <div className="space-y-3">
+              {d.phases.map((phase, pi) => (
+                <SOPPhaseRow
+                  key={phase.id}
+                  phase={phase}
+                  editing={editing}
+                  onUpdateStep={(si, field, value) => updatePhaseStep(pi, si, field, value)}
+                  onAddStep={() => addStep(pi)}
+                  onRemoveStep={(si) => removeStep(pi, si)}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* ── Roles ── */}
+          {activeSection === 'roles' && (
+            <div className="space-y-3">
+              {d.roles.map((role, ri) => (
+                <div key={ri} className="flex items-start gap-4 p-4 rounded-xl border border-[#e8eaf0] bg-[#fafafa]">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                    style={{ background: getInitialsColor(role.initials) }}
+                  >
+                    {role.initials}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {editing ? (
+                      <div className="space-y-1.5">
+                        <input
+                          value={role.name}
+                          onChange={e => updateRole(ri, 'name', e.target.value)}
+                          className="w-full text-sm font-semibold border border-[#e8e8f0] rounded-lg px-3 py-1.5 outline-none focus:border-[#F79C31]"
+                        />
+                        <input
+                          value={role.desc}
+                          onChange={e => updateRole(ri, 'desc', e.target.value)}
+                          placeholder="Descripción del rol..."
+                          className="w-full text-sm border border-[#e8e8f0] rounded-lg px-3 py-1.5 outline-none focus:border-[#F79C31] text-[#4a4a6a]"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-sm font-semibold text-[#1a1a2e]">{role.name}</p>
+                        {role.desc && <p className="text-xs text-[#8888a8] mt-0.5 leading-relaxed">{role.desc}</p>}
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Herramientas ── */}
+          {activeSection === 'tools' && (
+            <div>
+              <div className="flex flex-wrap gap-2">
+                {d.tools.map((tool, ti) => (
+                  <div
+                    key={ti}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#f0f2f8] border border-[#e0e4f0] group"
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#0C2054] flex-shrink-0" />
+                    <span className="text-xs font-medium text-[#0C2054]">{tool}</span>
+                    {editing && (
+                      <button
+                        onClick={() => removeTool(ti)}
+                        className="w-4 h-4 flex items-center justify-center text-[#8888a8] hover:text-red-500 transition-colors ml-1"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {editing && (
+                <div className="mt-4 flex gap-2">
+                  <input
+                    value={newTool}
+                    onChange={e => setNewTool(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTool())}
+                    placeholder="Nueva herramienta..."
+                    className="flex-1 text-sm border border-[#e8e8f0] rounded-lg px-3 py-2 outline-none focus:border-[#F79C31]"
+                  />
+                  <button
+                    onClick={addTool}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#0C2054] text-white text-sm font-semibold rounded-lg hover:bg-[#1a3a7a] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Agregar
+                  </button>
+                </div>
+              )}
+              {d.tools.length === 0 && !editing && (
+                <p className="text-sm text-[#8888a8] italic">Sin herramientas registradas.</p>
+              )}
+            </div>
+          )}
+
+          {/* ── Reglas ── */}
+          {activeSection === 'rules' && (
+            <div className="space-y-2.5">
+              {d.rules.map((rule, ri) => (
+                <div
+                  key={ri}
+                  className="flex items-start gap-3 p-4 rounded-xl border border-[#e8eaf0] bg-[#fffbf0] group"
+                >
+                  <div className="w-5 h-5 rounded-full bg-[#F79C31]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Shield className="w-3 h-3 text-[#F79C31]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {editing ? (
+                      <textarea
+                        value={rule}
+                        onChange={e => updateRule(ri, e.target.value)}
+                        rows={2}
+                        className="w-full text-sm border border-[#e8e8f0] rounded-lg px-3 py-2 outline-none focus:border-[#F79C31] resize-none bg-white"
+                      />
+                    ) : (
+                      <p className="text-sm text-[#1a1a2e] leading-relaxed">{rule}</p>
+                    )}
+                  </div>
+                  {editing && (
+                    <button
+                      onClick={() => removeRule(ri)}
+                      className="w-6 h-6 flex items-center justify-center text-[#c0c0d0] hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0 mt-0.5"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              {editing && (
+                <div className="flex gap-2 mt-2">
+                  <input
+                    value={newRule}
+                    onChange={e => setNewRule(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addRule())}
+                    placeholder="Nueva regla o lineamiento..."
+                    className="flex-1 text-sm border border-[#e8e8f0] rounded-lg px-3 py-2 outline-none focus:border-[#F79C31]"
+                  />
+                  <button
+                    onClick={addRule}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#F79C31] text-white text-sm font-semibold rounded-lg hover:bg-[#e08a20] transition-colors"
+                  >
+                    <Plus className="w-4 h-4" /> Agregar
+                  </button>
+                </div>
+              )}
+              {d.rules.length === 0 && !editing && (
+                <p className="text-sm text-[#8888a8] italic">Sin reglas registradas.</p>
+              )}
+            </div>
+          )}
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function RecursosPage() {
-  const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar' | 'brainstorming'>('docs');
+  const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops'>('docs');
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [docs, setDocs] = useState<ApiDocument[]>([]);
@@ -1494,10 +3448,11 @@ export default function RecursosPage() {
             { key: 'brand', label: 'Brand Center', icon: Palette },
             { key: 'avatar', label: 'Avatar del Cliente', icon: Users },
             { key: 'brainstorming', label: 'Brainstorming', icon: Lightbulb },
+            { key: 'sops', label: 'SOPs', icon: ClipboardList },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar' | 'brainstorming')}
+              onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === key ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
               }`}
@@ -1866,6 +3821,13 @@ export default function RecursosPage() {
 
         {/* ── Brainstorming Tab ────────────────────────────────────────────── */}
         {activeTab === 'brainstorming' && <BrainstormingTab />}
+
+        {/* ── SOPs Tab ─────────────────────────────────────────────────────── */}
+        {activeTab === 'sops' && (
+          <div className="px-0">
+            <SOPsTab />
+          </div>
+        )}
 
       {/* ── Manual viewer modal ─────────────────────────────────────────── */}
       {manualOpen && (
