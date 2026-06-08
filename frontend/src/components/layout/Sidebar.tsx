@@ -165,10 +165,7 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
       <nav className="relative z-10 flex-1 px-3 py-5 overflow-y-auto space-y-6">
         {NAV_MAIN.map(group => (
           <div key={group.label}>
-            {!collapsed && group !== NAV_MAIN[0] && (
-              <div className="h-px bg-white/8 mx-3 mb-3" />
-            )}
-            <ul className="space-y-1">
+              <ul className="space-y-1">
               {group.items.map(({ href, icon: Icon, label, desc, subItems }) => {
                 const active = pathname === href || pathname.startsWith(href + '/');
                 const isOpen = openMenus.has(href);
