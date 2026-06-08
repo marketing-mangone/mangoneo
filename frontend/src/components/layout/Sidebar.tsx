@@ -33,6 +33,7 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
         subItems: [
           { href: '/metricas', label: 'Departamentales', exact: true },
           { href: '/metricas/individuales', label: 'Individuales' },
+          { href: '/metricas/integraciones', label: 'Integraciones' },
         ],
       },
     ],
@@ -162,11 +163,9 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
       </div>
 
       {/* ── NAV ── */}
-      <nav className="relative z-10 flex-1 px-3 py-5 overflow-y-auto space-y-6">
-        {NAV_MAIN.map(group => (
-          <div key={group.label}>
-              <ul className="space-y-1">
-              {group.items.map(({ href, icon: Icon, label, desc, subItems }) => {
+      <nav className="relative z-10 flex-1 px-3 py-5 overflow-y-auto">
+        <ul className="space-y-1">
+        {NAV_MAIN.flatMap(group => group.items).map(({ href, icon: Icon, label, desc, subItems }) => {
                 const active = pathname === href || pathname.startsWith(href + '/');
                 const isOpen = openMenus.has(href);
                 const itemClass = cn(
@@ -262,10 +261,8 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                     )}
                   </li>
                 );
-              })}
-            </ul>
-          </div>
-        ))}
+        })}
+        </ul>
       </nav>
 
 

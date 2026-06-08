@@ -27,15 +27,15 @@ const DAYS       = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sába
 const DAYS_SHORT = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 const SLOT_CONFIG = {
-  carousel: { label: 'Carrusel / Post',  border: 'border-blue-500',   header: 'bg-blue-900',  badge: 'bg-blue-700 text-blue-100',   Icon: LayoutGrid },
-  foto:     { label: 'Foto',             border: 'border-purple-500', header: 'bg-purple-900',badge: 'bg-purple-700 text-purple-100', Icon: ImageIcon  },
-  reel:     { label: 'Reel',             border: 'border-orange-500', header: 'bg-orange-900',badge: 'bg-orange-700 text-orange-100', Icon: Film       },
+  carousel: { label: 'Carrusel / Post',  border: 'border-blue-200',   header: 'bg-blue-50',    badge: 'bg-blue-100 text-blue-700',    Icon: LayoutGrid },
+  foto:     { label: 'Foto',             border: 'border-purple-200', header: 'bg-purple-50',  badge: 'bg-purple-100 text-purple-700', Icon: ImageIcon  },
+  reel:     { label: 'Reel',             border: 'border-orange-200', header: 'bg-orange-50',  badge: 'bg-orange-100 text-orange-700', Icon: Film       },
 } as const;
 
 const STATUS_CONFIG = {
-  borrador: { label: 'Borrador',           cls: 'bg-zinc-600 text-white' },
-  lista:    { label: 'Lista para revisar', cls: 'bg-emerald-600 text-white' },
-  publicada:{ label: 'Publicada',          cls: 'bg-blue-600 text-white' },
+  borrador: { label: 'Borrador',           cls: 'bg-[#f0f0f0] text-[#4a4a6a]' },
+  lista:    { label: 'Lista para revisar', cls: 'bg-emerald-100 text-emerald-700' },
+  publicada:{ label: 'Publicada',          cls: 'bg-blue-100 text-blue-700' },
 } as const;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -106,18 +106,18 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
     const next = [...arr(f)]; next[i] = v; setDraft(d => ({ ...d, [f]: next }));
   };
 
-  const textareaClass = "w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-400 resize-none";
-  const inputClass    = "w-full bg-zinc-800 border border-zinc-600 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-zinc-400";
+  const textareaClass = "w-full bg-white border border-[#e8e8f0] rounded-lg px-3 py-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#F79C31] resize-none";
+  const inputClass    = "w-full bg-white border border-[#e8e8f0] rounded-lg px-3 py-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#F79C31]";
 
   return (
-    <div className={`rounded-xl border ${cfg.border} overflow-hidden`}>
+    <div className={`rounded-xl border ${cfg.border} overflow-hidden bg-white shadow-sm`}>
       {/* Header */}
       <div className={`flex items-center justify-between px-4 py-2.5 ${cfg.header}`}>
         <div className="flex items-center gap-2">
-          <cfg.Icon size={14} className="text-zinc-300" />
+          <cfg.Icon size={14} className="text-[#4a4a6a]" />
           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${cfg.badge}`}>{cfg.label}</span>
           {post.slot === 'carousel' && (
-            <span className="text-xs text-zinc-400">{post.format === 'carousel' ? '· Carrusel' : '· Post Estático'}</span>
+            <span className="text-xs text-[#8888a8]">{post.format === 'carousel' ? '· Carrusel' : '· Post Estático'}</span>
           )}
         </div>
         {isDirty && (
@@ -137,16 +137,16 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
         {post.slot === 'carousel' && (
           <>
             <div>
-              <label className="text-xs text-zinc-300 block mb-1">Headline de la imagen</label>
+              <label className="text-xs text-[#4a4a6a] font-medium block mb-1">Headline de la imagen</label>
               <textarea rows={2} value={val('headline')} onChange={e => setDraft(d => ({ ...d, headline: e.target.value }))} className={textareaClass} placeholder="Texto para la gráfica…" />
             </div>
             {post.format === 'carousel' && arr('slide_titles').length > 0 && (
               <div>
-                <label className="text-xs text-zinc-300 block mb-1">Títulos de slides (para Sara)</label>
+                <label className="text-xs text-[#4a4a6a] font-medium block mb-1">Títulos de slides (para Sara)</label>
                 <div className="space-y-1.5">
                   {arr('slide_titles').map((t, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <span className="text-xs text-zinc-500 w-4 shrink-0">{i + 1}.</span>
+                      <span className="text-xs text-[#8888a8] w-4 shrink-0">{i + 1}.</span>
                       <input value={t} onChange={e => setArr('slide_titles', i, e.target.value)} className={inputClass} />
                     </div>
                   ))}
@@ -159,7 +159,7 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
         {/* Foto */}
         {post.slot === 'foto' && (
           <div>
-            <label className="text-xs text-zinc-300 block mb-1">Sugerencia de foto</label>
+            <label className="text-xs text-[#4a4a6a] font-medium block mb-1">Sugerencia de foto</label>
             <textarea rows={2} value={val('photo_suggestion')} onChange={e => setDraft(d => ({ ...d, photo_suggestion: e.target.value }))} className={textareaClass} placeholder="Ej: Auguy en oficina mirando a cámara, traje azul…" />
           </div>
         )}
@@ -168,16 +168,16 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
         {post.slot === 'reel' && (
           <>
             <div>
-              <label className="text-xs text-zinc-300 block mb-1">Título en pantalla</label>
+              <label className="text-xs text-[#4a4a6a] font-medium block mb-1">Título en pantalla</label>
               <input value={val('video_title')} onChange={e => setDraft(d => ({ ...d, video_title: e.target.value }))} className={inputClass} placeholder="Texto corto para el inicio del video…" />
             </div>
             {arr('script_points').length > 0 && (
               <div>
-                <label className="text-xs text-zinc-300 block mb-1">Guión para Gloriana</label>
+                <label className="text-xs text-[#4a4a6a] font-medium block mb-1">Guión para Gloriana</label>
                 <div className="space-y-1.5">
                   {arr('script_points').map((p, i) => (
                     <div key={i} className="flex items-start gap-2">
-                      <span className="text-xs text-zinc-500 mt-2 w-4 shrink-0">{i + 1}.</span>
+                      <span className="text-xs text-[#8888a8] mt-2 w-4 shrink-0">{i + 1}.</span>
                       <textarea rows={2} value={p} onChange={e => setArr('script_points', i, e.target.value)} className={textareaClass} />
                     </div>
                   ))}
@@ -190,11 +190,11 @@ function PostCard({ post, onSave }: { post: GridPost; onSave: (id: number, data:
         {/* Caption */}
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="text-xs text-zinc-400">Caption completo</label>
+            <label className="text-xs text-[#4a4a6a] font-medium">Caption completo</label>
             <CopyButton text={val('caption')} />
           </div>
           <textarea rows={8} value={val('caption')} onChange={e => setDraft(d => ({ ...d, caption: e.target.value }))} className={cn(textareaClass, 'font-mono leading-relaxed')} />
-          <p className="text-xs text-zinc-600 mt-1 text-right">{val('caption').length} / 2,200</p>
+          <p className="text-xs text-[#8888a8] mt-1 text-right">{val('caption').length} / 2,200</p>
         </div>
       </div>
     </div>
@@ -221,12 +221,12 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onDelete }: {
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-start gap-3">
-          <button onClick={onBack} className="mt-0.5 text-zinc-400 hover:text-white transition-colors">
+          <button onClick={onBack} className="mt-0.5 text-[#8888a8] hover:text-[#0C2054] transition-colors">
             <ChevronLeft size={20} />
           </button>
           <div>
-            <h1 className="text-xl font-bold text-white">{grid.tema_display}</h1>
-            <p className="text-sm text-zinc-400 mt-0.5">{formatWeekRange(grid.week_start)}</p>
+            <h1 className="text-xl font-bold text-[#0C2054]">{grid.tema_display}</h1>
+            <p className="text-sm text-[#8888a8] mt-0.5">{formatWeekRange(grid.week_start)}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -256,7 +256,7 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onDelete }: {
       </div>
 
       {!hasPosts && (
-        <div className="text-center py-16 text-zinc-500 border border-dashed border-zinc-800 rounded-2xl">
+        <div className="text-center py-16 text-[#8888a8] border border-dashed border-[#e8eaf0] rounded-2xl bg-white">
           <Sparkles size={32} className="mx-auto mb-3 opacity-40" />
           <p className="text-sm">La grilla no tiene contenido generado.</p>
         </div>
@@ -265,7 +265,7 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onDelete }: {
       {hasPosts && (
         <>
           {/* Day tabs */}
-          <div className="flex gap-1 flex-wrap border-b border-zinc-800 pb-0">
+          <div className="flex gap-1 flex-wrap border-b border-[#e8eaf0] pb-0">
             {DAYS_SHORT.map((d, i) => (
               <button
                 key={i}
@@ -273,12 +273,12 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onDelete }: {
                 className={cn(
                   'px-3 py-2 text-xs font-medium rounded-t-lg transition-colors border-b-2 -mb-px',
                   activeDay === i
-                    ? 'text-white border-[#F79C31] bg-zinc-900'
-                    : 'text-zinc-500 border-transparent hover:text-zinc-300'
+                    ? 'text-[#0C2054] border-[#F79C31] bg-[#f7f8fc]'
+                    : 'text-[#8888a8] border-transparent hover:text-[#4a4a6a]'
                 )}
               >
                 {d}
-                <span className="ml-1 text-zinc-600 text-xs">
+                <span className="ml-1 text-[#c0c0d0] text-xs">
                   {getPostsForDay(grid.posts, i).length}
                 </span>
               </button>
@@ -287,9 +287,9 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onDelete }: {
 
           {/* Day content */}
           <div>
-            <p className="text-sm font-medium text-zinc-400 mb-4">{DAYS[activeDay]}</p>
+            <p className="text-sm font-medium text-[#4a4a6a] mb-4">{DAYS[activeDay]}</p>
             {getPostsForDay(grid.posts, activeDay).length === 0 ? (
-              <p className="text-xs text-zinc-600 py-8 text-center">Sin posts para este día.</p>
+              <p className="text-xs text-[#8888a8] py-8 text-center">Sin posts para este día.</p>
             ) : (
               <div className="space-y-4">
                 {getPostsForDay(grid.posts, activeDay).map(post => (
@@ -309,18 +309,18 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onDelete }: {
 function GrillaCard({ grilla, onClick }: { grilla: ContentGridList; onClick: () => void }) {
   const s = STATUS_CONFIG[grilla.status];
   return (
-    <button onClick={onClick} className="w-full text-left bg-zinc-900 border border-zinc-800 hover:border-zinc-600 rounded-xl p-4 transition-all hover:bg-zinc-800/60">
+    <button onClick={onClick} className="w-full text-left bg-white border border-[#e8eaf0] hover:border-[#d0d4e8] rounded-xl p-4 transition-all hover:shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="font-semibold text-white text-sm">{grilla.tema_display}</p>
-          <p className="text-xs text-zinc-400 mt-0.5">{formatWeekRange(grilla.week_start)}</p>
+          <p className="font-semibold text-[#0C2054] text-sm">{grilla.tema_display}</p>
+          <p className="text-xs text-[#8888a8] mt-0.5">{formatWeekRange(grilla.week_start)}</p>
         </div>
         <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${s.cls}`}>{s.label}</span>
       </div>
       <div className="flex items-center gap-3 mt-3">
-        <span className="text-xs text-zinc-500">{grilla.post_count} posts</span>
-        <span className="text-zinc-700">·</span>
-        <span className="text-xs text-zinc-500">
+        <span className="text-xs text-[#8888a8]">{grilla.post_count} posts</span>
+        <span className="text-[#d0d0e0]">·</span>
+        <span className="text-xs text-[#8888a8]">
           {new Date(grilla.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
         </span>
       </div>
@@ -382,7 +382,7 @@ export default function GrillasPage() {
     setSelectedGrid(null); setView('list'); await loadList();
   };
 
-  const selectClass = "w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-zinc-200 focus:outline-none focus:border-zinc-500 appearance-none cursor-pointer";
+  const selectClass = "w-full bg-white border border-[#e8e8f0] rounded-lg px-3 py-2.5 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#F79C31] appearance-none cursor-pointer";
 
   // ── Detail view ─────────────────────────────────────────────────────────────
   if (view === 'detail' && selectedGrid) {
@@ -398,15 +398,15 @@ export default function GrillasPage() {
     return (
       <div className="max-w-lg mx-auto p-8">
         <div className="flex items-center gap-3 mb-8">
-          <button onClick={() => setView('list')} className="text-zinc-400 hover:text-white transition-colors">
+          <button onClick={() => setView('list')} className="text-[#8888a8] hover:text-[#0C2054] transition-colors">
             <ChevronLeft size={20} />
           </button>
-          <h1 className="text-xl font-bold text-white">Nueva Grilla</h1>
+          <h1 className="text-xl font-bold text-[#0C2054]">Nueva Grilla</h1>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-5">
+        <div className="bg-white border border-[#e8eaf0] rounded-2xl p-6 space-y-5 shadow-sm">
           <div>
-            <label className="text-sm text-zinc-300 block mb-2">Semana</label>
+            <label className="text-sm text-[#4a4a6a] font-medium block mb-2">Semana</label>
             <div className="relative">
               <select value={form.week_start} onChange={e => setForm(f => ({ ...f, week_start: e.target.value }))} className={selectClass}>
                 {mondays.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
@@ -415,7 +415,7 @@ export default function GrillasPage() {
           </div>
 
           <div>
-            <label className="text-sm text-zinc-300 block mb-2">Tema de la semana</label>
+            <label className="text-sm text-[#4a4a6a] font-medium block mb-2">Tema de la semana</label>
             <select value={form.tema} onChange={e => setForm(f => ({ ...f, tema: e.target.value }))} className={selectClass}>
               <option value="" disabled>Selecciona el tema…</option>
               {TEMAS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
@@ -423,18 +423,19 @@ export default function GrillasPage() {
           </div>
 
           {error && (
-            <div className="bg-red-950/50 border border-red-800 rounded-lg px-4 py-3 text-sm text-red-300">{error}</div>
+            <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">{error}</div>
           )}
 
           {generating && (
-            <div className="bg-blue-950/40 border border-blue-800 rounded-lg px-4 py-4 text-center">
-              <Loader2 size={24} className="animate-spin mx-auto mb-2 text-blue-400" />
-              <p className="text-sm text-blue-300 font-medium">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-4 text-center">
+              <Loader2 size={24} className="animate-spin mx-auto mb-2 text-blue-500" />
+              <p className="text-sm text-blue-700 font-medium">
                 {form.tema === 'uscis'
                   ? 'Consultando noticias de USCIS y generando 21 posts…'
                   : 'Generando 21 posts con IA…'}
               </p>
               <p className="text-xs text-blue-500 mt-1">Esto puede tomar 20–40 segundos</p>
+
             </div>
           )}
 
@@ -460,34 +461,34 @@ export default function GrillasPage() {
     <div className="max-w-4xl mx-auto p-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Generador de Grillas</h1>
-          <p className="text-sm text-zinc-400 mt-1">Planning semanal para Instagram y Facebook</p>
+          <h1 className="text-2xl font-bold text-[#0C2054]">Generador de Grillas</h1>
+          <p className="text-sm text-[#8888a8] mt-1">Planning semanal para Instagram y Facebook</p>
         </div>
         <Button onClick={() => { setError(''); setView('create'); }} variant="secondary">
           <Plus size={16} /> Nueva Grilla
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 text-xs text-zinc-500">
-        <span className="flex items-center gap-1.5"><LayoutGrid size={12} className="text-blue-400" /> Carrusel / Post</span>
-        <span className="flex items-center gap-1.5"><ImageIcon size={12} className="text-purple-400" /> Foto</span>
-        <span className="flex items-center gap-1.5"><Film size={12} className="text-orange-400" /> Reel</span>
-        <span className="text-zinc-700">·</span>
+      <div className="flex items-center gap-4 text-xs text-[#8888a8]">
+        <span className="flex items-center gap-1.5"><LayoutGrid size={12} className="text-blue-500" /> Carrusel / Post</span>
+        <span className="flex items-center gap-1.5"><ImageIcon size={12} className="text-purple-500" /> Foto</span>
+        <span className="flex items-center gap-1.5"><Film size={12} className="text-orange-500" /> Reel</span>
+        <span className="text-[#d0d0e0]">·</span>
         <span>3 posts por día · 21 posts por semana</span>
       </div>
 
       {error && (
-        <div className="bg-red-950/50 border border-red-800 rounded-lg px-4 py-3 text-sm text-red-300">{error}</div>
+        <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-600">{error}</div>
       )}
 
       {loadingList ? (
         <div className="flex items-center justify-center py-24">
-          <Loader2 size={28} className="animate-spin text-zinc-500" />
+          <Loader2 size={28} className="animate-spin text-[#F79C31]" />
         </div>
       ) : grillas.length === 0 ? (
-        <div className="text-center py-24 border border-dashed border-zinc-800 rounded-2xl text-zinc-500">
+        <div className="text-center py-24 border border-dashed border-[#e8eaf0] rounded-2xl text-[#8888a8] bg-white">
           <Sparkles size={36} className="mx-auto mb-4 opacity-30" />
-          <p className="text-base font-medium text-zinc-400">No hay grillas creadas</p>
+          <p className="text-base font-medium text-[#4a4a6a]">No hay grillas creadas</p>
           <p className="text-sm mt-1">Crea la primera grilla con el botón de arriba</p>
         </div>
       ) : (
