@@ -56,16 +56,6 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-6 pt-8 border-t border-white/10">
-            {[['284', 'Leads / mes'], ['18.4K', 'Sesiones web'], ['5.2%', 'Engagement']].map(([val, label]) => (
-              <div key={label}>
-                <p className="text-[#F79C31] font-display text-2xl">{val}</p>
-                <p className="text-white/40 text-xs">{label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
 
       {/* Right panel */}

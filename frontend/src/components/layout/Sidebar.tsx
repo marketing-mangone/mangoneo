@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
-  CheckSquare, Calendar, Bell, ChevronLeft, ChevronRight,
-  Settings, Sparkles, TrendingUp, LogOut, Target, Wrench,
+  CheckSquare, Calendar, ChevronLeft, ChevronRight,
+  LogOut, Target, Wrench,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { auth } from '@/lib/api';
@@ -165,10 +165,8 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
       <nav className="relative z-10 flex-1 px-3 py-5 overflow-y-auto space-y-6">
         {NAV_MAIN.map(group => (
           <div key={group.label}>
-            {!collapsed && (
-              <p className="text-white/25 text-[10px] font-semibold uppercase tracking-[0.12em] px-3 mb-2">
-                {group.label}
-              </p>
+            {!collapsed && group !== NAV_MAIN[0] && (
+              <div className="h-px bg-white/8 mx-3 mb-3" />
             )}
             <ul className="space-y-1">
               {group.items.map(({ href, icon: Icon, label, desc, subItems }) => {
@@ -273,57 +271,12 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
         ))}
       </nav>
 
-      {/* ── STATS MINI (solo expandido) ── */}
-      {!collapsed && (
-        <div className="relative z-10 mx-3 mb-4 rounded-xl p-3.5"
-          style={{ background: 'rgba(247,156,49,0.08)', border: '1px solid rgba(247,156,49,0.15)' }}
-        >
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="w-3.5 h-3.5 text-[#F79C31]" />
-            <span className="text-[11px] font-semibold text-[#F79C31]">Mayo 2026</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {[['284', 'Leads'], ['18.4K', 'Sesiones']].map(([val, lbl]) => (
-              <div key={lbl}>
-                <p className="text-white font-bold text-base leading-none">{val}</p>
-                <p className="text-white/35 text-[10px] mt-0.5">{lbl}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* ── BOTTOM ── */}
       <div className={cn(
         'relative z-10 border-t border-white/8',
         collapsed ? 'px-0 py-3' : 'px-3 py-3'
       )}>
-        {/* Notifications */}
-        <Link
-          href="/notificaciones"
-          className={cn(
-            'flex items-center rounded-xl text-white/50 hover:bg-white/6 hover:text-white/80 transition-all mb-1',
-            collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5'
-          )}
-        >
-          <div className="relative flex-shrink-0">
-            <div className={cn(
-              'flex items-center justify-center rounded-lg bg-white/6',
-              collapsed ? 'w-9 h-9' : 'w-8 h-8'
-            )}>
-              <Bell style={{ width: '15px', height: '15px' }} />
-            </div>
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 bg-[#F79C31] text-[#0C2054] text-[9px] font-bold rounded-full flex items-center justify-center px-0.5">
-                {unreadCount}
-              </span>
-            )}
-          </div>
-          {!collapsed && (
-            <span className="text-[13px] font-medium text-white/60">Notificaciones</span>
-          )}
-        </Link>
-
         {/* User profile + logout */}
         <div className={cn(
           'flex items-center rounded-xl transition-all',
