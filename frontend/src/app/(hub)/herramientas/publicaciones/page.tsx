@@ -98,28 +98,28 @@ function RescheduleModal({ post, onClose, onDone }: {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 space-y-5"
+        className="bg-[var(--surface)] rounded-2xl w-full max-w-sm shadow-2xl p-6 space-y-5"
         style={{ boxShadow: '0 32px 80px rgba(12,32,84,0.22)' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-[#0C2054] text-sm">Reprogramar publicación</h3>
-          <button onClick={onClose} className="text-[#9ca3af] hover:text-[#374151]"><X className="w-4 h-4" /></button>
+          <h3 className="font-bold text-[var(--t-0c2054)] text-sm">Reprogramar publicación</h3>
+          <button onClick={onClose} className="text-[var(--t-9ca3af)] hover:text-[var(--t-374151)]"><X className="w-4 h-4" /></button>
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-2">Nueva fecha y hora</p>
+          <p className="text-xs font-semibold text-[var(--t-6b7280)] uppercase tracking-widest mb-2">Nueva fecha y hora</p>
           <input
             type="datetime-local"
             value={scheduledAt}
             onChange={e => setScheduledAt(e.target.value)}
             min={new Date().toISOString().slice(0, 16)}
-            className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/10 focus:bg-white transition-all"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--s-f9fafb)] text-sm outline-none focus:border-[var(--s-0c2054)] focus:ring-2 focus:ring-[#0C2054]/10 focus:bg-[var(--surface)] transition-all"
           />
         </div>
 
         <div>
-          <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-2">Plataformas</p>
+          <p className="text-xs font-semibold text-[var(--t-6b7280)] uppercase tracking-widest mb-2">Plataformas</p>
           <div className="flex flex-wrap gap-2">
             {PLATFORMS.map(p => (
               <button
@@ -128,8 +128,8 @@ function RescheduleModal({ post, onClose, onDone }: {
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all',
                   platforms.includes(p.id)
-                    ? 'bg-[#0C2054] border-[#0C2054] text-white'
-                    : 'bg-white border-[#e5e7eb] text-[#9ca3af]'
+                    ? 'bg-[var(--s-0c2054)] border-[var(--s-0c2054)] text-white'
+                    : 'bg-[var(--surface)] border-[var(--s-e5e7eb)] text-[var(--t-9ca3af)]'
                 )}
               >
                 {p.emoji} {p.label}
@@ -143,13 +143,13 @@ function RescheduleModal({ post, onClose, onDone }: {
         )}
 
         <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-[#e5e7eb] text-sm text-[#6b7280] font-medium hover:bg-[#f9fafb] transition-colors">
+          <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-[var(--s-e5e7eb)] text-sm text-[var(--t-6b7280)] font-medium hover:bg-[var(--s-f9fafb)] transition-colors">
             Cancelar
           </button>
           <button
             onClick={handle}
             disabled={loading}
-            className="flex-1 py-3 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-[var(--s-0c2054)] text-white text-sm font-semibold hover:bg-[var(--s-0f2960)] transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><Clock className="w-4 h-4" /> Reprogramar</>}
           </button>
@@ -210,15 +210,15 @@ function PostRow({ post, onUpdate }: { post: GridPost; onUpdate: (updated: GridP
                     <span className={cn('w-1.5 h-1.5 rounded-full', cfg.dot)} />
                     {cfg.label}
                   </span>
-                  <span className="text-[11px] text-[#9ca3af] bg-white/70 px-2 py-0.5 rounded-full border border-white">
+                  <span className="text-[11px] text-[var(--t-9ca3af)] bg-white/70 px-2 py-0.5 rounded-full border border-white">
                     {SLOT_LABELS[post.slot] ?? post.slot}
                   </span>
                   {post.grid_tema && (
-                    <span className="text-[11px] text-[#9ca3af]">{post.grid_tema}</span>
+                    <span className="text-[11px] text-[var(--t-9ca3af)]">{post.grid_tema}</span>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-[#0C2054] truncate">{postTitle(post)}</p>
-                <p className="text-xs text-[#6b7280] mt-0.5">
+                <p className="text-sm font-semibold text-[var(--t-0c2054)] truncate">{postTitle(post)}</p>
+                <p className="text-xs text-[var(--t-6b7280)] mt-0.5">
                   {status === 'scheduled' && post.scheduled_at && (
                     <><Clock className="w-3 h-3 inline mr-1" />Programado: {formatDateTime(post.scheduled_at)}</>
                   )}
@@ -236,14 +236,14 @@ function PostRow({ post, onUpdate }: { post: GridPost; onUpdate: (updated: GridP
                   <>
                     <button
                       onClick={() => setShowReschedule(true)}
-                      className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-white border border-amber-200 text-amber-700 hover:bg-amber-50 transition-all"
+                      className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-[var(--surface)] border border-amber-200 text-amber-700 hover:bg-amber-50 transition-all"
                     >
                       <RotateCcw className="w-3 h-3" /> Reprogramar
                     </button>
                     <button
                       onClick={handleCancel}
                       disabled={cancelling}
-                      className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-white border border-red-200 text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
+                      className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-[var(--surface)] border border-red-200 text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
                     >
                       {cancelling ? <Loader2 className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
                       Cancelar
@@ -254,7 +254,7 @@ function PostRow({ post, onUpdate }: { post: GridPost; onUpdate: (updated: GridP
                   <button
                     onClick={handleRetry}
                     disabled={retrying}
-                    className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-white border border-[#0C2054] text-[#0C2054] hover:bg-[#f0f2f8] transition-all disabled:opacity-50"
+                    className="flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1.5 rounded-lg bg-[var(--surface)] border border-[var(--s-0c2054)] text-[var(--t-0c2054)] hover:bg-[var(--s-f0f2f8)] transition-all disabled:opacity-50"
                   >
                     {retrying ? <Loader2 className="w-3 h-3 animate-spin" /> : <Zap className="w-3 h-3" />}
                     Reintentar
@@ -262,7 +262,7 @@ function PostRow({ post, onUpdate }: { post: GridPost; onUpdate: (updated: GridP
                 )}
                 <button
                   onClick={() => setExpanded(v => !v)}
-                  className="text-[#9ca3af] hover:text-[#374151] transition-colors p-1"
+                  className="text-[var(--t-9ca3af)] hover:text-[var(--t-374151)] transition-colors p-1"
                 >
                   <ChevronRight className={cn('w-4 h-4 transition-transform', expanded && 'rotate-90')} />
                 </button>
@@ -290,8 +290,8 @@ function PostRow({ post, onUpdate }: { post: GridPost; onUpdate: (updated: GridP
             {/* Caption expanded */}
             {expanded && post.caption && (
               <div className="mt-3 p-3 bg-white/70 rounded-xl border border-white">
-                <p className="text-[11px] font-semibold text-[#9ca3af] uppercase tracking-widest mb-1.5">Caption</p>
-                <p className="text-xs text-[#374151] leading-relaxed whitespace-pre-line">{post.caption}</p>
+                <p className="text-[11px] font-semibold text-[var(--t-9ca3af)] uppercase tracking-widest mb-1.5">Caption</p>
+                <p className="text-xs text-[var(--t-374151)] leading-relaxed whitespace-pre-line">{post.caption}</p>
               </div>
             )}
           </div>
@@ -366,19 +366,19 @@ export default function PublicacionesPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-[#0C2054] flex items-center justify-center">
-              <Globe className="w-5 h-5 text-[#F79C31]" />
+            <div className="w-10 h-10 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
+              <Globe className="w-5 h-5 text-[var(--t-f79c31)]" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[#0C2054]">Publicaciones</h1>
-              <p className="text-sm text-[#9ca3af]">Cola de publicación en redes sociales via Ayrshare</p>
+              <h1 className="text-xl font-bold text-[var(--t-0c2054)]">Publicaciones</h1>
+              <p className="text-sm text-[var(--t-9ca3af)]">Cola de publicación en redes sociales via Ayrshare</p>
             </div>
           </div>
         </div>
         <button
           onClick={() => load(true)}
           disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#e5e7eb] bg-white text-sm font-medium text-[#374151] hover:bg-[#f9fafb] transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-sm font-medium text-[var(--t-374151)] hover:bg-[var(--s-f9fafb)] transition-all disabled:opacity-50"
         >
           <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
           Actualizar
@@ -407,7 +407,7 @@ export default function PublicacionesPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex gap-1 p-1 bg-white rounded-xl border border-[#e5e7eb] shadow-sm">
+        <div className="flex gap-1 p-1 bg-[var(--surface)] rounded-xl border border-[var(--s-e5e7eb)] shadow-sm">
           {FILTER_STATUSES.map(f => (
             <button
               key={f.value}
@@ -415,8 +415,8 @@ export default function PublicacionesPage() {
               className={cn(
                 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all',
                 filter === f.value
-                  ? 'bg-[#0C2054] text-white shadow-sm'
-                  : 'text-[#6b7280] hover:text-[#374151]'
+                  ? 'bg-[var(--s-0c2054)] text-white shadow-sm'
+                  : 'text-[var(--t-6b7280)] hover:text-[var(--t-374151)]'
               )}
             >
               {f.label}
@@ -427,7 +427,7 @@ export default function PublicacionesPage() {
         <select
           value={platform}
           onChange={e => setPlatform(e.target.value as SocialPlatform | 'all')}
-          className="px-3 py-2 rounded-xl border border-[#e5e7eb] bg-white text-xs font-semibold text-[#374151] outline-none focus:border-[#0C2054] transition-all"
+          className="px-3 py-2 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-xs font-semibold text-[var(--t-374151)] outline-none focus:border-[var(--s-0c2054)] transition-all"
         >
           <option value="all">Todas las plataformas</option>
           {(Object.entries(PLATFORM_CONFIG) as [SocialPlatform, typeof PLATFORM_CONFIG[SocialPlatform]][]).map(([id, cfg]) => (
@@ -437,13 +437,13 @@ export default function PublicacionesPage() {
       </div>
 
       {/* Connection notice */}
-      <div className="flex items-start gap-3 p-4 bg-[#fef6e7] border border-[#F79C31]/30 rounded-2xl">
+      <div className="flex items-start gap-3 p-4 bg-[var(--s-fef6e7)] border border-[#F79C31]/30 rounded-2xl">
         <div className="w-8 h-8 rounded-lg bg-[#F79C31]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <Zap className="w-4 h-4 text-[#F79C31]" />
+          <Zap className="w-4 h-4 text-[var(--t-f79c31)]" />
         </div>
         <div>
-          <p className="text-sm font-semibold text-[#92400e]">Conecta Ayrshare para activar la publicación automática</p>
-          <p className="text-xs text-[#b45309] mt-1 leading-relaxed">
+          <p className="text-sm font-semibold text-[var(--t-92400e)]">Conecta Ayrshare para activar la publicación automática</p>
+          <p className="text-xs text-[var(--t-b45309)] mt-1 leading-relaxed">
             Agrega tu <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">AYRSHARE_API_KEY</code> en el archivo <code className="bg-amber-100 px-1 py-0.5 rounded font-mono">.env</code> del backend (y en Railway para producción).
             Obtén tu clave en{' '}
             <span className="font-semibold">app.ayrshare.com → Profile → API Key</span>.
@@ -454,17 +454,17 @@ export default function PublicacionesPage() {
       {/* List */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-6 h-6 animate-spin text-[#9ca3af]" />
+          <Loader2 className="w-6 h-6 animate-spin text-[var(--t-9ca3af)]" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-[#e5e7eb]">
-          <div className="w-14 h-14 rounded-2xl bg-[#f0f2f8] flex items-center justify-center mx-auto mb-4">
-            <Send className="w-6 h-6 text-[#9ca3af]" />
+        <div className="text-center py-16 bg-[var(--surface)] rounded-2xl border border-[var(--s-e5e7eb)]">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--s-f0f2f8)] flex items-center justify-center mx-auto mb-4">
+            <Send className="w-6 h-6 text-[var(--t-9ca3af)]" />
           </div>
-          <p className="text-sm font-semibold text-[#374151]">
+          <p className="text-sm font-semibold text-[var(--t-374151)]">
             {filter === 'all' ? 'Aún no hay publicaciones' : `No hay posts ${FILTER_STATUSES.find(f => f.value === filter)?.label.toLowerCase()}`}
           </p>
-          <p className="text-xs text-[#9ca3af] mt-1 max-w-xs mx-auto">
+          <p className="text-xs text-[var(--t-9ca3af)] mt-1 max-w-xs mx-auto">
             Aprueba un post en el Generador de Grillas y usa el botón <strong>Publicar</strong> para programarlo aquí.
           </p>
         </div>

@@ -220,7 +220,7 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
   const [newLower, setNewLower] = useState(false);
   const [addError, setAddError] = useState('');
 
-  const inputCls = 'px-2 py-1.5 text-xs border border-[#e8e8f0] bg-[#f7f8fc] rounded-md outline-none focus:border-[#0C2054] focus:bg-white transition-all';
+  const inputCls = 'px-2 py-1.5 text-xs border border-[var(--s-e8e8f0)] bg-[var(--s-f7f8fc)] rounded-md outline-none focus:border-[var(--s-0c2054)] focus:bg-[var(--surface)] transition-all';
 
   function updateKpi(id: string, field: keyof KPIDef, value: unknown) {
     setKpis(prev => prev.map(k => k.id === id ? { ...k, [field]: value } : k));
@@ -251,10 +251,10 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[88vh] flex flex-col">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg max-h-[88vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center gap-3 px-6 py-4 border-b border-[#e8e8f0]">
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-[var(--s-e8e8f0)]">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
             style={{ background: avatarColor(member) }}
@@ -262,10 +262,10 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
             {member.avatar || member.name.slice(0, 2).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-[#1a1a2e] text-base leading-tight">KPIs de {member.name.split(' ')[0]}</h2>
-            <p className="text-xs text-[#8888a8]">{member.position || member.area}</p>
+            <h2 className="font-bold text-[var(--t-1a1a2e)] text-base leading-tight">KPIs de {member.name.split(' ')[0]}</h2>
+            <p className="text-xs text-[var(--t-8888a8)]">{member.position || member.area}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 text-[#8888a8] hover:text-[#1a1a2e] transition-colors">
+          <button onClick={onClose} className="p-1.5 text-[var(--t-8888a8)] hover:text-[var(--t-1a1a2e)] transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -275,20 +275,20 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
           {/* Column headers */}
           {kpis.length > 0 && (
             <div className="grid grid-cols-[1fr_80px_100px_28px_28px] gap-2 items-center px-1 mb-1">
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide">Nombre</span>
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-center">Meta</span>
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-center">Unidad</span>
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-center" title="¿Menor es mejor?">↓</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide">Nombre</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide text-center">Meta</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide text-center">Unidad</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide text-center" title="¿Menor es mejor?">↓</span>
               <span />
             </div>
           )}
 
           {kpis.length === 0 && (
-            <p className="text-sm text-[#8888a8] italic text-center py-4">Sin KPIs. Agrega uno abajo.</p>
+            <p className="text-sm text-[var(--t-8888a8)] italic text-center py-4">Sin KPIs. Agrega uno abajo.</p>
           )}
 
           {kpis.map(kpi => (
-            <div key={kpi.id} className="grid grid-cols-[1fr_80px_100px_28px_28px] gap-2 items-center bg-[#f7f8fc] rounded-lg px-3 py-2">
+            <div key={kpi.id} className="grid grid-cols-[1fr_80px_100px_28px_28px] gap-2 items-center bg-[var(--s-f7f8fc)] rounded-lg px-3 py-2">
               <input
                 value={kpi.name}
                 onChange={e => updateKpi(kpi.id, 'name', e.target.value)}
@@ -323,7 +323,7 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
               </div>
               <button
                 onClick={() => deleteKpi(kpi.id)}
-                className="flex items-center justify-center w-7 h-7 rounded-md text-[#c0c0d0] hover:text-red-500 hover:bg-red-50 transition-colors"
+                className="flex items-center justify-center w-7 h-7 rounded-md text-[var(--t-c0c0d0)] hover:text-red-500 hover:bg-red-50 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -331,8 +331,8 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
           ))}
 
           {/* Add new KPI */}
-          <div className="mt-4 pt-4 border-t border-[#e8e8f0]">
-            <p className="text-xs font-semibold text-[#1a1a2e] mb-2">Agregar KPI</p>
+          <div className="mt-4 pt-4 border-t border-[var(--s-e8e8f0)]">
+            <p className="text-xs font-semibold text-[var(--t-1a1a2e)] mb-2">Agregar KPI</p>
             <div className="grid grid-cols-[1fr_80px_100px_auto] gap-2 items-start">
               <input
                 value={newName}
@@ -362,7 +362,7 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
               <button
                 onClick={handleAdd}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
-                style={{ background: '#0C2054' }}
+                style={{ background: 'var(--s-0c2054)' }}
               >
                 <Plus className="w-3.5 h-3.5" />
                 Agregar
@@ -375,18 +375,18 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
                 onChange={e => setNewLower(e.target.checked)}
                 className="w-3.5 h-3.5 accent-[#0C2054]"
               />
-              <span className="text-xs text-[#4a4a6a]">Menor es mejor (ej: tiempo de revisión, costo por lead)</span>
+              <span className="text-xs text-[var(--t-4a4a6a)]">Menor es mejor (ej: tiempo de revisión, costo por lead)</span>
             </label>
             {addError && <p className="text-xs text-red-500 mt-1">{addError}</p>}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-[#e8e8f0]">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[var(--s-e8e8f0)]">
           {KPI_DEFAULTS[member.area] && (
             <button
               onClick={handleRestore}
-              className="flex items-center gap-1.5 text-xs font-medium text-[#8888a8] hover:text-[#4a4a6a] transition-colors"
+              className="flex items-center gap-1.5 text-xs font-medium text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)] transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               Restaurar defaults del área
@@ -396,14 +396,14 @@ function KPIConfigModal({ member, initialKPIs, onSave, onClose }: KPIConfigModal
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-semibold text-[#4a4a6a] bg-[#f7f8fc] hover:bg-[#eeeef5] rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-semibold text-[var(--t-4a4a6a)] bg-[var(--s-f7f8fc)] hover:bg-[var(--s-eeeef5)] rounded-lg transition-colors"
             >
               Cancelar
             </button>
             <button
               onClick={() => onSave(kpis)}
               className="px-4 py-2 text-sm font-bold text-white rounded-lg hover:opacity-90 transition-opacity"
-              style={{ background: '#0C2054' }}
+              style={{ background: 'var(--s-0c2054)' }}
             >
               Guardar KPIs
             </button>
@@ -436,7 +436,7 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
   return (
     <Card className="p-0 overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-[#f0f0f0]">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--s-f0f0f0)]">
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm flex-shrink-0 shadow-sm"
           style={{ background: color }}
@@ -444,8 +444,8 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
           {member.avatar || member.name.slice(0, 2).toUpperCase()}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#1a1a2e] truncate leading-tight">{member.name}</p>
-          <p className="text-xs text-[#8888a8] mt-0.5">{member.position || member.area}</p>
+          <p className="text-sm font-bold text-[var(--t-1a1a2e)] truncate leading-tight">{member.name}</p>
+          <p className="text-xs text-[var(--t-8888a8)] mt-0.5">{member.position || member.area}</p>
         </div>
         <span className={cn('text-xs font-bold px-2.5 py-1 rounded-full', pctBadgeCls(overall))}>
           {overall !== null ? `${overall.toFixed(0)}%` : 'Pendiente'}
@@ -456,14 +456,14 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
             <button
               onClick={onConfigKPIs}
               title="Configurar KPIs"
-              className="p-1.5 text-[#c0c0d0] hover:text-[#0C2054] hover:bg-[#f0f0f8] rounded-lg transition-colors flex-shrink-0"
+              className="p-1.5 text-[var(--t-c0c0d0)] hover:text-[var(--t-0c2054)] hover:bg-[var(--s-f0f0f8)] rounded-lg transition-colors flex-shrink-0"
             >
               <Settings2 className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={onRemove}
               title="Quitar de seguimiento"
-              className="p-1.5 text-[#c0c0d0] hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
+              className="p-1.5 text-[var(--t-c0c0d0)] hover:text-red-400 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
             >
               <UserMinus className="w-3.5 h-3.5" />
             </button>
@@ -475,11 +475,11 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
       <div className="px-5 py-3 flex-1">
         {kpis.length === 0 ? (
           <div className="py-4 text-center">
-            <p className="text-xs text-[#8888a8] italic">Sin KPIs configurados.</p>
+            <p className="text-xs text-[var(--t-8888a8)] italic">Sin KPIs configurados.</p>
             {isAdmin && (
               <button
                 onClick={onConfigKPIs}
-                className="mt-2 text-xs font-semibold text-[#0C2054] hover:underline"
+                className="mt-2 text-xs font-semibold text-[var(--t-0c2054)] hover:underline"
               >
                 + Configurar KPIs
               </button>
@@ -488,10 +488,10 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
         ) : (
           <>
             <div className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 items-center mb-2">
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide">KPI</span>
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-right">Meta</span>
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-right w-16">Real</span>
-              <span className="text-[10px] font-semibold text-[#8888a8] uppercase tracking-wide text-right w-10">%</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide">KPI</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide text-right">Meta</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide text-right w-16">Real</span>
+              <span className="text-[10px] font-semibold text-[var(--t-8888a8)] uppercase tracking-wide text-right w-10">%</span>
             </div>
 
             <div className="space-y-0">
@@ -500,16 +500,16 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
                 const pct = calcPct(actual, kpi.target, kpi.lowerIsBetter);
                 const col = pctColor(pct);
                 return (
-                  <div key={kpi.id} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 items-center py-2.5 border-t border-[#f7f8fc]">
-                    <span className="text-xs text-[#4a4a6a] font-medium truncate">{kpi.name}</span>
-                    <span className="text-xs text-[#8888a8] text-right tabular-nums">{fmtVal(kpi.target, kpi.unit)}</span>
+                  <div key={kpi.id} className="grid grid-cols-[1fr_auto_auto_auto] gap-x-3 items-center py-2.5 border-t border-[var(--s-f7f8fc)]">
+                    <span className="text-xs text-[var(--t-4a4a6a)] font-medium truncate">{kpi.name}</span>
+                    <span className="text-xs text-[var(--t-8888a8)] text-right tabular-nums">{fmtVal(kpi.target, kpi.unit)}</span>
                     <div className="w-16">
                       {editMode ? (
                         <input
                           type="number"
                           value={actual ?? ''}
                           onChange={e => onKpiChange(kpi.id, e.target.value === '' ? null : parseFloat(e.target.value))}
-                          className="w-full text-right text-xs font-semibold px-2 py-1 rounded-md border border-[#e8e8f0] focus:outline-none focus:border-[#0C2054] bg-[#f7f8fc] text-[#1a1a2e] tabular-nums"
+                          className="w-full text-right text-xs font-semibold px-2 py-1 rounded-md border border-[var(--s-e8e8f0)] focus:outline-none focus:border-[var(--s-0c2054)] bg-[var(--s-f7f8fc)] text-[var(--t-1a1a2e)] tabular-nums"
                           placeholder="—"
                           min={0}
                           step={kpi.unit === 'percentage' ? 0.1 : 1}
@@ -526,7 +526,7 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
                     <div className="w-10 text-right">
                       {pct !== null
                         ? <span className="text-[10px] font-semibold tabular-nums" style={{ color: col }}>{pct.toFixed(0)}%</span>
-                        : <span className="text-[10px] text-[#d1d5db]">—</span>
+                        : <span className="text-[10px] text-[var(--t-d1d5db)]">—</span>
                       }
                     </div>
                   </div>
@@ -536,7 +536,7 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
 
             {overall !== null && (
               <div className="mt-3">
-                <div className="w-full h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-[var(--s-f0f0f0)] rounded-full overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-500"
                     style={{ width: `${overall}%`, background: pctColor(overall) }}
@@ -550,17 +550,17 @@ function MemberCard({ member, kpis, kpiMap, notes, editMode, isAdmin, onKpiChang
 
       {/* Notes */}
       {(editMode || notes) && (
-        <div className="px-5 pb-4 border-t border-[#f0f0f0] pt-3">
+        <div className="px-5 pb-4 border-t border-[var(--s-f0f0f0)] pt-3">
           {editMode ? (
             <textarea
               value={notes}
               onChange={e => onNotesChange(e.target.value)}
               placeholder="Notas sobre el desempeño de esta semana..."
               rows={2}
-              className="w-full text-xs px-3 py-2 rounded-lg border border-[#e8e8f0] focus:outline-none focus:border-[#0C2054] bg-[#f7f8fc] text-[#4a4a6a] resize-none placeholder:text-[#c0c0d0]"
+              className="w-full text-xs px-3 py-2 rounded-lg border border-[var(--s-e8e8f0)] focus:outline-none focus:border-[var(--s-0c2054)] bg-[var(--s-f7f8fc)] text-[var(--t-4a4a6a)] resize-none placeholder:text-[var(--t-c0c0d0)]"
             />
           ) : (
-            <p className="text-xs text-[#6b7280] italic leading-relaxed">{notes}</p>
+            <p className="text-xs text-[var(--t-6b7280)] italic leading-relaxed">{notes}</p>
           )}
         </div>
       )}
@@ -585,10 +585,10 @@ function ManageModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e8f0]">
-          <h2 className="font-bold text-[#1a1a2e]">Miembros en seguimiento</h2>
-          <button onClick={onClose} className="p-1.5 text-[#8888a8] hover:text-[#1a1a2e] transition-colors">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--s-e8e8f0)]">
+          <h2 className="font-bold text-[var(--t-1a1a2e)]">Miembros en seguimiento</h2>
+          <button onClick={onClose} className="p-1.5 text-[var(--t-8888a8)] hover:text-[var(--t-1a1a2e)] transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -596,7 +596,7 @@ function ManageModal({
           {allMembers.map(m => {
             const included = !draft.includes(m.id);
             return (
-              <label key={m.id} className="flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-[#f7f8fc] cursor-pointer transition-colors">
+              <label key={m.id} className="flex items-center gap-3 py-2.5 px-2 rounded-lg hover:bg-[var(--s-f7f8fc)] cursor-pointer transition-colors">
                 <div
                   className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
                   style={{ background: avatarColor(m) }}
@@ -604,8 +604,8 @@ function ManageModal({
                   {m.avatar || m.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#1a1a2e] truncate">{m.name}</p>
-                  <p className="text-xs text-[#8888a8]">{m.position || m.area}</p>
+                  <p className="text-sm font-semibold text-[var(--t-1a1a2e)] truncate">{m.name}</p>
+                  <p className="text-xs text-[var(--t-8888a8)]">{m.position || m.area}</p>
                 </div>
                 <input
                   type="checkbox"
@@ -617,14 +617,14 @@ function ManageModal({
             );
           })}
         </div>
-        <div className="flex justify-end gap-3 px-6 py-4 border-t border-[#e8e8f0]">
-          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-[#4a4a6a] bg-[#f7f8fc] hover:bg-[#eeeef5] rounded-lg transition-colors">
+        <div className="flex justify-end gap-3 px-6 py-4 border-t border-[var(--s-e8e8f0)]">
+          <button onClick={onClose} className="px-4 py-2 text-sm font-semibold text-[var(--t-4a4a6a)] bg-[var(--s-f7f8fc)] hover:bg-[var(--s-eeeef5)] rounded-lg transition-colors">
             Cancelar
           </button>
           <button
             onClick={() => { onSave(draft); onClose(); }}
             className="px-4 py-2 text-sm font-bold text-white rounded-lg hover:opacity-90 transition-opacity"
-            style={{ background: '#0C2054' }}
+            style={{ background: 'var(--s-0c2054)' }}
           >
             Guardar selección
           </button>
@@ -740,7 +740,7 @@ export default function MetricasIndividualesPage() {
               <button
                 onClick={() => setShowManage(true)}
                 disabled={editMode}
-                className="flex items-center gap-2 text-xs font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg px-3 py-2 hover:bg-[#f7f8fc] transition-colors disabled:opacity-40"
+                className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors disabled:opacity-40"
               >
                 <Users className="w-3.5 h-3.5" />
                 Gestionar miembros
@@ -750,7 +750,7 @@ export default function MetricasIndividualesPage() {
               <>
                 <button
                   onClick={handleCancel}
-                  className="flex items-center gap-2 text-xs font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg px-3 py-2 hover:bg-[#f7f8fc] transition-colors"
+                  className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
                   Cancelar
@@ -758,7 +758,7 @@ export default function MetricasIndividualesPage() {
                 <button
                   onClick={handleSave}
                   className="flex items-center gap-2 text-xs font-bold text-white rounded-lg px-4 py-2 hover:opacity-90 transition-opacity"
-                  style={{ background: '#0C2054' }}
+                  style={{ background: 'var(--s-0c2054)' }}
                 >
                   <Save className="w-3.5 h-3.5" />
                   Guardar semana
@@ -767,7 +767,7 @@ export default function MetricasIndividualesPage() {
             ) : (
               <button
                 onClick={handleEdit}
-                className="flex items-center gap-2 text-xs font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg px-3 py-2 hover:bg-[#f7f8fc] transition-colors"
+                className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors"
               >
                 <Pencil className="w-3.5 h-3.5" />
                 Editar semana
@@ -785,26 +785,26 @@ export default function MetricasIndividualesPage() {
             <button
               onClick={() => setWeek(w => shiftWeek(w, -1))}
               disabled={editMode}
-              className="w-8 h-8 rounded-lg border border-[#e8e8f0] flex items-center justify-center text-[#4a4a6a] hover:bg-[#f7f8fc] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-8 h-8 rounded-lg border border-[var(--s-e8e8f0)] flex items-center justify-center text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="px-5 py-2 bg-white border border-[#e8e8f0] rounded-lg">
-              <p className="text-sm font-semibold text-[#1a1a2e]">
+            <div className="px-5 py-2 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-lg">
+              <p className="text-sm font-semibold text-[var(--t-1a1a2e)]">
                 {mounted ? formatWeekLabel(week) : '...'}
               </p>
             </div>
             <button
               onClick={() => setWeek(w => shiftWeek(w, 1))}
               disabled={editMode}
-              className="w-8 h-8 rounded-lg border border-[#e8e8f0] flex items-center justify-center text-[#4a4a6a] hover:bg-[#f7f8fc] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-8 h-8 rounded-lg border border-[var(--s-e8e8f0)] flex items-center justify-center text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => setWeek(getISOWeekKey(new Date()))}
               disabled={editMode}
-              className="text-xs font-semibold text-[#0C2054] hover:underline ml-1 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-xs font-semibold text-[var(--t-0c2054)] hover:underline ml-1 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Semana actual
             </button>
@@ -843,8 +843,8 @@ export default function MetricasIndividualesPage() {
             className="flex items-center gap-3 px-5 py-3.5 rounded-xl border"
             style={{ background: 'rgba(247,156,49,0.06)', borderColor: 'rgba(247,156,49,0.3)' }}
           >
-            <span className="w-2 h-2 rounded-full bg-[#F79C31] animate-pulse flex-shrink-0" />
-            <p className="text-sm font-medium text-[#92400e]">
+            <span className="w-2 h-2 rounded-full bg-[var(--s-f79c31)] animate-pulse flex-shrink-0" />
+            <p className="text-sm font-medium text-[var(--t-92400e)]">
               Modo edición — Ingresa los valores reales de cada miembro y guarda los cambios.
             </p>
           </div>
@@ -852,15 +852,15 @@ export default function MetricasIndividualesPage() {
 
         {loadingMembers && (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 animate-spin text-[#8888a8]" />
+            <Loader2 className="w-6 h-6 animate-spin text-[var(--t-8888a8)]" />
           </div>
         )}
 
         {!loadingMembers && visibleMembers.length === 0 && (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Users className="w-10 h-10 text-[#d1d5db] mb-3" />
-            <p className="text-sm font-semibold text-[#4a4a6a]">Sin miembros en seguimiento</p>
-            <p className="text-xs text-[#8888a8] mt-1">
+            <Users className="w-10 h-10 text-[var(--t-d1d5db)] mb-3" />
+            <p className="text-sm font-semibold text-[var(--t-4a4a6a)]">Sin miembros en seguimiento</p>
+            <p className="text-xs text-[var(--t-8888a8)] mt-1">
               {allMembers.length > 0
                 ? 'Usa "Gestionar miembros" para agregar personas al panel.'
                 : 'No hay miembros activos en el equipo.'}

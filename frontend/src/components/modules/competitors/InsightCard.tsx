@@ -25,7 +25,7 @@ export function InsightCard({ insight, onDelete, competitorName }: Props) {
   const Icon = type.icon;
 
   return (
-    <div className={`bg-white rounded-xl border ${type.border} p-4 group`}>
+    <div className={`bg-[var(--surface)] rounded-xl border ${type.border} p-4 group`}>
       <div className="flex items-start gap-3">
         <div className={`w-8 h-8 rounded-lg ${type.bg} flex items-center justify-center flex-shrink-0 mt-0.5`}>
           <Icon className={`w-4 h-4 ${type.text}`} />
@@ -35,16 +35,16 @@ export function InsightCard({ insight, onDelete, competitorName }: Props) {
             <span className={`text-[10px] font-semibold uppercase tracking-wide ${type.text}`}>{type.label}</span>
             <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${impact.color}`}>{impact.label}</span>
             {competitorName && (
-              <span className="text-[10px] text-[#9ca3af]">· {competitorName}</span>
+              <span className="text-[10px] text-[var(--t-9ca3af)]">· {competitorName}</span>
             )}
           </div>
-          <h4 className="font-semibold text-[#0C2054] text-sm leading-tight mb-1">{insight.title}</h4>
-          <p className="text-[#6b7280] text-xs leading-relaxed">{insight.description}</p>
+          <h4 className="font-semibold text-[var(--t-0c2054)] text-sm leading-tight mb-1">{insight.title}</h4>
+          <p className="text-[var(--t-6b7280)] text-xs leading-relaxed">{insight.description}</p>
           {insight.action_items.length > 0 && (
             <div className="mt-2 space-y-0.5">
               {insight.action_items.map((item, i) => (
-                <div key={i} className="flex items-start gap-1.5 text-xs text-[#374151]">
-                  <span className="text-[#F79C31] font-bold mt-0.5">→</span>
+                <div key={i} className="flex items-start gap-1.5 text-xs text-[var(--t-374151)]">
+                  <span className="text-[var(--t-f79c31)] font-bold mt-0.5">→</span>
                   {item}
                 </div>
               ))}
@@ -54,7 +54,7 @@ export function InsightCard({ insight, onDelete, competitorName }: Props) {
         {onDelete && (
           <button
             onClick={() => onDelete(insight.id)}
-            className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg flex items-center justify-center text-[#9ca3af] hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
+            className="opacity-0 group-hover:opacity-100 w-7 h-7 rounded-lg flex items-center justify-center text-[var(--t-9ca3af)] hover:text-red-500 hover:bg-red-50 transition-all flex-shrink-0"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>

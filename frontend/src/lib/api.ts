@@ -104,6 +104,32 @@ export interface CurrentUser {
   role: string;
   avatar: string;
   position: string;
+  // Campos enriquecidos (perfil)
+  first_name?: string;
+  last_name?: string;
+  department?: string;
+  area?: string;
+  phone?: string;
+  bio?: string;
+  skills?: string[];
+  start_date?: string | null;
+  status?: string;
+  reports_to_name?: string | null;
+  date_joined?: string;
+  last_login?: string | null;
+}
+
+export interface MeUpdateInput {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  position?: string;
+  department?: string;
+  area?: string;
+  phone?: string;
+  bio?: string;
+  avatar?: string;
+  skills?: string[];
 }
 
 function saveCurrentUser(user: CurrentUser) {
@@ -462,6 +488,23 @@ export type UserUpdateInput = Partial<Omit<ApiUserManagement, 'id' | 'name'>>;
 export const meApi = {
   get() {
     return apiJSON<CurrentUser>('/api/accounts/me/');
+  },
+  async update(data: MeUpdateInput) {
+    const user = await apiJSON<CurrentUser>('/api/accounts/me/', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    // Mantener el cache de sesión sincronizado (sidebar, etc.)
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('current_user', JSON.stringify(user));
+    }
+    return user;
+  },
+  changePassword(oldPassword: string, newPassword: string) {
+    return apiJSON<{ status: string; detail: string }>('/api/accounts/me/change-password/', {
+      method: 'POST',
+      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }),
+    });
   },
 };
 
