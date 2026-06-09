@@ -899,6 +899,8 @@ export type ContentGrid = {
   week_start: string;
   tema: string;
   tema_display: string;
+  tono: string;
+  notes: string;
   status: 'borrador' | 'lista' | 'publicada';
   status_display: string;
   created_by: number | null;
@@ -915,7 +917,7 @@ export type ContentGridList = Omit<ContentGrid, 'posts'> & {
 
 export const grillasApi = {
   list: () => apiJSON<{ results: ContentGridList[]; count: number }>('/api/grillas/'),
-  create: (data: { week_start: string; tema: string }) =>
+  create: (data: { week_start: string; tema: string; tono?: string; notes?: string }) =>
     apiJSON<ContentGrid>('/api/grillas/', { method: 'POST', body: JSON.stringify(data) }),
   get: (id: number) => apiJSON<ContentGrid>(`/api/grillas/${id}/`),
   update: (id: number, data: { status?: string }) =>
@@ -935,4 +937,8 @@ export const grillasApi = {
     apiJSON<GridPostVersion[]>(`/api/grillas/posts/${postId}/history/`),
   toCalendar: (gridId: number) =>
     apiJSON<{ created: number; week: string; tema: string }>(`/api/grillas/${gridId}/to_calendar/`, { method: 'POST' }),
+  generateHashtags: (gridId: number) =>
+    apiJSON<{ pequeños: string[]; medianos: string[]; grandes: string[] }>(`/api/grillas/${gridId}/hashtags/`, { method: 'POST' }),
+  improvePost: (postId: number) =>
+    apiJSON<{ caption: string }>(`/api/grillas/posts/${postId}/improve/`, { method: 'POST' }),
 };

@@ -668,11 +668,12 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
   onApprove: (id: number) => Promise<void>;
 }) {
   const cfg = SLOT_CONFIG[post.slot];
-  const [draft, setDraft]     = useState<Partial<GridPost>>({});
-  const [saving, setSaving]   = useState(false);
-  const [saved, setSaved]     = useState(false);
+  const [draft, setDraft]         = useState<Partial<GridPost>>({});
+  const [saving, setSaving]       = useState(false);
+  const [saved, setSaved]         = useState(false);
   const [approving, setApproving] = useState(false);
-  const [tab, setTab]         = useState<PanelTab>('contenido');
+  const [improving, setImproving] = useState(false);
+  const [tab, setTab]             = useState<PanelTab>('contenido');
 
   useEffect(() => { setDraft({}); setSaved(false); setTab('contenido'); }, [post.id]);
 
@@ -702,6 +703,15 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
 
   const setArr = (f: 'slide_titles' | 'script_points', i: number, v: string) => {
     const next = [...arr(f)]; next[i] = v; setDraft(d => ({ ...d, [f]: next }));
+  };
+
+  const handleImprove = async () => {
+    setImproving(true);
+    try {
+      const { caption } = await grillasApi.improvePost(post.id);
+      setDraft(d => ({ ...d, caption }));
+    } catch { /* silently fail */ }
+    finally { setImproving(false); }
   };
 
   const ta  = 'w-full bg-[#f7f8fc] border border-[#e8e8f0] rounded-lg px-3 py-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#F79C31] focus:bg-white resize-none transition-colors';
@@ -878,7 +888,26 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-[#4a4a6a]">Caption completo</label>
-                  <CopyButton text={val('caption')} />
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={handleImprove}
+                      disabled={improving}
+                      title="Mejorar con IA"
+                      className={cn(
+                        'flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg border transition-all',
+                        improving
+                          ? 'bg-[#F79C31]/10 border-[#F79C31]/30 text-[#F79C31] cursor-not-allowed'
+                          : 'bg-white border-[#e8e8f0] text-[#8888a8] hover:border-[#F79C31] hover:text-[#F79C31]'
+                      )}
+                    >
+                      {improving
+                        ? <Loader2 size={10} className="animate-spin" />
+                        : <Sparkles size={10} />
+                      }
+                      {improving ? 'Mejorando…' : 'Mejorar con IA'}
+                    </button>
+                    <CopyButton text={val('caption')} />
+                  </div>
                 </div>
                 <textarea
                   rows={10}
@@ -1015,7 +1044,10 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
   const [selectedPost, setSelectedPost] = useState<GridPost | null>(null);
   const [statusLoading, setStatusLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [showFeed, setShowFeed]           = useState(false);
+  const [showFeed, setShowFeed]             = useState(false);
+  const [showHashtags, setShowHashtags]     = useState(false);
+  const [hashtags, setHashtags]             = useState<{ pequeños: string[]; medianos: string[]; grandes: string[] } | null>(null);
+  const [loadingHashtags, setLoadingHashtags] = useState(false);
   const statusCfg = STATUS_CONFIG[grid.status];
   const hasPosts   = grid.posts.length > 0;
   const total      = grid.posts.length;
@@ -1129,6 +1161,81 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
 
           <WeeklyGrid posts={grid.posts} onSelectPost={setSelectedPost} />
 
+          {/* Hashtags panel */}
+          <div className="bg-white rounded-2xl border border-[#e8eaf0] overflow-hidden">
+            <button
+              onClick={async () => {
+                setShowHashtags(s => !s);
+                if (!hashtags && !showHashtags) {
+                  setLoadingHashtags(true);
+                  try { setHashtags(await grillasApi.generateHashtags(grid.id)); }
+                  catch { /* silently fail */ }
+                  finally { setLoadingHashtags(false); }
+                }
+              }}
+              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#f7f8fc] transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#F79C31]/10 flex items-center justify-center">
+                  <span className="text-sm">#</span>
+                </div>
+                <p className="text-sm font-bold text-[#1a1a2e]">Hashtags con IA</p>
+                <span className="text-[10px] text-[#8888a8] bg-[#f0f0f0] px-2 py-0.5 rounded-full">30 tags · por reach</span>
+              </div>
+              {loadingHashtags
+                ? <Loader2 size={14} className="text-[#F79C31] animate-spin" />
+                : <ChevronDown size={14} className={cn('text-[#8888a8] transition-transform', showHashtags && 'rotate-180')} />
+              }
+            </button>
+            {showHashtags && hashtags && (
+              <div className="px-5 pb-5 border-t border-[#f0f0f0] pt-4 space-y-4">
+                {([
+                  { key: 'pequeños' as const,  label: '🎯 Nicho',    desc: '< 100K posts · alta conversión',   color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                  { key: 'medianos' as const,  label: '⚖️ Balance',  desc: '100K–1M posts · reach + conversión', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+                  { key: 'grandes' as const,   label: '🚀 Alcance',  desc: '> 1M posts · máxima exposición',    color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                ] as const).map(({ key, label, desc, color }) => (
+                  <div key={key}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="text-xs font-bold text-[#1a1a2e]">{label}</p>
+                        <p className="text-[10px] text-[#8888a8]">{desc}</p>
+                      </div>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(hashtags[key].join(' '))}
+                        className="text-[10px] font-semibold text-[#8888a8] hover:text-[#0C2054] flex items-center gap-1 transition-colors"
+                      >
+                        <Copy size={10} /> Copiar grupo
+                      </button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {hashtags[key].map(tag => (
+                        <button
+                          key={tag}
+                          onClick={() => navigator.clipboard.writeText(tag)}
+                          title="Copiar"
+                          className={`text-[11px] font-medium px-2 py-1 rounded-lg border transition-all hover:shadow-sm ${color}`}
+                        >
+                          {tag}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <button
+                  onClick={async () => {
+                    setLoadingHashtags(true);
+                    try { setHashtags(await grillasApi.generateHashtags(grid.id)); }
+                    catch { /* silently fail */ }
+                    finally { setLoadingHashtags(false); }
+                  }}
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[#8888a8] hover:text-[#0C2054] transition-colors"
+                >
+                  <Sparkles size={11} /> Regenerar hashtags
+                </button>
+              </div>
+            )}
+          </div>
+
           {/* Feed preview toggle */}
           <div className="bg-white rounded-2xl border border-[#e8eaf0] overflow-hidden">
             <button
@@ -1230,15 +1337,30 @@ function CreateWizard({ onBack, onCreate }: {
   const [tono, setTono]             = useState('educativo');
   const [notes, setNotes]           = useState('');
   const [generating, setGenerating] = useState(false);
+  const [genStep, setGenStep]       = useState(0);
   const [error, setError]           = useState('');
+
+  const GEN_STEPS = [
+    'Analizando el tema y el tono…',
+    'Generando carruseles y posts estáticos…',
+    'Creando fotos y reels…',
+    'Redactando captions en español…',
+    'Verificando cumplimiento legal…',
+    '¡Casi listo! Finalizando 21 posts…',
+  ];
 
   const selectedTema = TEMAS.find(t => t.value === tema);
   const selectedWeek = mondays.find(m => m.value === week);
 
   const handleGenerate = async () => {
-    setGenerating(true); setError('');
+    setGenerating(true); setGenStep(0); setError('');
+    // Animate through steps while the real call runs
+    const interval = setInterval(() => {
+      setGenStep(s => (s < GEN_STEPS.length - 1 ? s + 1 : s));
+    }, 5000);
     try { await onCreate({ week_start: week, tema, tono, notes: notes.trim() || undefined }); }
     catch (e: any) { setError(String(e)); setGenerating(false); }
+    finally { clearInterval(interval); }
   };
 
   const STEPS = [
@@ -1362,16 +1484,48 @@ function CreateWizard({ onBack, onCreate }: {
           </div>
           {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">{error}</div>}
           {generating && (
-            <div className="bg-gradient-to-r from-[#0C2054] to-[#1a3a7a] rounded-xl p-5 text-center">
-              <Loader2 size={28} className="animate-spin mx-auto mb-3 text-[#F79C31]" />
-              <p className="text-sm font-bold text-white mb-1">
-                {tema === 'uscis' ? 'Consultando noticias de USCIS…' : 'Generando 21 posts con IA…'}
-              </p>
-              <p className="text-xs text-white/50">Esto puede tomar 20–40 segundos</p>
-              <div className="flex justify-center gap-1 mt-3">
-                {['Carruseles', 'Fotos', 'Reels'].map(l => (
-                  <span key={l} className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-white/10 text-white/60">{l}</span>
+            <div className="bg-gradient-to-br from-[#0C2054] to-[#1a3a7a] rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-[#F79C31]/20 flex items-center justify-center flex-shrink-0">
+                  <Sparkles size={20} className="text-[#F79C31] animate-pulse" />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-white">Generando tu grilla…</p>
+                  <p className="text-[11px] text-white/50">20–40 segundos · {selectedTema?.label} · {TONOS.find(t => t.value === tono)?.label}</p>
+                </div>
+              </div>
+
+              {/* Progress steps */}
+              <div className="space-y-2 mb-4">
+                {GEN_STEPS.map((s, i) => (
+                  <div key={i} className={cn('flex items-center gap-2.5 transition-all', i > genStep && 'opacity-20')}>
+                    <div className={cn(
+                      'w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
+                      i < genStep  ? 'bg-emerald-500'      :
+                      i === genStep ? 'bg-[#F79C31] animate-pulse' : 'bg-white/10'
+                    )}>
+                      {i < genStep
+                        ? <Check size={9} className="text-white" strokeWidth={3} />
+                        : i === genStep
+                        ? <Loader2 size={9} className="text-white animate-spin" />
+                        : <span className="w-1.5 h-1.5 rounded-full bg-white/30" />
+                      }
+                    </div>
+                    <p className={cn(
+                      'text-xs transition-all',
+                      i === genStep ? 'text-white font-semibold' :
+                      i < genStep  ? 'text-emerald-300'  : 'text-white/30'
+                    )}>{s}</p>
+                  </div>
                 ))}
+              </div>
+
+              {/* Progress bar */}
+              <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#F79C31] rounded-full transition-all duration-1000"
+                  style={{ width: `${Math.min(((genStep + 1) / GEN_STEPS.length) * 90, 90)}%` }}
+                />
               </div>
             </div>
           )}

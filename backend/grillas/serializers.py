@@ -47,6 +47,7 @@ class ContentGridSerializer(serializers.ModelSerializer):
         model = ContentGrid
         fields = [
             'id', 'week_start', 'tema', 'tema_display',
+            'tono', 'notes',
             'status', 'status_display',
             'created_by', 'created_by_name',
             'created_at', 'updated_at', 'posts',

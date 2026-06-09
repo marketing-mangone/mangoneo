@@ -88,6 +88,8 @@ class ContentGridViewSet(viewsets.ModelViewSet):
                 grid.get_tema_display(),
                 str(grid.week_start),
                 uscis_news=uscis_news,
+                tono=grid.tono or 'educativo',
+                notes=grid.notes or '',
             )
         except Exception as e:
             return Response({'error': f'Error al generar contenido: {str(e)}'}, status=500)
@@ -98,6 +100,16 @@ class ContentGridViewSet(viewsets.ModelViewSet):
 
         serializer = ContentGridSerializer(grid)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'])
+    def hashtags(self, request, pk=None):
+        """Generate 30 themed hashtags segmented by reach."""
+        grid = self.get_object()
+        try:
+            result = _generate_hashtags(grid.get_tema_display(), grid.tono or 'educativo')
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+        return Response(result)
 
 
 class GridPostUpdateView(generics.UpdateAPIView):
@@ -165,6 +177,22 @@ class PostHistoryView(generics.ListAPIView):
         return GridPostVersion.objects.filter(post_id=self.kwargs['pk'])
 
 
+class PostImproveView(generics.GenericAPIView):
+    """Return an AI-improved version of a post's caption without saving it."""
+    permission_classes = [IsAuthenticated]
+    queryset = GridPost.objects.all()
+
+    def post(self, request, pk=None):
+        post = self.get_object()
+        if not post.caption or not post.caption.strip():
+            return Response({'error': 'El post no tiene caption para mejorar.'}, status=400)
+        try:
+            improved = _improve_caption(post)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+        return Response({'caption': improved})
+
+
 def _fetch_uscis_news(max_items: int = 7) -> list[dict]:
     """Fetch latest USCIS news from their RSS feeds. Returns list of {title, summary, date} dicts."""
     feeds = [
@@ -193,7 +221,21 @@ def _fetch_uscis_news(max_items: int = 7) -> list[dict]:
     return items
 
 
-def _generate_with_groq(tema_display: str, week_start: str, uscis_news: list | None = None) -> list:
+TONO_INSTRUCCIONES = {
+    'educativo':  'Tono EDUCATIVO: explica conceptos legales con claridad, usa analogías simples, prioriza que el lector entienda y aprenda.',
+    'emotivo':    'Tono EMOTIVO: conecta con la historia personal del inmigrante, usa narrativa de transformación, evoca esperanza sin prometer resultados.',
+    'urgente':    'Tono URGENTE: resalta plazos reales, consecuencias de no actuar, llamado claro a la acción inmediata sin generar miedo innecesario.',
+    'inspirador': 'Tono INSPIRADOR: historias de superación, posibilidades que se abren, énfasis en el futuro positivo que es posible con el proceso correcto.',
+}
+
+
+def _generate_with_groq(
+    tema_display: str,
+    week_start: str,
+    uscis_news: list | None = None,
+    tono: str = 'educativo',
+    notes: str = '',
+) -> list:
     client = Groq(api_key=settings.GROQ_API_KEY)
 
     news_block = ""
@@ -210,10 +252,15 @@ def _generate_with_groq(tema_display: str, week_start: str, uscis_news: list | N
             "Genera contenido sobre novedades migratorias y cambios de política de USCIS en general."
         )
 
+    tono_instruccion = TONO_INSTRUCCIONES.get(tono, TONO_INSTRUCCIONES['educativo'])
+    notes_block = f"\n\nCONTEXTO ADICIONAL (priorizar en la generación):\n{notes}" if notes.strip() else ""
+
     user_prompt = (
         f"Genera la grilla de contenido para la semana del {week_start}.\n"
-        f"Tema de la semana: {tema_display}"
-        f"{news_block}\n\n"
+        f"Tema de la semana: {tema_display}\n\n"
+        f"TONO REQUERIDO: {tono_instruccion}"
+        f"{news_block}"
+        f"{notes_block}\n\n"
         "Genera exactamente 21 posts (3 por cada uno de los 7 días, day_of_week de 0 a 6).\n"
         "Responde ÚNICAMENTE con el JSON válido, sin texto adicional."
     )
@@ -255,3 +302,80 @@ def _generate_with_groq(tema_display: str, week_start: str, uscis_news: list | N
         })
 
     return result
+
+
+def _improve_caption(post: GridPost) -> str:
+    """Return an AI-improved caption for a given post (does NOT save)."""
+    client = Groq(api_key=settings.GROQ_API_KEY)
+
+    slot_context = {
+        'carousel': f"Tipo: Carrusel/Post estático.\nHeadline de la imagen: {post.headline or '(sin headline)'}",
+        'foto':     f"Tipo: Foto.\nSugerencia visual: {post.photo_suggestion or '(sin sugerencia)'}",
+        'reel':     f"Tipo: Reel.\nTítulo en pantalla: {post.video_title or '(sin título)'}",
+    }.get(post.slot, '')
+
+    system_prompt = (
+        "Eres el copywriter experto de Mangone Law Firm, LLC.\n"
+        "Tu misión: mejorar el caption recibido manteniendo el mismo tema y ángulo.\n"
+        "REGLAS OBLIGATORIAS:\n"
+        "- NUNCA uses 'especialistas' ni 'especializada' (restricción ética NJ RPC 7.4).\n"
+        "- Sin garantías de resultado ('garantizamos', 'aprobación garantizada', etc.).\n"
+        "- Sin estadísticas propias ('miles de familias', 'X casos ganados').\n"
+        "- Voz en primera persona plural: nosotros, podemos, estamos.\n"
+        "- Estructura: Hook emocional → Desarrollo (2-3 párrafos cortos) → CTA → Disclaimer legal.\n"
+        "- CTA siempre por DM o teléfono (862) 701-2097, nunca en comentarios públicos.\n"
+        "- RESPONDE ÚNICAMENTE con el caption mejorado, sin explicaciones ni comillas externas."
+    )
+
+    completion = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": (
+                f"{slot_context}\n\n"
+                f"Caption actual:\n{post.caption}\n\n"
+                "Mejora este caption: hazlo más impactante, con mejor estructura y mayor poder de enganche. "
+                "Mantén el mismo tema, tono y cumplimiento legal."
+            )},
+        ],
+        temperature=0.75,
+        max_tokens=1200,
+    )
+    return completion.choices[0].message.content.strip()
+
+
+def _generate_hashtags(tema_display: str, tono: str) -> dict:
+    """Generate 30 hashtags segmented by reach for a grid theme."""
+    client = Groq(api_key=settings.GROQ_API_KEY)
+
+    completion = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Eres un experto en SEO y marketing en redes sociales para firmas legales de inmigración en EE.UU. "
+                    "Generas hashtags en español e inglés que son seguros legalmente (sin garantías ni promesas). "
+                    "PROHIBIDO: #garantiz*, #aprobacionsegura, #visagarantizada, #residenciagarantizada. "
+                    "Responde ÚNICAMENTE con JSON válido."
+                ),
+            },
+            {
+                "role": "user",
+                "content": (
+                    f"Genera 30 hashtags para contenido sobre '{tema_display}' con tono '{tono}' "
+                    f"para una firma de abogados de inmigración que sirve al mercado Latino en EE.UU.\n\n"
+                    "Organízalos en 3 grupos de 10:\n"
+                    "- pequeños: menos de 100K posts — muy específicos, alta conversión\n"
+                    "- medianos: 100K–1M posts — buen balance reach/competencia\n"
+                    "- grandes: más de 1M posts — máximo alcance\n\n"
+                    'Formato exacto: {"pequeños": ["#tag1", ...], "medianos": ["#tag1", ...], "grandes": ["#tag1", ...]}'
+                ),
+            },
+        ],
+        temperature=0.6,
+        max_tokens=600,
+        response_format={"type": "json_object"},
+    )
+
+    return json.loads(completion.choices[0].message.content.strip())

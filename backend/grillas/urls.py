@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework.routers import DefaultRouter
 from .views import (
     ContentGridViewSet, GridPostUpdateView,
-    PostApproveView, PostCommentsView, PostHistoryView,
+    PostApproveView, PostCommentsView, PostHistoryView, PostImproveView,
 )
 
 router = DefaultRouter()
@@ -13,4 +13,5 @@ urlpatterns = router.urls + [
     path('posts/<int:pk>/approve/',  PostApproveView.as_view(),    name='gridpost-approve'),
     path('posts/<int:pk>/comments/', PostCommentsView.as_view(),   name='gridpost-comments'),
     path('posts/<int:pk>/history/',  PostHistoryView.as_view(),    name='gridpost-history'),
+    path('posts/<int:pk>/improve/',  PostImproveView.as_view(),    name='gridpost-improve'),
 ]

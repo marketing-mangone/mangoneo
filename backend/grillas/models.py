@@ -22,9 +22,19 @@ STATUS_CHOICES = [
 ]
 
 
+TONO_CHOICES = [
+    ('educativo',  'Educativo'),
+    ('emotivo',    'Emotivo'),
+    ('urgente',    'Urgente'),
+    ('inspirador', 'Inspirador'),
+]
+
+
 class ContentGrid(models.Model):
     week_start = models.DateField(help_text="Lunes de inicio de la semana")
     tema = models.CharField(max_length=50, choices=TEMA_CHOICES)
+    tono = models.CharField(max_length=20, choices=TONO_CHOICES, default='educativo', blank=True)
+    notes = models.TextField(blank=True, help_text="Contexto adicional para la IA")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='borrador')
     created_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
