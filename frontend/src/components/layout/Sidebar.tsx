@@ -1,14 +1,14 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, ChevronLeft, ChevronRight,
-  LogOut, Target, Wrench,
+  LogOut, Target, Wrench, Link2,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { auth } from '@/lib/api';
 
 type SubNavItem = { href: string; label: string; exact?: boolean };
@@ -71,238 +71,310 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
   },
 ];
 
+// ── Flyout card ───────────────────────────────────────────────────────────────
+
+function FlyoutCard({
+  item,
+  anchorY,
+  sidebarWidth,
+  pathname,
+  onClose,
+}: {
+  item: NavItem;
+  anchorY: number;
+  sidebarWidth: number;
+  pathname: string;
+  onClose: () => void;
+}) {
+  const router = useRouter();
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Keep card within viewport vertically
+  const CARD_ESTIMATE = 44 + (item.subItems?.length ?? 0) * 40 + 16;
+  const top = Math.min(anchorY, window.innerHeight - CARD_ESTIMATE - 16);
+
+  return (
+    <div
+      ref={cardRef}
+      className="fixed z-[200] pointer-events-auto"
+      style={{ left: sidebarWidth + 8, top }}
+      onMouseLeave={onClose}
+    >
+      {/* Arrow pointing left */}
+      <div
+        className="absolute left-[-6px] top-5 w-3 h-3 rotate-45 rounded-sm"
+        style={{ background: '#ffffff', boxShadow: '-2px 2px 4px rgba(0,0,0,0.06)' }}
+      />
+
+      {/* Card */}
+      <div
+        className="bg-white rounded-2xl overflow-hidden"
+        style={{
+          minWidth: 200,
+          boxShadow: '0 8px 32px rgba(12,32,84,0.14), 0 2px 8px rgba(12,32,84,0.08)',
+          border: '1px solid rgba(229,231,235,0.8)',
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-2.5 px-4 py-3 border-b border-[#f0f2f8]">
+          <div className="w-7 h-7 rounded-lg bg-[#0C2054] flex items-center justify-center flex-shrink-0">
+            <item.icon style={{ width: 13, height: 13, color: '#F79C31' }} />
+          </div>
+          <div>
+            <p className="text-[13px] font-bold text-[#0C2054] leading-tight">{item.label}</p>
+            <p className="text-[11px] text-[#9ca3af] leading-tight">{item.desc}</p>
+          </div>
+        </div>
+
+        {/* Sub-items */}
+        <div className="py-1.5">
+          {item.subItems?.map(sub => {
+            const active = sub.exact
+              ? pathname === sub.href
+              : pathname.startsWith(sub.href);
+            return (
+              <button
+                key={sub.href}
+                onClick={() => { router.push(sub.href); onClose(); }}
+                className={cn(
+                  'w-full flex items-center gap-2.5 px-4 py-2 text-left transition-all group',
+                  active
+                    ? 'bg-[#f0f2f8] text-[#0C2054]'
+                    : 'text-[#374151] hover:bg-[#f7f8fc] hover:text-[#0C2054]'
+                )}
+              >
+                <span className={cn(
+                  'w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors',
+                  active ? 'bg-[#F79C31]' : 'bg-[#d1d5db] group-hover:bg-[#F79C31]'
+                )} />
+                <span className={cn('text-[13px] font-medium', active && 'font-semibold')}>
+                  {sub.label}
+                </span>
+                {active && (
+                  <ChevronRight className="w-3 h-3 ml-auto text-[#F79C31]" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+
 export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  // Sub-menus collapsed by default; auto-expand only the active parent route
-  const [openMenus, setOpenMenus] = useState<Set<string>>(new Set());
+  const [flyout, setFlyout] = useState<{ item: NavItem; anchorY: number } | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    setOpenMenus(prev => {
-      const next = new Set(prev);
-      for (const group of NAV_MAIN) {
-        for (const item of group.items) {
-          if (item.subItems?.some(s => pathname === s.href || pathname.startsWith(s.href + '/'))) {
-            next.add(item.href);
-          }
-        }
-      }
-      return next;
-    });
-  }, [pathname]);
-
-  const toggleMenu = (href: string) =>
-    setOpenMenus(prev => {
-      const next = new Set(prev);
-      next.has(href) ? next.delete(href) : next.add(href);
-      return next;
-    });
   const currentUser = auth.getCurrentUser();
   const displayName = currentUser?.name || currentUser?.username || 'Usuario';
   const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
   const roleLabel = currentUser?.role === 'admin' ? 'Admin' : currentUser?.role || '';
 
+  // Close flyout on route change
+  useEffect(() => { setFlyout(null); }, [pathname]);
+
+  const sidebarWidth = collapsed ? 72 : 264;
+
+  const scheduledClose = useCallback(() => {
+    closeTimer.current = setTimeout(() => setFlyout(null), 120);
+  }, []);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+  }, []);
+
+  const openFlyout = useCallback((item: NavItem, e: React.MouseEvent) => {
+    cancelClose();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setFlyout({ item, anchorY: rect.top });
+  }, [cancelClose]);
+
   return (
-    <aside
-      className={cn(
-        'relative flex flex-col h-screen flex-shrink-0 transition-all duration-300 ease-in-out',
-        collapsed ? 'w-[72px]' : 'w-[264px]'
-      )}
-      style={{
-        background: 'linear-gradient(180deg, #0c2054 0%, #0f2860 60%, #091840 100%)',
-        boxShadow: '1px 0 0 rgba(255,255,255,0.06), 4px 0 20px rgba(0,0,0,0.15)',
-      }}
-    >
-      {/* Subtle texture overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: 'radial-gradient(ellipse at 80% 0%, rgba(247,156,49,0.08) 0%, transparent 60%)',
-        }}
-      />
-
-      {/* Collapse toggle */}
-      <button
-        onClick={() => setCollapsed(!collapsed)}
-        className="absolute -right-3 top-[72px] z-30 w-6 h-6 rounded-full bg-white border border-[#e5e7eb] shadow-md flex items-center justify-center text-[#6b7280] hover:text-[#0C2054] hover:border-[#0C2054] transition-all"
-      >
-        {collapsed
-          ? <ChevronRight className="w-3 h-3" />
-          : <ChevronLeft className="w-3 h-3" />
-        }
-      </button>
-
-      {/* ── LOGO ── */}
-      <div className={cn(
-        'relative z-10 flex items-center border-b border-white/8',
-        collapsed ? 'justify-center px-0 py-4' : 'gap-3 px-5 py-4'
-      )}>
-        {collapsed ? (
-          <div className="w-9 h-9 relative flex-shrink-0">
-            <Image
-              src="/brand/logo-blanco.png"
-              alt="Mangone Law Firm"
-              fill
-              className="object-contain"
-            />
-          </div>
-        ) : (
-          <div className="flex flex-col gap-1 overflow-hidden">
-            <div className="relative h-9 w-36 flex-shrink-0">
-              <Image
-                src="/brand/logo-blanco.png"
-                alt="Mangone Law Firm"
-                fill
-                className="object-contain object-left"
-              />
-            </div>
-            <p className="text-white/50 text-[11px] font-semibold uppercase tracking-[0.12em] truncate">
-              Marketing Hub
-            </p>
-          </div>
+    <>
+      <aside
+        ref={sidebarRef}
+        className={cn(
+          'relative flex flex-col h-screen flex-shrink-0 transition-all duration-300 ease-in-out',
+          collapsed ? 'w-[72px]' : 'w-[264px]'
         )}
-      </div>
+        style={{
+          background: 'linear-gradient(180deg, #0c2054 0%, #0f2860 60%, #091840 100%)',
+          boxShadow: '1px 0 0 rgba(255,255,255,0.06), 4px 0 20px rgba(0,0,0,0.15)',
+        }}
+      >
+        {/* Subtle texture overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(ellipse at 80% 0%, rgba(247,156,49,0.08) 0%, transparent 60%)',
+          }}
+        />
 
-      {/* ── NAV ── */}
-      <nav className="relative z-10 flex-1 px-3 py-5 overflow-y-auto">
-        <ul className="space-y-1">
-        {NAV_MAIN.flatMap(group => group.items).map(({ href, icon: Icon, label, desc, subItems }) => {
-                const active = pathname === href || pathname.startsWith(href + '/');
-                const isOpen = openMenus.has(href);
-                const itemClass = cn(
-                  'group flex items-center rounded-xl transition-all duration-150 relative overflow-hidden',
-                  collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5',
-                  active
-                    ? 'bg-white/12 text-white'
-                    : 'text-white/50 hover:bg-white/6 hover:text-white/80'
-                );
-                const iconClass = cn(
-                  'flex items-center justify-center rounded-lg flex-shrink-0 transition-all',
-                  collapsed ? 'w-9 h-9' : 'w-8 h-8',
-                  active
-                    ? 'bg-[#F79C31] text-[#0C2054] shadow-[0_2px_8px_rgba(247,156,49,0.4)]'
-                    : 'bg-white/6 text-white/60 group-hover:bg-white/10 group-hover:text-white'
-                );
-                const innerContent = (
-                  <>
-                    {active && (
-                      <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-[#F79C31]" />
-                    )}
-                    <div className={iconClass}>
-                      <Icon style={{ width: '16px', height: '16px' }} strokeWidth={active ? 2.5 : 2} />
-                    </div>
-                    {!collapsed && (
-                      <div className="flex-1 min-w-0">
-                        <p className={cn(
-                          'text-[13px] font-semibold leading-tight truncate',
-                          active ? 'text-white' : 'text-white/70 group-hover:text-white/90'
-                        )}>
-                          {label}
-                        </p>
-                        <p className="text-[11px] text-white/30 group-hover:text-white/40 truncate mt-0.5">
-                          {desc}
-                        </p>
-                      </div>
-                    )}
-                    {/* Chevron for items with sub-menus */}
-                    {subItems && !collapsed && (
-                      <ChevronRight className={cn(
-                        'w-3.5 h-3.5 flex-shrink-0 transition-transform duration-200 text-white/30',
-                        isOpen && 'rotate-90'
-                      )} />
-                    )}
-                  </>
-                );
+        {/* Collapse toggle */}
+        <button
+          onClick={() => { setCollapsed(v => !v); setFlyout(null); }}
+          className="absolute -right-3 top-[72px] z-30 w-6 h-6 rounded-full bg-white border border-[#e5e7eb] shadow-md flex items-center justify-center text-[#6b7280] hover:text-[#0C2054] hover:border-[#0C2054] transition-all"
+        >
+          {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        </button>
 
-                return (
-                  <li key={href}>
-                    {/* Items with subItems toggle the menu; otherwise navigate directly */}
-                    {subItems && !collapsed ? (
-                      <button
-                        onClick={() => toggleMenu(href)}
-                        title={collapsed ? label : undefined}
-                        className={cn(itemClass, 'w-full text-left')}
-                      >
-                        {innerContent}
-                      </button>
-                    ) : (
-                      <Link href={href} title={collapsed ? label : undefined} className={itemClass}>
-                        {innerContent}
-                      </Link>
-                    )}
-
-                    {/* Sub-items — shown only when open */}
-                    {subItems && !collapsed && isOpen && (
-                      <ul className="mt-0.5 mb-1 space-y-0.5 pl-[44px] pr-1">
-                        {subItems.map(sub => {
-                          const subActive = sub.exact
-                            ? pathname === sub.href
-                            : pathname.startsWith(sub.href);
-                          return (
-                            <li key={sub.href}>
-                              <Link
-                                href={sub.href}
-                                className={cn(
-                                  'flex items-center gap-2 text-[12px] font-medium px-3 py-1.5 rounded-lg transition-all',
-                                  subActive
-                                    ? 'text-white bg-white/10'
-                                    : 'text-white/40 hover:text-white/70 hover:bg-white/5'
-                                )}
-                              >
-                                <span className={cn(
-                                  'w-1.5 h-1.5 rounded-full flex-shrink-0',
-                                  subActive ? 'bg-[#F79C31]' : 'bg-white/20'
-                                )} />
-                                {sub.label}
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </li>
-                );
-        })}
-        </ul>
-      </nav>
-
-
-      {/* ── BOTTOM ── */}
-      <div className={cn(
-        'relative z-10 border-t border-white/8',
-        collapsed ? 'px-0 py-3' : 'px-3 py-3'
-      )}>
-        {/* User profile + logout */}
+        {/* ── LOGO ── */}
         <div className={cn(
-          'flex items-center rounded-xl transition-all',
-          collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5'
+          'relative z-10 flex items-center border-b border-white/8',
+          collapsed ? 'justify-center px-0 py-4' : 'gap-3 px-5 py-4'
         )}>
-          <div className={cn(
-            'rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-[#0C2054] shadow-md',
-            collapsed ? 'w-9 h-9 text-sm' : 'w-8 h-8 text-[13px]'
-          )}
-            style={{ background: 'linear-gradient(135deg, #F79C31 0%, #f0a94a 100%)' }}
-          >
-            {initials}
-          </div>
-          {!collapsed && (
-            <>
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-[13px] font-semibold truncate leading-tight">{displayName}</p>
-                <p className="text-white/35 text-[11px] truncate">{currentUser?.position || roleLabel}</p>
+          {collapsed ? (
+            <div className="w-9 h-9 relative flex-shrink-0">
+              <Image src="/brand/logo-blanco.png" alt="Mangone Law Firm" fill className="object-contain" />
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1 overflow-hidden">
+              <div className="relative h-9 w-36 flex-shrink-0">
+                <Image src="/brand/logo-blanco.png" alt="Mangone Law Firm" fill className="object-contain object-left" />
               </div>
-              <button
-                onClick={() => auth.logout()}
-                title="Cerrar sesión"
-                className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 hover:bg-white/6 transition-all"
-              >
-                <LogOut style={{ width: '14px', height: '14px' }} />
-              </button>
-            </>
+              <p className="text-white/50 text-[11px] font-semibold uppercase tracking-[0.12em] truncate">
+                Marketing Hub
+              </p>
+            </div>
           )}
         </div>
-      </div>
-    </aside>
+
+        {/* ── NAV ── */}
+        <nav className="relative z-10 flex-1 px-3 py-5 overflow-y-auto">
+          <ul className="space-y-1">
+            {NAV_MAIN.flatMap(group => group.items).map(item => {
+              const { href, icon: Icon, label, desc, subItems } = item;
+              const active = pathname === href || pathname.startsWith(href + '/');
+              const hasFlyout = !!subItems;
+
+              const itemClass = cn(
+                'group flex items-center rounded-xl transition-all duration-150 relative overflow-hidden w-full text-left',
+                collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5',
+                active
+                  ? 'bg-white/12 text-white'
+                  : 'text-white/50 hover:bg-white/6 hover:text-white/80'
+              );
+              const iconClass = cn(
+                'flex items-center justify-center rounded-lg flex-shrink-0 transition-all',
+                collapsed ? 'w-9 h-9' : 'w-8 h-8',
+                active
+                  ? 'bg-[#F79C31] text-[#0C2054] shadow-[0_2px_8px_rgba(247,156,49,0.4)]'
+                  : 'bg-white/6 text-white/60 group-hover:bg-white/10 group-hover:text-white'
+              );
+
+              const innerContent = (
+                <>
+                  {active && (
+                    <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-[#F79C31]" />
+                  )}
+                  <div className={iconClass}>
+                    <Icon style={{ width: '16px', height: '16px' }} strokeWidth={active ? 2.5 : 2} />
+                  </div>
+                  {!collapsed && (
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        'text-[13px] font-semibold leading-tight truncate',
+                        active ? 'text-white' : 'text-white/70 group-hover:text-white/90'
+                      )}>
+                        {label}
+                      </p>
+                      <p className="text-[11px] text-white/30 group-hover:text-white/40 truncate mt-0.5">
+                        {desc}
+                      </p>
+                    </div>
+                  )}
+                  {/* Flyout indicator */}
+                  {hasFlyout && !collapsed && (
+                    <ChevronRight className="w-3.5 h-3.5 flex-shrink-0 text-white/25 group-hover:text-white/50 transition-colors" />
+                  )}
+                </>
+              );
+
+              return (
+                <li key={href}>
+                  {hasFlyout ? (
+                    <button
+                      className={itemClass}
+                      onMouseEnter={e => openFlyout(item, e)}
+                      onMouseLeave={scheduledClose}
+                      onClick={e => openFlyout(item, e)}
+                    >
+                      {innerContent}
+                    </button>
+                  ) : (
+                    <Link
+                      href={href}
+                      title={collapsed ? label : undefined}
+                      className={itemClass}
+                      onMouseEnter={() => { cancelClose(); setFlyout(null); }}
+                    >
+                      {innerContent}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* ── BOTTOM ── */}
+        <div className={cn(
+          'relative z-10 border-t border-white/8',
+          collapsed ? 'px-0 py-3' : 'px-3 py-3'
+        )}>
+          <div className={cn(
+            'flex items-center rounded-xl transition-all',
+            collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5'
+          )}>
+            <div
+              className={cn(
+                'rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-[#0C2054] shadow-md',
+                collapsed ? 'w-9 h-9 text-sm' : 'w-8 h-8 text-[13px]'
+              )}
+              style={{ background: 'linear-gradient(135deg, #F79C31 0%, #f0a94a 100%)' }}
+            >
+              {initials}
+            </div>
+            {!collapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-[13px] font-semibold truncate leading-tight">{displayName}</p>
+                  <p className="text-white/35 text-[11px] truncate">{currentUser?.position || roleLabel}</p>
+                </div>
+                <button
+                  onClick={() => auth.logout()}
+                  title="Cerrar sesión"
+                  className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 hover:bg-white/6 transition-all"
+                >
+                  <LogOut style={{ width: '14px', height: '14px' }} />
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </aside>
+
+      {/* ── FLYOUT PORTAL (rendered outside aside to escape overflow:hidden) ── */}
+      {flyout && (
+        <div
+          className="fixed inset-0 z-[199] pointer-events-none"
+          onMouseEnter={cancelClose}
+        >
+          <FlyoutCard
+            item={flyout.item}
+            anchorY={flyout.anchorY}
+            sidebarWidth={sidebarWidth}
+            pathname={pathname}
+            onClose={() => setFlyout(null)}
+          />
+        </div>
+      )}
+    </>
   );
 }
-
