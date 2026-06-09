@@ -296,6 +296,7 @@ class PublishingQueueView(generics.ListAPIView):
     """All posts that have ever been scheduled or published."""
     permission_classes = [IsAuthenticated]
     serializer_class   = GridPostSerializer
+    pagination_class   = None  # Return a plain array, no pagination wrapper
 
     def get_queryset(self):
         qs = (
