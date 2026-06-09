@@ -11,6 +11,7 @@ import {
   CheckCircle, Loader2, CloudUpload, Maximize2,
   Edit3, Plus, Users, Lightbulb, Heart, Tag,
   ClipboardList, ChevronDown, ChevronRight, Shield, Wrench,
+  Link2, ExternalLink, Globe,
 } from 'lucide-react';
 import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar } from '@/lib/api';
 
@@ -321,6 +322,289 @@ function IdeaCard({ idea, onLike, onDelete }: {
           {idea.likes > 0 && <span>{idea.likes}</span>}
         </button>
       </div>
+    </div>
+  );
+}
+
+// ── Links ─────────────────────────────────────────────────────────────────────
+
+const LINK_CATEGORIES = [
+  'Herramientas de Marketing',
+  'Diseño y Creatividad',
+  'Redes Sociales',
+  'SEO y Analytics',
+  'IA y Automatización',
+  'Legal / Inmigración',
+  'Inspiración',
+  'Otros',
+];
+
+const LINK_CATEGORY_COLORS: Record<string, string> = {
+  'Herramientas de Marketing': 'bg-blue-100 text-blue-700',
+  'Diseño y Creatividad':      'bg-pink-100 text-pink-700',
+  'Redes Sociales':            'bg-purple-100 text-purple-700',
+  'SEO y Analytics':           'bg-green-100 text-green-700',
+  'IA y Automatización':       'bg-amber-100 text-amber-700',
+  'Legal / Inmigración':       'bg-slate-100 text-slate-700',
+  'Inspiración':               'bg-orange-100 text-orange-700',
+  'Otros':                     'bg-gray-100 text-gray-600',
+};
+
+const LINKS_STORAGE_KEY = 'mangone_resource_links';
+
+interface ResourceLink {
+  id: string;
+  name: string;
+  url: string;
+  category: string;
+  created_at: string;
+}
+
+function loadLinks(): ResourceLink[] {
+  if (typeof window === 'undefined') return [];
+  try { return JSON.parse(localStorage.getItem(LINKS_STORAGE_KEY) || '[]'); } catch { return []; }
+}
+function saveLinks(links: ResourceLink[]) {
+  localStorage.setItem(LINKS_STORAGE_KEY, JSON.stringify(links));
+}
+
+function AddLinkModal({ onClose, onCreate }: {
+  onClose: () => void;
+  onCreate: (link: ResourceLink) => void;
+}) {
+  const [name, setName]         = useState('');
+  const [url, setUrl]           = useState('');
+  const [category, setCategory] = useState(LINK_CATEGORIES[0]);
+  const [error, setError]       = useState('');
+
+  const handle = () => {
+    if (!name.trim())  { setError('El nombre es requerido.');  return; }
+    if (!url.trim())   { setError('La URL es requerida.');     return; }
+    let finalUrl = url.trim();
+    if (!/^https?:\/\//i.test(finalUrl)) finalUrl = 'https://' + finalUrl;
+    onCreate({ id: Date.now().toString(), name: name.trim(), url: finalUrl, category, created_at: new Date().toISOString() });
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(12,32,84,0.5)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-7 space-y-5"
+        style={{ boxShadow: '0 32px 80px rgba(12,32,84,0.18)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#0C2054] flex items-center justify-center">
+              <Link2 className="w-4 h-4 text-[#F79C31]" />
+            </div>
+            <h3 className="font-bold text-[#0C2054]">Agregar link</h3>
+          </div>
+          <button onClick={onClose} className="text-[#9ca3af] hover:text-[#374151]"><X className="w-5 h-5" /></button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-1.5">Nombre</label>
+            <input
+              autoFocus
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="ej. Canva, Buffer, Notion…"
+              className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] placeholder-[#c4c8d4] outline-none focus:border-[#0C2054] focus:bg-white focus:ring-2 focus:ring-[#0C2054]/10 transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-1.5">URL</label>
+            <input
+              value={url}
+              onChange={e => setUrl(e.target.value)}
+              placeholder="https://…"
+              className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] placeholder-[#c4c8d4] outline-none focus:border-[#0C2054] focus:bg-white focus:ring-2 focus:ring-[#0C2054]/10 transition-all"
+              onKeyDown={e => e.key === 'Enter' && handle()}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-1.5">Categoría</label>
+            <select
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] outline-none focus:border-[#0C2054] focus:bg-white transition-all"
+            >
+              {LINK_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {error && (
+          <div className="text-xs text-red-700 bg-red-50 border border-red-100 rounded-xl p-3">⚠️ {error}</div>
+        )}
+
+        <div className="flex gap-3 pt-1">
+          <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-[#e5e7eb] text-sm text-[#6b7280] font-medium hover:bg-[#f9fafb] transition-colors">
+            Cancelar
+          </button>
+          <button
+            onClick={handle}
+            className="flex-1 py-3 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md flex items-center justify-center gap-2"
+          >
+            <Link2 className="w-4 h-4" /> Guardar link
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LinkCard({ link, onDelete }: { link: ResourceLink; onDelete: () => void }) {
+  const colorCls = LINK_CATEGORY_COLORS[link.category] ?? LINK_CATEGORY_COLORS['Otros'];
+  let domain = '';
+  try { domain = new URL(link.url).hostname.replace('www.', ''); } catch { domain = link.url; }
+
+  return (
+    <div className="bg-white rounded-2xl border border-[#e8e8f0] p-5 hover:border-[#0C2054]/20 hover:shadow-md transition-all group flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-[#f0f2f8] flex items-center justify-center flex-shrink-0">
+            <Globe className="w-4 h-4 text-[#0C2054]" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-[#0C2054] text-sm truncate">{link.name}</p>
+            <p className="text-xs text-[#9ca3af] truncate">{domain}</p>
+          </div>
+        </div>
+        <button
+          onClick={onDelete}
+          className="opacity-0 group-hover:opacity-100 text-[#c4c8d4] hover:text-red-500 transition-all flex-shrink-0 p-1"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      <span className={`self-start text-[11px] font-semibold px-2.5 py-1 rounded-full ${colorCls}`}>
+        {link.category}
+      </span>
+
+      <a
+        href={link.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#f0f2f8] hover:bg-[#0C2054] text-[#0C2054] hover:text-white text-xs font-semibold transition-all"
+      >
+        <ExternalLink className="w-3.5 h-3.5" /> Abrir enlace
+      </a>
+    </div>
+  );
+}
+
+function LinksTab() {
+  const [links, setLinks]           = useState<ResourceLink[]>([]);
+  const [showModal, setShowModal]   = useState(false);
+  const [search, setSearch]         = useState('');
+  const [catFilter, setCatFilter]   = useState('Todos');
+
+  useEffect(() => { setLinks(loadLinks()); }, []);
+
+  const persist = (updated: ResourceLink[]) => { saveLinks(updated); setLinks(updated); };
+
+  const handleCreate = (link: ResourceLink) => persist([link, ...links]);
+  const handleDelete = (id: string) => {
+    if (!confirm('¿Eliminar este link?')) return;
+    persist(links.filter(l => l.id !== id));
+  };
+
+  const usedCats = ['Todos', ...Array.from(new Set(links.map(l => l.category)))];
+  const filtered = links.filter(l => {
+    const matchCat    = catFilter === 'Todos' || l.category === catFilter;
+    const matchSearch = !search || l.name.toLowerCase().includes(search.toLowerCase()) || l.url.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
+  return (
+    <div className="px-10 pb-10 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[#0C2054] flex items-center justify-center">
+            <Link2 className="w-5 h-5 text-[#F79C31]" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-[#0C2054]">Links de Recursos</h2>
+            <p className="text-sm text-[#9ca3af]">{links.length} enlace{links.length !== 1 ? 's' : ''} guardado{links.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setShowModal(true)}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md"
+        >
+          <Plus className="w-4 h-4" /> Agregar link
+        </button>
+      </div>
+
+      {/* Search + Category filter */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9ca3af]" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar links…"
+            className="pl-9 pr-4 py-2.5 rounded-xl border border-[#e5e7eb] bg-white text-sm text-[#111827] placeholder-[#9ca3af] outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/10 transition-all w-56"
+          />
+        </div>
+        <div className="flex gap-1.5 flex-wrap">
+          {usedCats.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCatFilter(cat)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                catFilter === cat
+                  ? 'bg-[#0C2054] text-white border-[#0C2054] shadow-sm'
+                  : 'bg-white text-[#6b7280] border-[#e5e7eb] hover:border-[#d1d5db]'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Grid */}
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-[#e5e7eb]">
+          <div className="w-14 h-14 rounded-2xl bg-[#f0f2f8] flex items-center justify-center mx-auto mb-4">
+            <Link2 className="w-6 h-6 text-[#9ca3af]" />
+          </div>
+          <p className="text-sm font-semibold text-[#374151]">
+            {links.length === 0 ? 'Aún no hay links guardados' : 'Sin resultados para este filtro'}
+          </p>
+          <p className="text-xs text-[#9ca3af] mt-1">
+            {links.length === 0 && 'Haz clic en "Agregar link" para guardar tu primer recurso.'}
+          </p>
+          {links.length === 0 && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md mx-auto"
+            >
+              <Plus className="w-4 h-4" /> Agregar primer link
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filtered.map(link => (
+            <LinkCard key={link.id} link={link} onDelete={() => handleDelete(link.id)} />
+          ))}
+        </div>
+      )}
+
+      {showModal && <AddLinkModal onClose={() => setShowModal(false)} onCreate={handleCreate} />}
     </div>
   );
 }
@@ -3322,7 +3606,7 @@ function SOPsTab() {
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function RecursosPage() {
-  const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops'>('docs');
+  const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops' | 'links'>('docs');
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [docs, setDocs] = useState<ApiDocument[]>([]);
@@ -3449,10 +3733,11 @@ export default function RecursosPage() {
             { key: 'avatar', label: 'Avatar del Cliente', icon: Users },
             { key: 'brainstorming', label: 'Brainstorming', icon: Lightbulb },
             { key: 'sops', label: 'SOPs', icon: ClipboardList },
+            { key: 'links', label: 'Links', icon: Link2 },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
-              onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops')}
+              onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops' | 'links')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === key ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
               }`}
@@ -3828,6 +4113,9 @@ export default function RecursosPage() {
             <SOPsTab />
           </div>
         )}
+
+        {/* ── Links Tab ────────────────────────────────────────────────────── */}
+        {activeTab === 'links' && <LinksTab />}
 
       {/* ── Manual viewer modal ─────────────────────────────────────────── */}
       {manualOpen && (
