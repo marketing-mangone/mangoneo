@@ -10,6 +10,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from django.utils.dateparse import parse_datetime
 from .models import ContentGrid, GridPost, GridPostComment, GridPostVersion
 from .serializers import (
     ContentGridSerializer, ContentGridListSerializer, GridPostSerializer,
@@ -191,6 +192,125 @@ class PostImproveView(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)}, status=500)
         return Response({'caption': improved})
+
+
+class PostScheduleView(generics.GenericAPIView):
+    """Schedule a GridPost for publishing via Ayrshare."""
+    permission_classes = [IsAuthenticated]
+    queryset = GridPost.objects.all()
+
+    def post(self, request, pk=None):
+        post = self.get_object()
+        if not post.approved:
+            return Response({'error': 'El post debe estar aprobado antes de programarlo.'}, status=400)
+        if not post.caption or not post.caption.strip():
+            return Response({'error': 'El post no tiene caption para publicar.'}, status=400)
+
+        scheduled_at_raw = request.data.get('scheduled_at')
+        platforms        = request.data.get('platforms', ['instagram', 'facebook'])
+
+        if not scheduled_at_raw:
+            return Response({'error': 'Se requiere una fecha de publicación.'}, status=400)
+        if not platforms:
+            return Response({'error': 'Selecciona al menos una plataforma.'}, status=400)
+
+        scheduled_dt = parse_datetime(scheduled_at_raw)
+        if not scheduled_dt:
+            return Response({'error': 'Formato de fecha inválido.'}, status=400)
+
+        post.scheduled_at   = scheduled_dt
+        post.platforms      = platforms
+        post.publish_status = 'scheduled'
+        post.publish_error  = ''
+        post.save(update_fields=['scheduled_at', 'platforms', 'publish_status', 'publish_error'])
+
+        serializer = GridPostSerializer(post)
+        return Response(serializer.data)
+
+
+class PostPublishNowView(generics.GenericAPIView):
+    """Immediately publish a GridPost via Ayrshare."""
+    permission_classes = [IsAuthenticated]
+    queryset = GridPost.objects.all()
+
+    def post(self, request, pk=None):
+        from .ayrshare import post_to_social
+
+        post = self.get_object()
+        if not post.approved:
+            return Response({'error': 'El post debe estar aprobado antes de publicarlo.'}, status=400)
+        if not post.caption or not post.caption.strip():
+            return Response({'error': 'El post no tiene caption para publicar.'}, status=400)
+
+        platforms = request.data.get('platforms') or post.platforms or ['instagram', 'facebook']
+
+        try:
+            result = post_to_social(caption=post.caption, platforms=platforms)
+            post.platforms        = platforms
+            post.publish_status   = 'published'
+            post.published_at     = timezone.now()
+            post.ayrshare_post_id = result.get('id', '')
+            post.publish_error    = ''
+            post.save(update_fields=[
+                'platforms', 'publish_status', 'published_at',
+                'ayrshare_post_id', 'publish_error',
+            ])
+        except Exception as exc:
+            post.publish_status = 'failed'
+            post.publish_error  = str(exc)
+            post.save(update_fields=['publish_status', 'publish_error'])
+            return Response({'error': f'Error al publicar: {exc}'}, status=500)
+
+        serializer = GridPostSerializer(post)
+        return Response(serializer.data)
+
+
+class PostCancelScheduleView(generics.GenericAPIView):
+    """Cancel a scheduled GridPost."""
+    permission_classes = [IsAuthenticated]
+    queryset = GridPost.objects.all()
+
+    def post(self, request, pk=None):
+        post = self.get_object()
+        if post.publish_status != 'scheduled':
+            return Response({'error': 'Solo se pueden cancelar posts programados.'}, status=400)
+
+        # If Ayrshare already has the post queued, attempt to cancel it there too.
+        if post.ayrshare_post_id:
+            try:
+                from .ayrshare import delete_scheduled_post
+                delete_scheduled_post(post.ayrshare_post_id)
+            except Exception as exc:
+                logger.warning("No se pudo cancelar en Ayrshare post %s: %s", post.ayrshare_post_id, exc)
+
+        post.publish_status   = 'cancelled'
+        post.scheduled_at     = None
+        post.ayrshare_post_id = ''
+        post.save(update_fields=['publish_status', 'scheduled_at', 'ayrshare_post_id'])
+
+        serializer = GridPostSerializer(post)
+        return Response(serializer.data)
+
+
+class PublishingQueueView(generics.ListAPIView):
+    """All posts that have ever been scheduled or published."""
+    permission_classes = [IsAuthenticated]
+    serializer_class   = GridPostSerializer
+
+    def get_queryset(self):
+        qs = (
+            GridPost.objects
+            .filter(publish_status__isnull=False)
+            .select_related('grid', 'approved_by')
+            .order_by('-scheduled_at', '-published_at')
+        )
+        status = self.request.query_params.get('status')
+        if status:
+            qs = qs.filter(publish_status=status)
+        platform = self.request.query_params.get('platform')
+        if platform:
+            qs = qs.filter(platforms__contains=platform)
+        return qs
 
 
 def _fetch_uscis_news(max_items: int = 7) -> list[dict]:

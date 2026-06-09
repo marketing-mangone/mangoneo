@@ -870,6 +870,9 @@ export type GridPostVersion = {
   created_at: string;
 };
 
+export type SocialPlatform = 'instagram' | 'facebook' | 'tiktok' | 'linkedin' | 'youtube';
+export type PublishStatus  = 'scheduled' | 'published' | 'failed' | 'cancelled';
+
 export type GridPost = {
   id: number;
   grid: number;
@@ -888,6 +891,16 @@ export type GridPost = {
   approved: boolean;
   approved_by_name: string | null;
   approved_at: string | null;
+  // Publishing
+  publish_status:   PublishStatus | null;
+  platforms:        SocialPlatform[];
+  scheduled_at:     string | null;
+  published_at:     string | null;
+  ayrshare_post_id: string;
+  publish_error:    string;
+  // Grid context (read-only, for queue view)
+  grid_tema:        string | null;
+  grid_week_start:  string | null;
   comments: GridPostComment[];
   versions: GridPostVersion[];
   created_at: string;
@@ -941,4 +954,14 @@ export const grillasApi = {
     apiJSON<{ pequeños: string[]; medianos: string[]; grandes: string[] }>(`/api/grillas/${gridId}/hashtags/`, { method: 'POST' }),
   improvePost: (postId: number) =>
     apiJSON<{ caption: string }>(`/api/grillas/posts/${postId}/improve/`, { method: 'POST' }),
+  schedulePost: (postId: number, data: { scheduled_at: string; platforms: SocialPlatform[] }) =>
+    apiJSON<GridPost>(`/api/grillas/posts/${postId}/schedule/`, { method: 'POST', body: JSON.stringify(data) }),
+  publishNow: (postId: number, data: { platforms: SocialPlatform[] }) =>
+    apiJSON<GridPost>(`/api/grillas/posts/${postId}/publish-now/`, { method: 'POST', body: JSON.stringify(data) }),
+  cancelSchedule: (postId: number) =>
+    apiJSON<GridPost>(`/api/grillas/posts/${postId}/cancel-schedule/`, { method: 'POST' }),
+  getPublishingQueue: (params?: { status?: PublishStatus; platform?: SocialPlatform }) => {
+    const qs = params ? '?' + new URLSearchParams(params as Record<string, string>).toString() : '';
+    return apiJSON<GridPost[]>(`/api/grillas/publishing/queue/${qs}`);
+  },
 };

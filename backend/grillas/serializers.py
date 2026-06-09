@@ -17,9 +17,11 @@ class GridPostVersionSerializer(serializers.ModelSerializer):
 
 
 class GridPostSerializer(serializers.ModelSerializer):
-    comments = GridPostCommentSerializer(many=True, read_only=True)
-    versions = GridPostVersionSerializer(many=True, read_only=True)
+    comments         = GridPostCommentSerializer(many=True, read_only=True)
+    versions         = GridPostVersionSerializer(many=True, read_only=True)
     approved_by_name = serializers.SerializerMethodField()
+    grid_tema        = serializers.SerializerMethodField()
+    grid_week_start  = serializers.SerializerMethodField()
 
     class Meta:
         model = GridPost
@@ -28,13 +30,21 @@ class GridPostSerializer(serializers.ModelSerializer):
             'id', 'grid', 'day_of_week', 'slot',
             'created_at', 'updated_at',
             'approved_by', 'approved_at', 'approved_by_name',
+            'published_at', 'ayrshare_post_id',
             'comments', 'versions',
+            'grid_tema', 'grid_week_start',
         ]
 
     def get_approved_by_name(self, obj):
         if obj.approved_by:
             return obj.approved_by.get_full_name() or obj.approved_by.username
         return None
+
+    def get_grid_tema(self, obj):
+        return obj.grid.get_tema_display() if obj.grid_id else None
+
+    def get_grid_week_start(self, obj):
+        return str(obj.grid.week_start) if obj.grid_id else None
 
 
 class ContentGridSerializer(serializers.ModelSerializer):

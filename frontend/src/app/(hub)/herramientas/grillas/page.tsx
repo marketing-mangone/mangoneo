@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   grillasApi, ContentGrid, ContentGridList, GridPost,
-  GridPostComment, GridPostVersion,
+  GridPostComment, GridPostVersion, SocialPlatform,
 } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { cn } from '@/lib/utils';
@@ -13,6 +13,7 @@ import {
   X, ChevronRight, ArrowRight, Calendar, FileText, Zap,
   MessageCircle, History, ThumbsUp, Send, RotateCcw,
   Download, CalendarPlus, Printer, Eye, ChevronDown,
+  Send as SendIcon, Clock, Globe,
 } from 'lucide-react';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -659,6 +660,194 @@ function HistoryPanel({ postId, onRestore }: {
 
 // ── PostPanel (slide-over) ────────────────────────────────────────────────────
 
+// ── ScheduleModal ─────────────────────────────────────────────────────────────
+
+const PLATFORMS: { id: SocialPlatform; label: string; color: string; icon: string }[] = [
+  { id: 'instagram', label: 'Instagram', color: 'bg-pink-100 text-pink-700 border-pink-200',    icon: '📸' },
+  { id: 'facebook',  label: 'Facebook',  color: 'bg-blue-100 text-blue-700 border-blue-200',    icon: '👤' },
+  { id: 'tiktok',    label: 'TikTok',    color: 'bg-slate-100 text-slate-700 border-slate-200', icon: '🎵' },
+  { id: 'linkedin',  label: 'LinkedIn',  color: 'bg-sky-100 text-sky-700 border-sky-200',       icon: '💼' },
+  { id: 'youtube',   label: 'YouTube',   color: 'bg-red-100 text-red-700 border-red-200',       icon: '▶️' },
+];
+
+const PUBLISH_STATUS_CONFIG = {
+  scheduled:  { label: 'Programado',  cls: 'bg-amber-100 text-amber-700',   dot: 'bg-amber-400' },
+  published:  { label: 'Publicado',   cls: 'bg-emerald-100 text-emerald-700', dot: 'bg-emerald-500' },
+  failed:     { label: 'Error',       cls: 'bg-red-100 text-red-700',        dot: 'bg-red-500' },
+  cancelled:  { label: 'Cancelado',   cls: 'bg-slate-100 text-slate-500',    dot: 'bg-slate-400' },
+} as const;
+
+function ScheduleModal({ post, onClose, onDone }: {
+  post: GridPost;
+  onClose: () => void;
+  onDone: (updated: GridPost) => void;
+}) {
+  const [tab, setTab]               = useState<'schedule' | 'now'>('schedule');
+  const [platforms, setPlatforms]   = useState<SocialPlatform[]>(
+    post.platforms?.length ? post.platforms : ['instagram', 'facebook'],
+  );
+  const [scheduledAt, setScheduledAt] = useState(() => {
+    const d = new Date();
+    d.setHours(d.getHours() + 1, 0, 0, 0);
+    return d.toISOString().slice(0, 16);
+  });
+  const [loading, setLoading]   = useState(false);
+  const [error, setError]       = useState('');
+
+  const togglePlatform = (p: SocialPlatform) =>
+    setPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+
+  const handleSchedule = async () => {
+    if (!platforms.length) { setError('Selecciona al menos una plataforma.'); return; }
+    setLoading(true); setError('');
+    try {
+      const updated = await grillasApi.schedulePost(post.id, {
+        scheduled_at: new Date(scheduledAt).toISOString(),
+        platforms,
+      });
+      onDone(updated);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error al programar el post.');
+      setLoading(false);
+    }
+  };
+
+  const handlePublishNow = async () => {
+    if (!platforms.length) { setError('Selecciona al menos una plataforma.'); return; }
+    setLoading(true); setError('');
+    try {
+      const updated = await grillasApi.publishNow(post.id, { platforms });
+      onDone(updated);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Error al publicar el post.');
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      style={{ backgroundColor: 'rgba(12,32,84,0.55)', backdropFilter: 'blur(6px)' }}
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
+        style={{ boxShadow: '0 32px 80px rgba(12,32,84,0.22)' }}
+        onClick={e => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#f0f2f8]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-[#0C2054] flex items-center justify-center">
+              <Globe className="w-4 h-4 text-[#F79C31]" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[#0C2054] text-sm">Publicar en redes sociales</h3>
+              <p className="text-xs text-[#9ca3af] mt-0.5 truncate max-w-[220px]">
+                {post.slot === 'carousel' ? post.headline : post.slot === 'reel' ? post.video_title : post.photo_suggestion || 'Post seleccionado'}
+              </p>
+            </div>
+          </div>
+          <button onClick={onClose} className="text-[#9ca3af] hover:text-[#374151] transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-5">
+          {/* Tabs */}
+          <div className="flex gap-1 p-1 bg-[#f0f2f8] rounded-xl">
+            {([['schedule', '🕐  Programar', 'Elige fecha y hora'], ['now', '⚡  Ahora mismo', 'Publica inmediatamente']] as const).map(([id, label, desc]) => (
+              <button
+                key={id}
+                onClick={() => setTab(id)}
+                className={cn(
+                  'flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all text-center',
+                  tab === id ? 'bg-white text-[#0C2054] shadow-sm' : 'text-[#6b7280] hover:text-[#374151]'
+                )}
+              >
+                {label}
+                <span className={cn('block text-[10px] font-normal mt-0.5', tab === id ? 'text-[#9ca3af]' : 'text-[#c4c8d4]')}>{desc}</span>
+              </button>
+            ))}
+          </div>
+
+          {/* Plataformas */}
+          <div>
+            <p className="text-xs font-semibold text-[#374151] uppercase tracking-widest mb-3">Plataformas</p>
+            <div className="flex flex-wrap gap-2">
+              {PLATFORMS.map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => togglePlatform(p.id)}
+                  className={cn(
+                    'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all',
+                    platforms.includes(p.id)
+                      ? p.color + ' border-current shadow-sm'
+                      : 'bg-white border-[#e5e7eb] text-[#9ca3af] hover:border-[#d1d5db]'
+                  )}
+                >
+                  <span>{p.icon}</span> {p.label}
+                  {platforms.includes(p.id) && <Check className="w-3 h-3 ml-0.5" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Fecha/hora (solo tab schedule) */}
+          {tab === 'schedule' && (
+            <div>
+              <p className="text-xs font-semibold text-[#374151] uppercase tracking-widest mb-2">Fecha y hora de publicación</p>
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={e => setScheduledAt(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+                className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/10 focus:bg-white transition-all"
+              />
+            </div>
+          )}
+
+          {/* Caption preview */}
+          <div className="bg-[#f9fafb] rounded-xl p-4 border border-[#f0f2f8]">
+            <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-widest mb-2">Vista previa del caption</p>
+            <p className="text-xs text-[#374151] leading-relaxed line-clamp-4 whitespace-pre-line">
+              {post.caption || 'Sin caption generado.'}
+            </p>
+          </div>
+
+          {error && (
+            <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-xs">
+              <span className="mt-0.5">⚠️</span> {error}
+            </div>
+          )}
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-1">
+            <button
+              onClick={onClose}
+              className="flex-1 py-3 rounded-xl border border-[#e5e7eb] text-sm text-[#6b7280] font-medium hover:bg-[#f9fafb] transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={tab === 'schedule' ? handleSchedule : handlePublishNow}
+              disabled={loading || !platforms.length}
+              className="flex-1 py-3 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading
+                ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                : tab === 'schedule' ? <><Clock className="w-4 h-4" /> Programar</> : <><SendIcon className="w-4 h-4" /> Publicar ahora</>
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PostPanel ─────────────────────────────────────────────────────────────────
+
 type PanelTab = 'contenido' | 'comentarios' | 'historial';
 
 function PostPanel({ post, onClose, onSave, onApprove }: {
@@ -668,14 +857,16 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
   onApprove: (id: number) => Promise<void>;
 }) {
   const cfg = SLOT_CONFIG[post.slot];
-  const [draft, setDraft]         = useState<Partial<GridPost>>({});
-  const [saving, setSaving]       = useState(false);
-  const [saved, setSaved]         = useState(false);
-  const [approving, setApproving] = useState(false);
-  const [improving, setImproving] = useState(false);
-  const [tab, setTab]             = useState<PanelTab>('contenido');
+  const [draft, setDraft]           = useState<Partial<GridPost>>({});
+  const [saving, setSaving]         = useState(false);
+  const [saved, setSaved]           = useState(false);
+  const [approving, setApproving]   = useState(false);
+  const [improving, setImproving]   = useState(false);
+  const [tab, setTab]               = useState<PanelTab>('contenido');
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [currentPost, setCurrentPost]   = useState<GridPost>(post);
 
-  useEffect(() => { setDraft({}); setSaved(false); setTab('contenido'); }, [post.id]);
+  useEffect(() => { setDraft({}); setSaved(false); setTab('contenido'); setCurrentPost(post); }, [post.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -763,6 +954,34 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
               }
               {post.approved ? 'Aprobado' : 'Aprobar'}
             </button>
+
+            {/* Publish status badge / schedule button */}
+            {currentPost.publish_status && PUBLISH_STATUS_CONFIG[currentPost.publish_status] && (
+              <span className={cn(
+                'flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-lg',
+                PUBLISH_STATUS_CONFIG[currentPost.publish_status].cls,
+              )}>
+                <span className={cn('w-1.5 h-1.5 rounded-full', PUBLISH_STATUS_CONFIG[currentPost.publish_status].dot)} />
+                {PUBLISH_STATUS_CONFIG[currentPost.publish_status].label}
+              </span>
+            )}
+            {post.approved && !currentPost.publish_status && (
+              <button
+                onClick={() => setShowSchedule(true)}
+                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border bg-[#0C2054] border-[#0C2054] text-white hover:bg-[#1a3a7a] transition-all shadow-sm"
+              >
+                <Globe size={11} />
+                Publicar
+              </button>
+            )}
+            {currentPost.publish_status === 'scheduled' && (
+              <button
+                onClick={() => setShowSchedule(true)}
+                className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 transition-all"
+              >
+                <Clock size={10} /> Reprogramar
+              </button>
+            )}
 
             {/* Save */}
             {isDirty && (
@@ -941,6 +1160,18 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
           )}
         </div>
       </div>
+
+      {/* Schedule modal */}
+      {showSchedule && (
+        <ScheduleModal
+          post={currentPost}
+          onClose={() => setShowSchedule(false)}
+          onDone={(updated) => {
+            setCurrentPost(updated);
+            setShowSchedule(false);
+          }}
+        />
+      )}
     </>
   );
 }

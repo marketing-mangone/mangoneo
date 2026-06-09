@@ -186,6 +186,9 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 # ── Groq API ─────────────────────────────────────────────────────────────────
 GROQ_API_KEY = config('GROQ_API_KEY', default='')
 
+# ── Ayrshare API (social media publishing) ───────────────────────────────────
+AYRSHARE_API_KEY = config('AYRSHARE_API_KEY', default='')
+
 # ── YouTube API ───────────────────────────────────────────────────────────────
 YOUTUBE_CLIENT_ID     = config('YOUTUBE_CLIENT_ID', default='')
 YOUTUBE_CLIENT_SECRET = config('YOUTUBE_CLIENT_SECRET', default='')

@@ -90,6 +90,20 @@ class GridPost(models.Model):
     )
     approved_at = models.DateTimeField(null=True, blank=True)
 
+    # Publishing
+    PUBLISH_STATUS_CHOICES = [
+        ('scheduled',  'Programado'),
+        ('published',  'Publicado'),
+        ('failed',     'Error'),
+        ('cancelled',  'Cancelado'),
+    ]
+    publish_status    = models.CharField(max_length=20, choices=PUBLISH_STATUS_CHOICES, null=True, blank=True)
+    platforms         = models.JSONField(default=list, blank=True, help_text="Plataformas seleccionadas")
+    scheduled_at      = models.DateTimeField(null=True, blank=True)
+    published_at      = models.DateTimeField(null=True, blank=True)
+    ayrshare_post_id  = models.CharField(max_length=200, blank=True)
+    publish_error     = models.TextField(blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
