@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'competitors',
     'customer_avatars',
     'grillas',
+    'blog',
 ]
 
 MIDDLEWARE = [

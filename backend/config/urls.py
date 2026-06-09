@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/competitors/', include('competitors.urls')),
     path('api/avatars/', include('customer_avatars.urls')),
     path('api/grillas/', include('grillas.urls')),
+    path('api/blog/', include('blog.urls')),
 ]
 
 if settings.DEBUG:

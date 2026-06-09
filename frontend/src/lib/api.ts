@@ -1008,3 +1008,68 @@ export const grillasApi = {
     return apiJSON<GridPost[]>(`/api/grillas/publishing/queue/${qs}`);
   },
 };
+
+// ── Blog Workflow ─────────────────────────────────────────────────────────────
+
+export type BlogStage = 'idea' | 'redaccion' | 'revision' | 'aprobado' | 'publicado';
+export type BlogPriority = 'alta' | 'media' | 'baja';
+
+export interface BlogPost {
+  id: number;
+  title: string;
+  keyword: string;
+  practice_area: string;
+  practice_area_display: string;
+  stage: BlogStage;
+  stage_display: string;
+  priority: BlogPriority;
+  priority_display: string;
+  assigned_to: number | null;
+  assigned_to_name: string | null;
+  reviewed_by: number | null;
+  reviewed_by_name: string | null;
+  created_by: number | null;
+  created_by_name: string | null;
+  due_date: string | null;
+  word_count_target: number;
+  brief: string;
+  notes: string;
+  webflow_url: string;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type BlogPostInput = Partial<Omit<BlogPost,
+  'id' | 'stage_display' | 'practice_area_display' | 'priority_display' |
+  'assigned_to_name' | 'reviewed_by_name' | 'created_by_name' |
+  'created_by' | 'published_at' | 'created_at' | 'updated_at'
+>>;
+
+export const blogApi = {
+  list(params?: { stage?: BlogStage; practice_area?: string }) {
+    const qs = params ? '?' + new URLSearchParams(params as Record<string, string>).toString() : '';
+    return apiJSON<{ results: BlogPost[]; count: number }>(`/api/blog/posts/${qs}`);
+  },
+  get(id: number) {
+    return apiJSON<BlogPost>(`/api/blog/posts/${id}/`);
+  },
+  create(data: BlogPostInput) {
+    return apiJSON<BlogPost>('/api/blog/posts/', { method: 'POST', body: JSON.stringify(data) });
+  },
+  update(id: number, data: BlogPostInput) {
+    return apiJSON<BlogPost>(`/api/blog/posts/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
+  },
+  remove(id: number) {
+    return apiFetch(`/api/blog/posts/${id}/`, { method: 'DELETE' });
+  },
+  advance(id: number, stage?: BlogStage) {
+    return apiJSON<BlogPost>(`/api/blog/posts/${id}/advance/`, {
+      method: 'POST',
+      body: JSON.stringify(stage ? { stage } : {}),
+    });
+  },
+  back(id: number) {
+    return apiJSON<BlogPost>(`/api/blog/posts/${id}/back/`, { method: 'POST' });
+  },
+};

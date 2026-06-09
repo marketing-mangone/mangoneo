@@ -6,7 +6,9 @@ import { cn } from '@/lib/utils';
 import {
   Globe, Clock, CheckCircle2, XCircle, AlertCircle,
   RefreshCw, Loader2, ChevronRight, Trash2, Zap, Send, RotateCcw, X,
+  PenLine,
 } from 'lucide-react';
+import { BlogWorkflow } from '@/components/modules/blog/BlogWorkflow';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -319,7 +321,10 @@ const FILTER_STATUSES: { value: PublishStatus | 'all'; label: string }[] = [
   { value: 'cancelled', label: 'Cancelados' },
 ];
 
+type Tab = 'redes' | 'blog';
+
 export default function PublicacionesPage() {
+  const [tab, setTab]             = useState<Tab>('redes');
   const [posts, setPosts]         = useState<GridPost[]>([]);
   const [loading, setLoading]     = useState(true);
   const [filter, setFilter]       = useState<PublishStatus | 'all'>('all');
@@ -360,30 +365,58 @@ export default function PublicacionesPage() {
   const filtered = filter === 'all' ? posts : posts.filter(p => p.publish_status === filter);
 
   return (
-    <div className="p-8 max-w-4xl mx-auto space-y-8">
+    <div className="p-8 max-w-5xl mx-auto space-y-8">
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
-              <Globe className="w-5 h-5 text-[var(--t-f79c31)]" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-[var(--t-0c2054)]">Publicaciones</h1>
-              <p className="text-sm text-[var(--t-9ca3af)]">Cola de publicación en redes sociales via Ayrshare</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
+            <Globe className="w-5 h-5 text-[var(--t-f79c31)]" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-[var(--t-0c2054)]">Publicaciones</h1>
+            <p className="text-sm text-[var(--t-9ca3af)]">Redes sociales y workflow de blog</p>
           </div>
         </div>
-        <button
-          onClick={() => load(true)}
-          disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-sm font-medium text-[var(--t-374151)] hover:bg-[var(--s-f9fafb)] transition-all disabled:opacity-50"
-        >
-          <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
-          Actualizar
-        </button>
+        {tab === 'redes' && (
+          <button
+            onClick={() => load(true)}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-sm font-medium text-[var(--t-374151)] hover:bg-[var(--s-f9fafb)] transition-all disabled:opacity-50"
+          >
+            <RefreshCw className={cn('w-4 h-4', refreshing && 'animate-spin')} />
+            Actualizar
+          </button>
+        )}
       </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 p-1 bg-[var(--surface)] rounded-xl border border-[var(--s-e5e7eb)] shadow-sm w-fit">
+        {([
+          { key: 'redes', label: 'Redes Sociales', icon: Globe },
+          { key: 'blog',  label: 'Blog',            icon: PenLine },
+        ] as { key: Tab; label: string; icon: React.ElementType }[]).map(t => (
+          <button
+            key={t.key}
+            onClick={() => setTab(t.key)}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all',
+              tab === t.key
+                ? 'bg-[var(--s-0c2054)] text-white shadow-sm'
+                : 'text-[var(--t-6b7280)] hover:text-[var(--t-374151)]'
+            )}
+          >
+            <t.icon className="w-4 h-4" />
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Blog tab */}
+      {tab === 'blog' && <BlogWorkflow />}
+
+      {/* Redes tab wrapper — keeps state alive when switching tabs */}
+      <div className={tab === 'redes' ? '' : 'hidden'}>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
@@ -475,6 +508,7 @@ export default function PublicacionesPage() {
           ))}
         </div>
       )}
+      </div>{/* end redes wrapper */}
     </div>
   );
 }
