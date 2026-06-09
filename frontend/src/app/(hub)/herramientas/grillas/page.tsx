@@ -12,6 +12,7 @@ import {
   ImageIcon, Film, LayoutGrid, Loader2, Trash2, CheckCircle,
   X, ChevronRight, ArrowRight, Calendar, FileText, Zap,
   MessageCircle, History, ThumbsUp, Send, RotateCcw,
+  Download, CalendarPlus, Printer, Eye, ChevronDown,
 } from 'lucide-react';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -111,11 +112,386 @@ function getPost(posts: GridPost[], day: number, slot: typeof SLOTS[number]) {
   return posts.find(p => p.day_of_week === day && p.slot === slot) ?? null;
 }
 
+// ── Export helpers ────────────────────────────────────────────────────────────
+
+function weekDateForDay(weekStart: string, dayOfWeek: number): string {
+  const d = new Date(weekStart + 'T00:00:00');
+  d.setDate(d.getDate() + dayOfWeek);
+  return d.toISOString().split('T')[0];
+}
+
+function exportCSV(grid: ContentGrid) {
+  const SLOT_LABEL: Record<string, string> = { carousel: 'Carrusel/Post', foto: 'Foto', reel: 'Reel' };
+  const CHANNEL: Record<string, string>    = { carousel: 'IG + FB', foto: 'IG + FB', reel: 'IG + TikTok' };
+
+  const header = ['Día', 'Fecha', 'Slot', 'Canal', 'Titular / Headline', 'Caption', 'Hashtags', 'Notas visuales'];
+  const rows = [...grid.posts]
+    .sort((a, b) => a.day_of_week - b.day_of_week || a.slot.localeCompare(b.slot))
+    .map(p => {
+      const notes =
+        p.slot === 'carousel' ? (p.slide_titles?.join(' | ') ?? '') :
+        p.slot === 'reel'     ? (p.script_points?.slice(0, 2).join(' | ') ?? '') :
+        p.photo_suggestion ?? '';
+      return [
+        DAYS[p.day_of_week],
+        weekDateForDay(grid.week_start, p.day_of_week),
+        SLOT_LABEL[p.slot] ?? p.slot,
+        CHANNEL[p.slot] ?? '',
+        p.slot === 'carousel' ? p.headline : p.slot === 'reel' ? p.video_title : p.photo_suggestion,
+        p.caption,
+        p.hashtags,
+        notes,
+      ].map(v => `"${(v ?? '').replace(/"/g, '""')}"`);
+    });
+
+  const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `grilla_${grid.tema}_${grid.week_start}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function postPreview(post: GridPost): string {
   if (post.slot === 'carousel') return post.headline || post.caption?.split('\n')[0] || '';
   if (post.slot === 'foto')     return post.photo_suggestion || post.caption?.split('\n')[0] || '';
   if (post.slot === 'reel')     return post.video_title || post.caption?.split('\n')[0] || '';
   return post.caption?.split('\n')[0] || '';
+}
+
+// ── BriefModal ────────────────────────────────────────────────────────────────
+
+function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void }) {
+  const handlePrint = () => window.print();
+
+  return (
+    <>
+      <style>{`
+        @media print {
+          body > *:not(#brief-modal) { display: none !important; }
+          #brief-modal { position: static !important; }
+          .no-print { display: none !important; }
+          .brief-page { page-break-after: always; }
+        }
+      `}</style>
+
+      <div className="fixed inset-0 z-50 flex flex-col bg-white overflow-y-auto" id="brief-modal">
+        {/* Toolbar — hidden on print */}
+        <div className="no-print sticky top-0 z-10 flex items-center justify-between bg-[#0C2054] px-6 py-3">
+          <div className="flex items-center gap-3">
+            <div className="w-7 h-7 rounded-lg bg-[#F79C31] flex items-center justify-center">
+              <FileText size={14} className="text-[#0C2054]" />
+            </div>
+            <div>
+              <p className="text-white font-bold text-sm">Brief de Diseño — {grid.tema_display}</p>
+              <p className="text-white/50 text-xs">{formatWeekRange(grid.week_start)}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-1.5 text-xs font-semibold bg-[#F79C31] text-[#0C2054] px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors"
+            >
+              <Printer size={13} /> Imprimir / PDF
+            </button>
+            <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors">
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        {/* Brief content */}
+        <div className="max-w-4xl mx-auto px-8 py-8 w-full space-y-10">
+          {/* Cover */}
+          <div className="text-center pb-8 border-b border-[#e8eaf0]">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#F79C31] mb-2">Brief de Diseño · Mangone Law Firm</p>
+            <h1 className="text-3xl font-bold text-[#0C2054] mb-1">{grid.tema_display}</h1>
+            <p className="text-[#8888a8]">{formatWeekRange(grid.week_start)}</p>
+            <div className="flex justify-center gap-6 mt-6">
+              {SLOTS.map(slot => {
+                const cfg = SLOT_CONFIG[slot];
+                const count = grid.posts.filter(p => p.slot === slot).length;
+                return (
+                  <div key={slot} className="text-center">
+                    <p className="text-2xl font-bold text-[#0C2054]">{count}</p>
+                    <div className="flex items-center gap-1.5 justify-center mt-1">
+                      <div className={`w-2 h-2 rounded-full ${cfg.dot}`} />
+                      <p className="text-xs text-[#8888a8]">{cfg.label}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* One section per day */}
+          {DAYS.map((dayName, dayIdx) => {
+            const dayPosts = SLOTS.map(slot => getPost(grid.posts, dayIdx, slot)).filter(Boolean) as GridPost[];
+            if (dayPosts.length === 0) return null;
+            const date = weekDateForDay(grid.week_start, dayIdx);
+            return (
+              <div key={dayIdx} className="brief-page">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-10 h-10 rounded-xl bg-[#0C2054] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                    {dayIdx + 1}
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-[#0C2054]">{dayName}</h2>
+                    <p className="text-xs text-[#8888a8]">{new Date(date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {dayPosts.map(post => {
+                    const cfg = SLOT_CONFIG[post.slot];
+                    return (
+                      <div key={post.id} className={`rounded-xl border ${cfg.border} overflow-hidden`}>
+                        <div className={`flex items-center gap-2 px-4 py-2.5 ${cfg.header}`}>
+                          <div className={`w-5 h-5 rounded flex items-center justify-center ${cfg.badge}`}>
+                            <cfg.Icon size={11} />
+                          </div>
+                          <span className={`text-xs font-bold ${cfg.badge} px-2 py-0.5 rounded-full`}>{cfg.label}</span>
+                        </div>
+
+                        <div className="px-5 py-4 grid grid-cols-2 gap-6">
+                          {/* Left: design specs */}
+                          <div className="space-y-3">
+                            {post.slot === 'carousel' && (
+                              <>
+                                {post.headline && (
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Headline para Sara</p>
+                                    <p className="text-sm font-semibold text-[#0C2054] bg-[#f0f2f8] rounded-lg px-3 py-2">{post.headline}</p>
+                                  </div>
+                                )}
+                                {post.slide_titles?.length > 0 && (
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Slides ({post.slide_titles.length})</p>
+                                    <div className="space-y-1">
+                                      {post.slide_titles.map((t, i) => (
+                                        <div key={i} className="flex items-start gap-2">
+                                          <span className="text-[10px] font-mono text-[#8888a8] w-4 mt-0.5">{i + 1}.</span>
+                                          <p className="text-xs text-[#1a1a2e]">{t}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            {post.slot === 'foto' && post.photo_suggestion && (
+                              <div>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Sugerencia de foto</p>
+                                <p className="text-sm text-[#1a1a2e] bg-[#faf0ff] rounded-lg px-3 py-2">{post.photo_suggestion}</p>
+                              </div>
+                            )}
+                            {post.slot === 'reel' && (
+                              <>
+                                {post.video_title && (
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Título en pantalla</p>
+                                    <p className="text-sm font-semibold text-[#1a1a2e] bg-[#fff7ed] rounded-lg px-3 py-2">{post.video_title}</p>
+                                  </div>
+                                )}
+                                {post.script_points?.length > 0 && (
+                                  <div>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Guión para Gloriana</p>
+                                    <div className="space-y-1.5">
+                                      {post.script_points.map((s, i) => (
+                                        <div key={i} className="flex items-start gap-2">
+                                          <span className="text-[10px] font-mono text-[#8888a8] w-4 mt-0.5">{i + 1}.</span>
+                                          <p className="text-xs text-[#1a1a2e] leading-relaxed">{s}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
+
+                          {/* Right: caption */}
+                          <div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Caption</p>
+                            <p className="text-xs text-[#1a1a2e] leading-relaxed whitespace-pre-wrap bg-[#f7f8fc] rounded-lg px-3 py-2 border border-[#e8eaf0]">
+                              {post.caption || <span className="italic text-[#c0c0d0]">Sin caption</span>}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── FeedPreview ───────────────────────────────────────────────────────────────
+
+function FeedPreview({ posts }: { posts: GridPost[] }) {
+  // Show posts in publication order: Mon→Sun, within each day: carousel→foto→reel
+  const ordered = [...posts].sort((a, b) =>
+    a.day_of_week !== b.day_of_week
+      ? a.day_of_week - b.day_of_week
+      : SLOTS.indexOf(a.slot as typeof SLOTS[number]) - SLOTS.indexOf(b.slot as typeof SLOTS[number])
+  );
+
+  const SLOT_BG: Record<string, string> = {
+    carousel: 'from-blue-100 to-blue-50 border-blue-200',
+    foto:     'from-purple-100 to-purple-50 border-purple-200',
+    reel:     'from-orange-100 to-orange-50 border-orange-200',
+  };
+
+  return (
+    <div>
+      <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-1.5">
+        {ordered.map((post, i) => {
+          const cfg = SLOT_CONFIG[post.slot];
+          const preview = postPreview(post);
+          const day = DAYS_SHORT[post.day_of_week];
+          return (
+            <div
+              key={post.id}
+              className={`aspect-square rounded-lg border bg-gradient-to-br ${SLOT_BG[post.slot]} flex flex-col p-2 relative overflow-hidden group`}
+            >
+              {/* Day badge */}
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[8px] font-bold text-[#8888a8]">{day}</span>
+                <div className={`w-3.5 h-3.5 rounded flex items-center justify-center ${cfg.badge}`}>
+                  <cfg.Icon size={7} />
+                </div>
+              </div>
+              {/* Preview text */}
+              <p className="text-[9px] leading-tight text-[#1a1a2e] line-clamp-4 flex-1">
+                {preview || <span className="italic text-[#c0c0d0]">vacío</span>}
+              </p>
+              {/* Post number */}
+              <p className="text-[7px] text-[#c0c0d0] mt-1 font-mono text-right">#{i + 1}</p>
+              {/* Approved overlay */}
+              {post.approved && (
+                <div className="absolute top-1 left-1 w-3 h-3 bg-emerald-500 rounded-full flex items-center justify-center">
+                  <Check size={7} className="text-white" strokeWidth={3} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <p className="text-[10px] text-[#8888a8] mt-2">
+        Orden de publicación: Lun → Dom · 3 posts/día · {posts.length} total
+      </p>
+    </div>
+  );
+}
+
+// ── ExportMenu ────────────────────────────────────────────────────────────────
+
+function ExportMenu({ grid, onCalendarPush }: {
+  grid: ContentGrid;
+  onCalendarPush: () => Promise<void>;
+}) {
+  const [open, setOpen]             = useState(false);
+  const [pushing, setPushing]       = useState(false);
+  const [pushed, setPushed]         = useState(false);
+  const [showBrief, setShowBrief]   = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const handleCalendar = async () => {
+    setOpen(false);
+    setPushing(true);
+    try {
+      await onCalendarPush();
+      setPushed(true);
+      setTimeout(() => setPushed(false), 3000);
+    } finally { setPushing(false); }
+  };
+
+  const handleCSV = () => { setOpen(false); exportCSV(grid); };
+  const handleBrief = () => { setOpen(false); setShowBrief(true); };
+
+  return (
+    <>
+      {showBrief && <BriefModal grid={grid} onClose={() => setShowBrief(false)} />}
+
+      <div className="relative" ref={menuRef}>
+        <button
+          onClick={() => setOpen(o => !o)}
+          className={cn(
+            'flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all',
+            pushed
+              ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
+              : 'bg-white border-[#e8eaf0] text-[#4a4a6a] hover:border-[#0C2054]/30 hover:text-[#0C2054]'
+          )}
+        >
+          {pushing ? <Loader2 size={12} className="animate-spin" /> : pushed ? <Check size={12} /> : <Download size={12} />}
+          {pushed ? '¡Enviado al calendario!' : 'Exportar'}
+          {!pushing && !pushed && <ChevronDown size={11} className={cn('transition-transform', open && 'rotate-180')} />}
+        </button>
+
+        {open && (
+          <div className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-[#e8eaf0] rounded-xl shadow-lg overflow-hidden z-30">
+            <button
+              onClick={handleCalendar}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[#f7f8fc] transition-colors"
+            >
+              <div className="w-7 h-7 rounded-lg bg-[#0C2054]/10 flex items-center justify-center flex-shrink-0">
+                <CalendarPlus size={13} className="text-[#0C2054]" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#1a1a2e]">Enviar al Calendario</p>
+                <p className="text-[10px] text-[#8888a8]">Crea 21 eventos programados</p>
+              </div>
+            </button>
+
+            <div className="h-px bg-[#f0f0f0]" />
+
+            <button
+              onClick={handleCSV}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[#f7f8fc] transition-colors"
+            >
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+                <Download size={13} className="text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#1a1a2e]">Descargar CSV</p>
+                <p className="text-[10px] text-[#8888a8]">Para Meta Business Suite</p>
+              </div>
+            </button>
+
+            <div className="h-px bg-[#f0f0f0]" />
+
+            <button
+              onClick={handleBrief}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[#f7f8fc] transition-colors"
+            >
+              <div className="w-7 h-7 rounded-lg bg-[#F79C31]/10 flex items-center justify-center flex-shrink-0">
+                <Printer size={13} className="text-[#F79C31]" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#1a1a2e]">Brief para Sara</p>
+                <p className="text-[10px] text-[#8888a8]">Vista imprimible de diseño</p>
+              </div>
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
 }
 
 // ── CopyButton ────────────────────────────────────────────────────────────────
@@ -627,17 +1003,19 @@ function WeeklyGrid({ posts, onSelectPost }: {
 
 // ── GridDetail ────────────────────────────────────────────────────────────────
 
-function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, onDelete }: {
+function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, onCalendarPush, onDelete }: {
   grid: ContentGrid;
   onBack: () => void;
   onStatusChange: (s: string) => Promise<void>;
   onPostSave: (id: number, data: Partial<GridPost>) => Promise<void>;
   onPostApprove: (id: number) => Promise<void>;
+  onCalendarPush: () => Promise<void>;
   onDelete: () => Promise<void>;
 }) {
   const [selectedPost, setSelectedPost] = useState<GridPost | null>(null);
   const [statusLoading, setStatusLoading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [showFeed, setShowFeed]           = useState(false);
   const statusCfg = STATUS_CONFIG[grid.status];
   const hasPosts   = grid.posts.length > 0;
   const total      = grid.posts.length;
@@ -705,6 +1083,8 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
             </Button>
           )}
 
+          <ExportMenu grid={grid} onCalendarPush={onCalendarPush} />
+
           {!deleteConfirm ? (
             <button onClick={() => setDeleteConfirm(true)} className="p-1.5 rounded-lg text-[#8888a8] hover:text-red-500 hover:bg-red-50 transition-colors">
               <Trash2 size={15} />
@@ -748,6 +1128,30 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
           </div>
 
           <WeeklyGrid posts={grid.posts} onSelectPost={setSelectedPost} />
+
+          {/* Feed preview toggle */}
+          <div className="bg-white rounded-2xl border border-[#e8eaf0] overflow-hidden">
+            <button
+              onClick={() => setShowFeed(f => !f)}
+              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#f7f8fc] transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-[#f0f2f8] flex items-center justify-center">
+                  <Eye size={13} className="text-[#0C2054]" />
+                </div>
+                <p className="text-sm font-bold text-[#1a1a2e]">Vista previa del feed</p>
+                <span className="text-[10px] text-[#8888a8] bg-[#f0f0f0] px-2 py-0.5 rounded-full">21 posts en orden</span>
+              </div>
+              <ChevronDown size={14} className={cn('text-[#8888a8] transition-transform', showFeed && 'rotate-180')} />
+            </button>
+            {showFeed && (
+              <div className="px-5 pb-5 border-t border-[#f0f0f0]">
+                <div className="pt-4">
+                  <FeedPreview posts={grid.posts} />
+                </div>
+              </div>
+            )}
+          </div>
         </>
       )}
 
@@ -1041,6 +1445,11 @@ export default function GrillasPage() {
     await refreshGrid();
   };
 
+  const handleCalendarPush = async () => {
+    if (!selectedGrid) return;
+    await grillasApi.toCalendar(selectedGrid.id);
+  };
+
   const handleDelete = async () => {
     if (!selectedGrid) return;
     await grillasApi.delete(selectedGrid.id);
@@ -1059,6 +1468,7 @@ export default function GrillasPage() {
           onStatusChange={handleStatusChange}
           onPostSave={handlePostSave}
           onPostApprove={handlePostApprove}
+          onCalendarPush={handleCalendarPush}
           onDelete={handleDelete}
         />
       </div>

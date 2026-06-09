@@ -35,6 +35,49 @@ class ContentGridViewSet(viewsets.ModelViewSet):
         serializer.save(created_by=self.request.user)
 
     @action(detail=True, methods=['post'])
+    def to_calendar(self, request, pk=None):
+        """Bulk-create CalendarEvents from every post in this grid."""
+        from datetime import timedelta
+        from tasks_app.models import CalendarEvent
+
+        grid = self.get_object()
+        if not grid.posts.exists():
+            return Response({'error': 'La grilla no tiene posts generados.'}, status=400)
+
+        SLOT_LABEL = {'carousel': 'Carrusel', 'foto': 'Foto', 'reel': 'Reel'}
+        SLOT_CHANNEL = {'carousel': 'instagram', 'foto': 'instagram', 'reel': 'instagram'}
+
+        # Remove previously pushed events for this grid (idempotent re-push)
+        marker = f'[grilla:{grid.id}]'
+        CalendarEvent.objects.filter(description__startswith=marker).delete()
+
+        events = []
+        for post in grid.posts.select_related().order_by('day_of_week', 'slot'):
+            post_date = grid.week_start + timedelta(days=post.day_of_week)
+
+            if post.slot == 'carousel':
+                preview = (post.headline or post.caption or '').split('\n')[0][:80]
+            elif post.slot == 'reel':
+                preview = (post.video_title or post.caption or '').split('\n')[0][:80]
+            else:
+                preview = (post.photo_suggestion or post.caption or '').split('\n')[0][:80]
+
+            title = f"[{SLOT_LABEL[post.slot]}] {preview}" if preview else f"[{SLOT_LABEL[post.slot]}] {grid.get_tema_display()}"
+
+            events.append(CalendarEvent(
+                title=title[:255],
+                type='content',
+                date=post_date,
+                channel=SLOT_CHANNEL[post.slot],
+                status='scheduled',
+                description=f"{marker}\n{post.caption}",
+                created_by=request.user,
+            ))
+
+        CalendarEvent.objects.bulk_create(events)
+        return Response({'created': len(events), 'week': str(grid.week_start), 'tema': grid.get_tema_display()})
+
+    @action(detail=True, methods=['post'])
     def generate(self, request, pk=None):
         grid = self.get_object()
         uscis_news = None

@@ -933,4 +933,6 @@ export const grillasApi = {
     }),
   getHistory: (postId: number) =>
     apiJSON<GridPostVersion[]>(`/api/grillas/posts/${postId}/history/`),
+  toCalendar: (gridId: number) =>
+    apiJSON<{ created: number; week: string; tema: string }>(`/api/grillas/${gridId}/to_calendar/`, { method: 'POST' }),
 };
