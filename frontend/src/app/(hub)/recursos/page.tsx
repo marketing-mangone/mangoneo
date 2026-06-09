@@ -150,15 +150,15 @@ function AddIdeaModal({ open, onClose, onCreate }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f0f0f0]">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--s-f0f0f0)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F79C31]/10 flex items-center justify-center">
-              <Lightbulb className="w-5 h-5 text-[#F79C31]" />
+              <Lightbulb className="w-5 h-5 text-[var(--t-f79c31)]" />
             </div>
-            <h3 className="font-bold text-[#1a1a2e]">Nueva idea</h3>
+            <h3 className="font-bold text-[var(--t-1a1a2e)]">Nueva idea</h3>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#f7f8fc] text-[#8888a8] transition-colors">
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--s-f7f8fc)] text-[var(--t-8888a8)] transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -172,35 +172,35 @@ function AddIdeaModal({ open, onClose, onCreate }: {
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Título <span className="text-red-400">*</span></label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Título <span className="text-red-400">*</span></label>
             <input
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="¿Cuál es la idea?"
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Descripción <span className="text-[#8888a8] font-normal">(opcional)</span></label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Descripción <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span></label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="Desarrolla la idea con más detalle..."
               rows={3}
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors resize-none"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors resize-none"
             />
           </div>
 
           {/* Author + Category */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Autor</label>
+              <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Autor</label>
               <select
                 value={author}
                 onChange={e => setAuthor(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] bg-white transition-colors"
+                className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] bg-[var(--surface)] transition-colors"
               >
                 {TEAM_MEMBERS.map(m => (
                   <option key={m.name} value={m.name}>{m.name} — {m.role}</option>
@@ -208,11 +208,11 @@ function AddIdeaModal({ open, onClose, onCreate }: {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Categoría</label>
+              <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Categoría</label>
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] bg-white transition-colors"
+                className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] bg-[var(--surface)] transition-colors"
               >
                 {BRAINSTORM_CATEGORIES.map(c => (
                   <option key={c} value={c}>{c}</option>
@@ -223,7 +223,7 @@ function AddIdeaModal({ open, onClose, onCreate }: {
 
           {/* Color */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Color de nota</label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Color de nota</label>
             <div className="flex gap-2">
               {BRAINSTORM_COLORS.map((c, i) => (
                 <button
@@ -238,10 +238,10 @@ function AddIdeaModal({ open, onClose, onCreate }: {
           </div>
 
           <div className="flex gap-3 pt-1">
-            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg hover:bg-[#f7f8fc] transition-colors">
+            <button type="button" onClick={onClose} className="flex-1 px-4 py-2.5 text-sm font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg hover:bg-[var(--s-f7f8fc)] transition-colors">
               Cancelar
             </button>
-            <button type="submit" className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[#F79C31] rounded-lg hover:bg-[#e08a20] transition-colors shadow-sm">
+            <button type="submit" className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-[var(--s-f79c31)] rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm">
               <Plus className="w-4 h-4" /> Agregar idea
             </button>
           </div>
@@ -393,49 +393,49 @@ function AddLinkModal({ onClose, onCreate }: {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-md shadow-2xl p-7 space-y-5"
+        className="bg-[var(--surface)] rounded-2xl w-full max-w-md shadow-2xl p-7 space-y-5"
         style={{ boxShadow: '0 32px 80px rgba(12,32,84,0.18)' }}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0C2054] flex items-center justify-center">
-              <Link2 className="w-4 h-4 text-[#F79C31]" />
+            <div className="w-9 h-9 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
+              <Link2 className="w-4 h-4 text-[var(--t-f79c31)]" />
             </div>
-            <h3 className="font-bold text-[#0C2054]">Agregar link</h3>
+            <h3 className="font-bold text-[var(--t-0c2054)]">Agregar link</h3>
           </div>
-          <button onClick={onClose} className="text-[#9ca3af] hover:text-[#374151]"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-[var(--t-9ca3af)] hover:text-[var(--t-374151)]"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-1.5">Nombre</label>
+            <label className="block text-xs font-semibold text-[var(--t-6b7280)] uppercase tracking-widest mb-1.5">Nombre</label>
             <input
               autoFocus
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder="ej. Canva, Buffer, Notion…"
-              className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] placeholder-[#c4c8d4] outline-none focus:border-[#0C2054] focus:bg-white focus:ring-2 focus:ring-[#0C2054]/10 transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--s-f9fafb)] text-sm text-[var(--t-111827)] placeholder-[var(--t-c4c8d4)] outline-none focus:border-[var(--s-0c2054)] focus:bg-[var(--surface)] focus:ring-2 focus:ring-[#0C2054]/10 transition-all"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-1.5">URL</label>
+            <label className="block text-xs font-semibold text-[var(--t-6b7280)] uppercase tracking-widest mb-1.5">URL</label>
             <input
               value={url}
               onChange={e => setUrl(e.target.value)}
               placeholder="https://…"
-              className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] placeholder-[#c4c8d4] outline-none focus:border-[#0C2054] focus:bg-white focus:ring-2 focus:ring-[#0C2054]/10 transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--s-f9fafb)] text-sm text-[var(--t-111827)] placeholder-[var(--t-c4c8d4)] outline-none focus:border-[var(--s-0c2054)] focus:bg-[var(--surface)] focus:ring-2 focus:ring-[#0C2054]/10 transition-all"
               onKeyDown={e => e.key === 'Enter' && handle()}
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#6b7280] uppercase tracking-widest mb-1.5">Categoría</label>
+            <label className="block text-xs font-semibold text-[var(--t-6b7280)] uppercase tracking-widest mb-1.5">Categoría</label>
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] outline-none focus:border-[#0C2054] focus:bg-white transition-all"
+              className="w-full px-4 py-3 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--s-f9fafb)] text-sm text-[var(--t-111827)] outline-none focus:border-[var(--s-0c2054)] focus:bg-[var(--surface)] transition-all"
             >
               {LINK_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -447,12 +447,12 @@ function AddLinkModal({ onClose, onCreate }: {
         )}
 
         <div className="flex gap-3 pt-1">
-          <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-[#e5e7eb] text-sm text-[#6b7280] font-medium hover:bg-[#f9fafb] transition-colors">
+          <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-[var(--s-e5e7eb)] text-sm text-[var(--t-6b7280)] font-medium hover:bg-[var(--s-f9fafb)] transition-colors">
             Cancelar
           </button>
           <button
             onClick={handle}
-            className="flex-1 py-3 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-xl bg-[var(--s-0c2054)] text-white text-sm font-semibold hover:bg-[var(--s-0f2960)] transition-all shadow-md flex items-center justify-center gap-2"
           >
             <Link2 className="w-4 h-4" /> Guardar link
           </button>
@@ -468,20 +468,20 @@ function LinkCard({ link, onDelete }: { link: ResourceLink; onDelete: () => void
   try { domain = new URL(link.url).hostname.replace('www.', ''); } catch { domain = link.url; }
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e8e8f0] p-5 hover:border-[#0C2054]/20 hover:shadow-md transition-all group flex flex-col gap-3">
+    <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8e8f0)] p-5 hover:border-[#0C2054]/20 hover:shadow-md transition-all group flex flex-col gap-3">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-xl bg-[#f0f2f8] flex items-center justify-center flex-shrink-0">
-            <Globe className="w-4 h-4 text-[#0C2054]" />
+          <div className="w-9 h-9 rounded-xl bg-[var(--s-f0f2f8)] flex items-center justify-center flex-shrink-0">
+            <Globe className="w-4 h-4 text-[var(--t-0c2054)]" />
           </div>
           <div className="min-w-0">
-            <p className="font-semibold text-[#0C2054] text-sm truncate">{link.name}</p>
-            <p className="text-xs text-[#9ca3af] truncate">{domain}</p>
+            <p className="font-semibold text-[var(--t-0c2054)] text-sm truncate">{link.name}</p>
+            <p className="text-xs text-[var(--t-9ca3af)] truncate">{domain}</p>
           </div>
         </div>
         <button
           onClick={onDelete}
-          className="opacity-0 group-hover:opacity-100 text-[#c4c8d4] hover:text-red-500 transition-all flex-shrink-0 p-1"
+          className="opacity-0 group-hover:opacity-100 text-[var(--t-c4c8d4)] hover:text-red-500 transition-all flex-shrink-0 p-1"
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -495,7 +495,7 @@ function LinkCard({ link, onDelete }: { link: ResourceLink; onDelete: () => void
         href={link.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#f0f2f8] hover:bg-[#0C2054] text-[#0C2054] hover:text-white text-xs font-semibold transition-all"
+        className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--s-f0f2f8)] hover:bg-[var(--s-0c2054)] text-[var(--t-0c2054)] hover:text-white text-xs font-semibold transition-all"
       >
         <ExternalLink className="w-3.5 h-3.5" /> Abrir enlace
       </a>
@@ -531,17 +531,17 @@ function LinksTab() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0C2054] flex items-center justify-center">
-            <Link2 className="w-5 h-5 text-[#F79C31]" />
+          <div className="w-10 h-10 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
+            <Link2 className="w-5 h-5 text-[var(--t-f79c31)]" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-[#0C2054]">Links de Recursos</h2>
-            <p className="text-sm text-[#9ca3af]">{links.length} enlace{links.length !== 1 ? 's' : ''} guardado{links.length !== 1 ? 's' : ''}</p>
+            <h2 className="text-lg font-bold text-[var(--t-0c2054)]">Links de Recursos</h2>
+            <p className="text-sm text-[var(--t-9ca3af)]">{links.length} enlace{links.length !== 1 ? 's' : ''} guardado{links.length !== 1 ? 's' : ''}</p>
           </div>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--s-0c2054)] text-white text-sm font-semibold hover:bg-[var(--s-0f2960)] transition-all shadow-md"
         >
           <Plus className="w-4 h-4" /> Agregar link
         </button>
@@ -550,12 +550,12 @@ function LinksTab() {
       {/* Search + Category filter */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9ca3af]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--t-9ca3af)]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar links…"
-            className="pl-9 pr-4 py-2.5 rounded-xl border border-[#e5e7eb] bg-white text-sm text-[#111827] placeholder-[#9ca3af] outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/10 transition-all w-56"
+            className="pl-9 pr-4 py-2.5 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-sm text-[var(--t-111827)] placeholder-[var(--t-9ca3af)] outline-none focus:border-[var(--s-0c2054)] focus:ring-2 focus:ring-[#0C2054]/10 transition-all w-56"
           />
         </div>
         <div className="flex gap-1.5 flex-wrap">
@@ -565,8 +565,8 @@ function LinksTab() {
               onClick={() => setCatFilter(cat)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border ${
                 catFilter === cat
-                  ? 'bg-[#0C2054] text-white border-[#0C2054] shadow-sm'
-                  : 'bg-white text-[#6b7280] border-[#e5e7eb] hover:border-[#d1d5db]'
+                  ? 'bg-[var(--s-0c2054)] text-white border-[var(--s-0c2054)] shadow-sm'
+                  : 'bg-[var(--surface)] text-[var(--t-6b7280)] border-[var(--s-e5e7eb)] hover:border-[var(--s-d1d5db)]'
               }`}
             >
               {cat}
@@ -577,20 +577,20 @@ function LinksTab() {
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-dashed border-[#e5e7eb]">
-          <div className="w-14 h-14 rounded-2xl bg-[#f0f2f8] flex items-center justify-center mx-auto mb-4">
-            <Link2 className="w-6 h-6 text-[#9ca3af]" />
+        <div className="text-center py-16 bg-[var(--surface)] rounded-2xl border border-dashed border-[var(--s-e5e7eb)]">
+          <div className="w-14 h-14 rounded-2xl bg-[var(--s-f0f2f8)] flex items-center justify-center mx-auto mb-4">
+            <Link2 className="w-6 h-6 text-[var(--t-9ca3af)]" />
           </div>
-          <p className="text-sm font-semibold text-[#374151]">
+          <p className="text-sm font-semibold text-[var(--t-374151)]">
             {links.length === 0 ? 'Aún no hay links guardados' : 'Sin resultados para este filtro'}
           </p>
-          <p className="text-xs text-[#9ca3af] mt-1">
+          <p className="text-xs text-[var(--t-9ca3af)] mt-1">
             {links.length === 0 && 'Haz clic en "Agregar link" para guardar tu primer recurso.'}
           </p>
           {links.length === 0 && (
             <button
               onClick={() => setShowModal(true)}
-              className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md mx-auto"
+              className="mt-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--s-0c2054)] text-white text-sm font-semibold hover:bg-[var(--s-0f2960)] transition-all shadow-md mx-auto"
             >
               <Plus className="w-4 h-4" /> Agregar primer link
             </button>
@@ -659,7 +659,7 @@ function BrainstormingTab() {
       <div className="bg-gradient-to-r from-[#0C2054] to-[#1a3a7a] rounded-xl p-6 relative overflow-hidden">
         <div className="absolute top-[-40px] right-[-40px] w-40 h-40 rounded-full bg-[#F79C31]/10" />
         <div className="absolute bottom-[-30px] left-[200px] w-28 h-28 rounded-full bg-white/5" />
-        <p className="text-[#F79C31] text-xs font-semibold uppercase tracking-widest mb-2">Board colaborativo</p>
+        <p className="text-[var(--t-f79c31)] text-xs font-semibold uppercase tracking-widest mb-2">Board colaborativo</p>
         <h2 className="text-white text-2xl font-bold mb-1.5">Brainstorming</h2>
         <p className="text-white/60 text-sm max-w-xl">
           Espacio para que el equipo capture y comparta ideas libremente. Agrega, vota y filtra ideas de todos los miembros.
@@ -681,7 +681,7 @@ function BrainstormingTab() {
           </div>
           <button
             onClick={() => setAddOpen(true)}
-            className="ml-auto flex items-center gap-2 bg-[#F79C31] text-[#0C2054] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[#e08a20] transition-colors shadow-md"
+            className="ml-auto flex items-center gap-2 bg-[var(--s-f79c31)] text-[var(--t-0c2054)] font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[var(--s-e08a20)] transition-colors shadow-md"
           >
             <Lightbulb className="w-4 h-4" /> Nueva idea
           </button>
@@ -691,8 +691,8 @@ function BrainstormingTab() {
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="flex items-center gap-1.5">
-          <Tag className="w-3.5 h-3.5 text-[#8888a8]" />
-          <span className="text-xs font-semibold text-[#4a4a6a]">Categoría:</span>
+          <Tag className="w-3.5 h-3.5 text-[var(--t-8888a8)]" />
+          <span className="text-xs font-semibold text-[var(--t-4a4a6a)]">Categoría:</span>
         </div>
         <div className="flex gap-1.5 flex-wrap">
           {['Todos', ...BRAINSTORM_CATEGORIES].map(cat => (
@@ -701,8 +701,8 @@ function BrainstormingTab() {
               onClick={() => setFilterCategory(cat)}
               className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                 filterCategory === cat
-                  ? 'bg-[#0C2054] text-white border-[#0C2054]'
-                  : 'bg-white text-[#4a4a6a] border-[#e8e8f0] hover:border-[#d0d0e0]'
+                  ? 'bg-[var(--s-0c2054)] text-white border-[var(--s-0c2054)]'
+                  : 'bg-[var(--surface)] text-[var(--t-4a4a6a)] border-[var(--s-e8e8f0)] hover:border-[var(--s-d0d0e0)]'
               }`}
             >
               {cat}
@@ -710,8 +710,8 @@ function BrainstormingTab() {
           ))}
         </div>
         <div className="ml-4 flex items-center gap-1.5">
-          <Users className="w-3.5 h-3.5 text-[#8888a8]" />
-          <span className="text-xs font-semibold text-[#4a4a6a]">Autor:</span>
+          <Users className="w-3.5 h-3.5 text-[var(--t-8888a8)]" />
+          <span className="text-xs font-semibold text-[var(--t-4a4a6a)]">Autor:</span>
         </div>
         <div className="flex gap-1.5 flex-wrap">
           {['Todos', ...TEAM_MEMBERS.map(m => m.name)].map(name => (
@@ -721,9 +721,9 @@ function BrainstormingTab() {
               className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                 filterAuthor === name
                   ? 'text-white border-transparent'
-                  : 'bg-white text-[#4a4a6a] border-[#e8e8f0] hover:border-[#d0d0e0]'
+                  : 'bg-[var(--surface)] text-[var(--t-4a4a6a)] border-[var(--s-e8e8f0)] hover:border-[var(--s-d0d0e0)]'
               }`}
-              style={filterAuthor === name && name !== 'Todos' ? { background: MEMBER_COLORS[name] ?? '#0C2054', borderColor: 'transparent' } : filterAuthor === name ? { background: '#0C2054' } : {}}
+              style={filterAuthor === name && name !== 'Todos' ? { background: MEMBER_COLORS[name] ?? '#0C2054', borderColor: 'transparent' } : filterAuthor === name ? { background: 'var(--s-0c2054)' } : {}}
             >
               {name}
             </button>
@@ -733,14 +733,14 @@ function BrainstormingTab() {
 
       {/* Board */}
       {!mounted ? null : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#e8eaf0] p-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#FEF3C7] flex items-center justify-center mx-auto mb-4">
-            <Lightbulb className="w-8 h-8 text-[#F79C31]" />
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] p-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--s-fef3c7)] flex items-center justify-center mx-auto mb-4">
+            <Lightbulb className="w-8 h-8 text-[var(--t-f79c31)]" />
           </div>
-          <h3 className="font-bold text-[#0C2054] text-lg mb-2">
+          <h3 className="font-bold text-[var(--t-0c2054)] text-lg mb-2">
             {ideas.length === 0 ? 'El board está vacío' : 'Sin ideas con estos filtros'}
           </h3>
-          <p className="text-[#6b7280] text-sm mb-6 max-w-sm mx-auto">
+          <p className="text-[var(--t-6b7280)] text-sm mb-6 max-w-sm mx-auto">
             {ideas.length === 0
               ? 'Sé el primero en agregar una idea al board del equipo.'
               : 'Prueba cambiando los filtros para ver más ideas.'}
@@ -748,7 +748,7 @@ function BrainstormingTab() {
           {ideas.length === 0 && (
             <button
               onClick={() => setAddOpen(true)}
-              className="inline-flex items-center gap-2 bg-[#F79C31] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#e08a20] transition-all"
+              className="inline-flex items-center gap-2 bg-[var(--s-f79c31)] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--s-e08a20)] transition-all"
             >
               <Plus className="w-4 h-4" /> Agregar primera idea
             </button>
@@ -769,7 +769,7 @@ function BrainstormingTab() {
       )}
 
       {filtered.length > 0 && (
-        <p className="text-xs text-[#8888a8] text-right">
+        <p className="text-xs text-[var(--t-8888a8)] text-right">
           Mostrando {filtered.length} de {ideas.length} idea{ideas.length !== 1 ? 's' : ''}
         </p>
       )}
@@ -807,16 +807,16 @@ function ColorSwatch({ color }: { color: typeof BRAND_COLORS[0] }) {
   };
   return (
     <div
-      className="rounded-xl overflow-hidden border border-[#e8e8f0] hover:shadow-md transition-all cursor-pointer"
+      className="rounded-xl overflow-hidden border border-[var(--s-e8e8f0)] hover:shadow-md transition-all cursor-pointer"
       onClick={copyHex}
     >
       <div className="h-24 w-full" style={{ background: color.hex }} />
-      <div className="p-3 bg-white">
-        <p className="font-bold text-sm text-[#1a1a2e]">{color.name}</p>
-        <p className="text-xs text-[#8888a8] mt-1 font-mono">
+      <div className="p-3 bg-[var(--surface)]">
+        <p className="font-bold text-sm text-[var(--t-1a1a2e)]">{color.name}</p>
+        <p className="text-xs text-[var(--t-8888a8)] mt-1 font-mono">
           {copied ? '¡Copiado!' : color.hex}
         </p>
-        <p className="text-[10px] text-[#8888a8] mt-0.5">RGB: {color.rgb}</p>
+        <p className="text-[10px] text-[var(--t-8888a8)] mt-0.5">RGB: {color.rgb}</p>
       </div>
     </div>
   );
@@ -849,25 +849,25 @@ function DocumentCard({
           {ext}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-[#1a1a2e] leading-tight mb-1 line-clamp-2">
+          <p className="text-sm font-semibold text-[var(--t-1a1a2e)] leading-tight mb-1 line-clamp-2">
             {doc.title}
           </p>
           {doc.description && (
-            <p className="text-xs text-[#8888a8] line-clamp-2 mb-2">{doc.description}</p>
+            <p className="text-xs text-[var(--t-8888a8)] line-clamp-2 mb-2">{doc.description}</p>
           )}
           <div className="flex items-center justify-between mt-2">
             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${sc.color}`}>
               {sc.label}
             </span>
-            <span className="text-[10px] text-[#8888a8]">
+            <span className="text-[10px] text-[var(--t-8888a8)]">
               v{doc.version} · {doc.size_display}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#f0f0f0]">
-        <span className="text-[10px] text-[#8888a8] flex items-center gap-1">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--s-f0f0f0)]">
+        <span className="text-[10px] text-[var(--t-8888a8)] flex items-center gap-1">
           <Clock className="w-3 h-3" />
           {formatRelative(doc.updated_at)}
           {doc.uploaded_by_name && (
@@ -878,21 +878,21 @@ function DocumentCard({
           <button
             onClick={onView}
             title="Ver documento"
-            className="p-1.5 rounded-lg hover:bg-[#f7f8fc] text-[#8888a8] hover:text-[#4a4a6a] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[var(--s-f7f8fc)] text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)] transition-colors"
           >
             <Eye className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onDownload}
             title="Descargar"
-            className="p-1.5 rounded-lg hover:bg-[#fef5e7] text-[#8888a8] hover:text-[#F79C31] transition-colors"
+            className="p-1.5 rounded-lg hover:bg-[var(--s-fef5e7)] text-[var(--t-8888a8)] hover:text-[var(--t-f79c31)] transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onDelete}
             title="Eliminar"
-            className="p-1.5 rounded-lg hover:bg-red-50 text-[#8888a8] hover:text-red-500 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-red-50 text-[var(--t-8888a8)] hover:text-red-500 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -961,21 +961,21 @@ function UploadModal({ onClose, onSuccess }: UploadModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f0f0f0]">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--s-f0f0f0)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F79C31]/10 flex items-center justify-center">
-              <CloudUpload className="w-5 h-5 text-[#F79C31]" />
+              <CloudUpload className="w-5 h-5 text-[var(--t-f79c31)]" />
             </div>
             <div>
-              <h3 className="font-bold text-[#1a1a2e]">Subir documento</h3>
-              <p className="text-xs text-[#8888a8]">PDF, DOCX, PPTX, XLSX, imágenes · máx. 50 MB</p>
+              <h3 className="font-bold text-[var(--t-1a1a2e)]">Subir documento</h3>
+              <p className="text-xs text-[var(--t-8888a8)]">PDF, DOCX, PPTX, XLSX, imágenes · máx. 50 MB</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-[#f7f8fc] text-[#8888a8] transition-colors"
+            className="p-2 rounded-lg hover:bg-[var(--s-f7f8fc)] text-[var(--t-8888a8)] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -990,10 +990,10 @@ function UploadModal({ onClose, onSuccess }: UploadModalProps) {
             onClick={() => inputRef.current?.click()}
             className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all ${
               dragging
-                ? 'border-[#F79C31] bg-[#fef5e7]'
+                ? 'border-[var(--s-f79c31)] bg-[var(--s-fef5e7)]'
                 : file
                 ? 'border-green-300 bg-green-50'
-                : 'border-[#e8e8f0] hover:border-[#F79C31]/50 hover:bg-[#fef5e7]/30'
+                : 'border-[var(--s-e8e8f0)] hover:border-[#F79C31]/50 hover:bg-[#fef5e7]/30'
             }`}
           >
             <input
@@ -1006,23 +1006,23 @@ function UploadModal({ onClose, onSuccess }: UploadModalProps) {
               <div className="flex items-center justify-center gap-3">
                 <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
                 <div className="text-left">
-                  <p className="text-sm font-semibold text-[#1a1a2e]">{file.name}</p>
-                  <p className="text-xs text-[#8888a8]">
+                  <p className="text-sm font-semibold text-[var(--t-1a1a2e)]">{file.name}</p>
+                  <p className="text-xs text-[var(--t-8888a8)]">
                     {(file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); setFile(null); setTitle(''); }}
-                  className="ml-auto p-1 rounded-full hover:bg-red-100 text-[#8888a8] hover:text-red-500"
+                  className="ml-auto p-1 rounded-full hover:bg-red-100 text-[var(--t-8888a8)] hover:text-red-500"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
               <>
-                <Upload className="w-8 h-8 text-[#d0d0e0] mx-auto mb-2" />
-                <p className="text-sm text-[#4a4a6a] font-medium">
-                  Arrastra el archivo aquí o <span className="text-[#F79C31]">selecciona</span>
+                <Upload className="w-8 h-8 text-[var(--t-d0d0e0)] mx-auto mb-2" />
+                <p className="text-sm text-[var(--t-4a4a6a)] font-medium">
+                  Arrastra el archivo aquí o <span className="text-[var(--t-f79c31)]">selecciona</span>
                 </p>
               </>
             )}
@@ -1030,24 +1030,24 @@ function UploadModal({ onClose, onSuccess }: UploadModalProps) {
 
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
               Título <span className="text-red-400">*</span>
             </label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Nombre del documento"
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors"
             />
           </div>
 
           {/* Category */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Categoría</label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Categoría</label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] bg-white transition-colors"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] bg-[var(--surface)] transition-colors"
             >
               {CATEGORIES.filter(c => c.key !== 'all').map(c => (
                 <option key={c.key} value={c.key}>{c.label}</option>
@@ -1057,15 +1057,15 @@ function UploadModal({ onClose, onSuccess }: UploadModalProps) {
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
-              Descripción <span className="text-[#8888a8] font-normal">(opcional)</span>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
+              Descripción <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span>
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Breve descripción del documento..."
               rows={2}
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors resize-none"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors resize-none"
             />
           </div>
 
@@ -1080,14 +1080,14 @@ function UploadModal({ onClose, onSuccess }: UploadModalProps) {
           {/* Progress */}
           {uploading && (
             <div>
-              <div className="flex justify-between text-xs text-[#8888a8] mb-1.5">
+              <div className="flex justify-between text-xs text-[var(--t-8888a8)] mb-1.5">
                 <span>{done ? 'Completado' : 'Subiendo...'}</span>
                 <span>{progress}%</span>
               </div>
-              <div className="h-2 bg-[#f0f0f0] rounded-full overflow-hidden">
+              <div className="h-2 bg-[var(--s-f0f0f0)] rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-300 ${
-                    done ? 'bg-green-500' : 'bg-[#F79C31]'
+                    done ? 'bg-green-500' : 'bg-[var(--s-f79c31)]'
                   }`}
                   style={{ width: `${progress}%` }}
                 />
@@ -1101,14 +1101,14 @@ function UploadModal({ onClose, onSuccess }: UploadModalProps) {
           <button
             onClick={onClose}
             disabled={uploading}
-            className="px-4 py-2 text-sm font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg hover:bg-[#f7f8fc] transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg hover:bg-[var(--s-f7f8fc)] transition-colors disabled:opacity-50"
           >
             Cancelar
           </button>
           <button
             onClick={submit}
             disabled={uploading || !file}
-            className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#F79C31] rounded-lg hover:bg-[#e08a20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[var(--s-f79c31)] rounded-lg hover:bg-[var(--s-e08a20)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             {uploading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -1137,21 +1137,21 @@ function DeleteModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
             <Trash2 className="w-5 h-5 text-red-500" />
           </div>
-          <h3 className="font-bold text-[#1a1a2e]">Eliminar documento</h3>
+          <h3 className="font-bold text-[var(--t-1a1a2e)]">Eliminar documento</h3>
         </div>
-        <p className="text-sm text-[#4a4a6a] mb-1">
+        <p className="text-sm text-[var(--t-4a4a6a)] mb-1">
           ¿Estás seguro de que quieres eliminar <strong>"{doc.title}"</strong>?
         </p>
-        <p className="text-xs text-[#8888a8] mb-6">Esta acción no se puede deshacer.</p>
+        <p className="text-xs text-[var(--t-8888a8)] mb-6">Esta acción no se puede deshacer.</p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg hover:bg-[#f7f8fc] transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg hover:bg-[var(--s-f7f8fc)] transition-colors"
           >
             Cancelar
           </button>
@@ -1266,7 +1266,7 @@ function DemographicsCard({
   ];
 
   return (
-    <div className="rounded-xl p-4 h-full flex flex-col" style={{ background: '#0C2054' }}>
+    <div className="rounded-xl p-4 h-full flex flex-col" style={{ background: 'var(--s-0c2054)' }}>
       <div className="flex items-center gap-2 mb-3">
         <span className="text-base">📊</span>
         <p className="text-xs font-bold uppercase tracking-wide text-white/80">Datos demográficos</p>
@@ -1343,7 +1343,7 @@ function AvatarCanvas({
   return (
     <div className="space-y-4">
       {/* Avatar header */}
-      <div className="bg-white rounded-2xl border border-[#e8eaf0] p-5">
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] p-5">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 border-2"
@@ -1357,26 +1357,26 @@ function AvatarCanvas({
               {editing ? (
                 <div className="space-y-2">
                   <input value={draft.name} onChange={e => updateField('name', e.target.value)}
-                    className="w-full text-lg font-bold text-[#0C2054] border border-[#e5e7eb] rounded-lg px-3 py-1.5 outline-none focus:border-[#0C2054]"
+                    className="w-full text-lg font-bold text-[var(--t-0c2054)] border border-[var(--s-e5e7eb)] rounded-lg px-3 py-1.5 outline-none focus:border-[var(--s-0c2054)]"
                     placeholder="Nombre del avatar..." />
                   <input value={draft.description} onChange={e => updateField('description', e.target.value)}
-                    className="w-full text-sm text-[#6b7280] border border-[#e5e7eb] rounded-lg px-3 py-1.5 outline-none focus:border-[#0C2054]"
+                    className="w-full text-sm text-[var(--t-6b7280)] border border-[var(--s-e5e7eb)] rounded-lg px-3 py-1.5 outline-none focus:border-[var(--s-0c2054)]"
                     placeholder="Descripción breve..." />
                   <input value={draft.quote} onChange={e => updateField('quote', e.target.value)}
-                    className="w-full text-sm italic border border-[#e5e7eb] rounded-lg px-3 py-1.5 outline-none focus:border-[#F79C31]"
+                    className="w-full text-sm italic border border-[var(--s-e5e7eb)] rounded-lg px-3 py-1.5 outline-none focus:border-[var(--s-f79c31)]"
                     placeholder='"Frase que representa al avatar..."' />
                 </div>
               ) : (
                 <>
                   <div className="flex items-center gap-2">
-                    <h3 className="text-xl font-bold text-[#0C2054]">{avatar.name}</h3>
+                    <h3 className="text-xl font-bold text-[var(--t-0c2054)]">{avatar.name}</h3>
                     {avatar.is_primary && (
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F79C31] text-[#0C2054]">PRINCIPAL</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--s-f79c31)] text-[var(--t-0c2054)]">PRINCIPAL</span>
                     )}
                   </div>
-                  {avatar.description && <p className="text-sm text-[#6b7280] mt-0.5">{avatar.description}</p>}
+                  {avatar.description && <p className="text-sm text-[var(--t-6b7280)] mt-0.5">{avatar.description}</p>}
                   {avatar.quote && (
-                    <p className="text-sm italic text-[#374151] mt-1 border-l-2 border-[#F79C31] pl-3">
+                    <p className="text-sm italic text-[var(--t-374151)] mt-1 border-l-2 border-[var(--s-f79c31)] pl-3">
                       "{avatar.quote}"
                     </p>
                   )}
@@ -1388,18 +1388,18 @@ function AvatarCanvas({
           <div className="flex items-center gap-2 flex-shrink-0">
             {!avatar.is_primary && !editing && (
               <button onClick={onSetPrimary}
-                className="text-xs text-[#6b7280] border border-[#e5e7eb] px-3 py-1.5 rounded-lg hover:bg-[#f9fafb] transition-colors">
+                className="text-xs text-[var(--t-6b7280)] border border-[var(--s-e5e7eb)] px-3 py-1.5 rounded-lg hover:bg-[var(--s-f9fafb)] transition-colors">
                 Marcar como principal
               </button>
             )}
             {editing ? (
               <>
                 <button onClick={handleCancel}
-                  className="text-xs text-[#6b7280] border border-[#e5e7eb] px-3 py-1.5 rounded-lg hover:bg-[#f9fafb] transition-colors">
+                  className="text-xs text-[var(--t-6b7280)] border border-[var(--s-e5e7eb)] px-3 py-1.5 rounded-lg hover:bg-[var(--s-f9fafb)] transition-colors">
                   Cancelar
                 </button>
                 <button onClick={handleSave} disabled={saving}
-                  className="text-xs font-semibold text-white bg-[#0C2054] px-4 py-1.5 rounded-lg hover:bg-[#1a3a7a] disabled:opacity-50 transition-colors flex items-center gap-1.5">
+                  className="text-xs font-semibold text-white bg-[var(--s-0c2054)] px-4 py-1.5 rounded-lg hover:bg-[var(--s-1a3a7a)] disabled:opacity-50 transition-colors flex items-center gap-1.5">
                   {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
                   Guardar
                 </button>
@@ -1407,11 +1407,11 @@ function AvatarCanvas({
             ) : (
               <>
                 <button onClick={() => setEditing(true)}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] border border-[#0C2054]/20 bg-[#0C2054]/5 px-3 py-1.5 rounded-lg hover:bg-[#0C2054]/10 transition-colors">
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[var(--t-0c2054)] border border-[#0C2054]/20 bg-[#0C2054]/5 px-3 py-1.5 rounded-lg hover:bg-[#0C2054]/10 transition-colors">
                   <Edit3 className="w-3.5 h-3.5" /> Editar
                 </button>
                 <button onClick={onDelete}
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9ca3af] hover:text-red-500 hover:bg-red-50 transition-colors">
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--t-9ca3af)] hover:text-red-500 hover:bg-red-50 transition-colors">
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </>
@@ -1542,7 +1542,7 @@ function AvatarCanvas({
         </div>
       </div>
 
-      <p className="text-xs text-[#9ca3af] text-right">Última actualización: {avatar.updated_at_display}</p>
+      <p className="text-xs text-[var(--t-9ca3af)] text-right">Última actualización: {avatar.updated_at_display}</p>
     </div>
   );
 }
@@ -1582,10 +1582,10 @@ function CreateAvatarModal({ open, onClose, onCreate }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md">
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f0f2f8]">
-          <h2 className="font-bold text-[#0C2054] text-lg">Nuevo Avatar</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-[#9ca3af] hover:bg-[#f0f2f8] transition-all">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-xl w-full max-w-md">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--s-f0f2f8)]">
+          <h2 className="font-bold text-[var(--t-0c2054)] text-lg">Nuevo Avatar</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-xl flex items-center justify-center text-[var(--t-9ca3af)] hover:bg-[var(--s-f0f2f8)] transition-all">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -1597,11 +1597,11 @@ function CreateAvatarModal({ open, onClose, onCreate }: {
               {emoji}
             </div>
             <div className="flex-1">
-              <p className="text-xs font-semibold text-[#374151] mb-1.5">Emoji</p>
+              <p className="text-xs font-semibold text-[var(--t-374151)] mb-1.5">Emoji</p>
               <div className="flex gap-1.5 flex-wrap">
                 {EMOJIS.map(e => (
                   <button key={e} type="button" onClick={() => setEmoji(e)}
-                    className={`w-8 h-8 rounded-lg text-base flex items-center justify-center transition-all ${emoji === e ? 'bg-[#0C2054]/10 ring-2 ring-[#0C2054]' : 'hover:bg-[#f0f2f8]'}`}>
+                    className={`w-8 h-8 rounded-lg text-base flex items-center justify-center transition-all ${emoji === e ? 'bg-[#0C2054]/10 ring-2 ring-[var(--s-0c2054)]' : 'hover:bg-[var(--s-f0f2f8)]'}`}>
                     {e}
                   </button>
                 ))}
@@ -1610,21 +1610,21 @@ function CreateAvatarModal({ open, onClose, onCreate }: {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#374151] mb-1.5">Nombre del avatar *</label>
+            <label className="block text-sm font-semibold text-[var(--t-374151)] mb-1.5">Nombre del avatar *</label>
             <input value={name} onChange={e => setName(e.target.value)}
               placeholder="ej. María - La Madre Inmigrante"
-              className="w-full border border-[#e5e7eb] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2054]/20" />
+              className="w-full border border-[var(--s-e5e7eb)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2054]/20" />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#374151] mb-1.5">Descripción breve</label>
+            <label className="block text-sm font-semibold text-[var(--t-374151)] mb-1.5">Descripción breve</label>
             <input value={description} onChange={e => setDescription(e.target.value)}
               placeholder="ej. Madre de 35 años buscando regularizar su estatus..."
-              className="w-full border border-[#e5e7eb] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2054]/20" />
+              className="w-full border border-[var(--s-e5e7eb)] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0C2054]/20" />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-[#374151] mb-1.5">Color de acento</label>
+            <label className="block text-sm font-semibold text-[var(--t-374151)] mb-1.5">Color de acento</label>
             <div className="flex gap-2">
               {COLORS.map(c => (
                 <button key={c} type="button" onClick={() => setColor(c)}
@@ -1635,11 +1635,11 @@ function CreateAvatarModal({ open, onClose, onCreate }: {
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 border border-[#e5e7eb] text-[#374151] rounded-xl py-2.5 text-sm font-medium hover:bg-[#f9fafb] transition-colors">
+            <button type="button" onClick={onClose} className="flex-1 border border-[var(--s-e5e7eb)] text-[var(--t-374151)] rounded-xl py-2.5 text-sm font-medium hover:bg-[var(--s-f9fafb)] transition-colors">
               Cancelar
             </button>
             <button type="submit" disabled={loading}
-              className="flex-1 bg-[#0C2054] text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-[#1a3a7a] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
+              className="flex-1 bg-[var(--s-0c2054)] text-white rounded-xl py-2.5 text-sm font-semibold hover:bg-[var(--s-1a3a7a)] disabled:opacity-50 transition-colors flex items-center justify-center gap-2">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
               Crear avatar
             </button>
@@ -3096,59 +3096,59 @@ function SOPPhaseRow({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-xl border border-[#e8eaf0] overflow-hidden bg-white">
+    <div className="rounded-xl border border-[var(--s-e8eaf0)] overflow-hidden bg-[var(--surface)]">
       {/* Phase header */}
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-[#f7f8fc] transition-colors"
+        className="w-full flex items-center gap-3 px-5 py-3.5 text-left hover:bg-[var(--s-f7f8fc)] transition-colors"
       >
-        <div className="w-7 h-7 rounded-lg bg-[#0C2054] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+        <div className="w-7 h-7 rounded-lg bg-[var(--s-0c2054)] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
           {phase.num}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold text-[#1a1a2e]">{phase.title}</p>
+          <p className="text-sm font-bold text-[var(--t-1a1a2e)]">{phase.title}</p>
           {phase.subtitle && (
-            <p className="text-xs text-[#8888a8] mt-0.5">{phase.subtitle}</p>
+            <p className="text-xs text-[var(--t-8888a8)] mt-0.5">{phase.subtitle}</p>
           )}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-[10px] font-semibold text-[#8888a8] bg-[#f0f0f0] px-2 py-0.5 rounded-full">
+          <span className="text-[10px] font-semibold text-[var(--t-8888a8)] bg-[var(--s-f0f0f0)] px-2 py-0.5 rounded-full">
             {phase.steps.length} pasos
           </span>
           {open ? (
-            <ChevronDown className="w-4 h-4 text-[#8888a8]" />
+            <ChevronDown className="w-4 h-4 text-[var(--t-8888a8)]" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-[#8888a8]" />
+            <ChevronRight className="w-4 h-4 text-[var(--t-8888a8)]" />
           )}
         </div>
       </button>
 
       {/* Steps table */}
       {open && (
-        <div className="border-t border-[#e8eaf0]">
+        <div className="border-t border-[var(--s-e8eaf0)]">
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="bg-[#f7f8fc]">
-                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold w-12">#</th>
-                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold">Acción</th>
-                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold w-40">Responsable</th>
-                  <th className="text-left px-4 py-2.5 text-[#8888a8] font-semibold w-36">Herramienta</th>
+                <tr className="bg-[var(--s-f7f8fc)]">
+                  <th className="text-left px-4 py-2.5 text-[var(--t-8888a8)] font-semibold w-12">#</th>
+                  <th className="text-left px-4 py-2.5 text-[var(--t-8888a8)] font-semibold">Acción</th>
+                  <th className="text-left px-4 py-2.5 text-[var(--t-8888a8)] font-semibold w-40">Responsable</th>
+                  <th className="text-left px-4 py-2.5 text-[var(--t-8888a8)] font-semibold w-36">Herramienta</th>
                   {editing && <th className="w-8" />}
                 </tr>
               </thead>
               <tbody>
                 {phase.steps.map((step, si) => (
-                  <tr key={si} className="border-t border-[#f0f0f0] hover:bg-[#fafafa] group">
+                  <tr key={si} className="border-t border-[var(--s-f0f0f0)] hover:bg-[var(--s-fafafa)] group">
                     <td className="px-4 py-2.5">
                       {editing ? (
                         <input
                           value={step.num}
                           onChange={e => onUpdateStep(si, 'num', e.target.value)}
-                          className="w-10 text-xs border border-[#e8e8f0] rounded px-1.5 py-1 outline-none focus:border-[#F79C31]"
+                          className="w-10 text-xs border border-[var(--s-e8e8f0)] rounded px-1.5 py-1 outline-none focus:border-[var(--s-f79c31)]"
                         />
                       ) : (
-                        <span className="text-[#8888a8] font-mono">{step.num}</span>
+                        <span className="text-[var(--t-8888a8)] font-mono">{step.num}</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5">
@@ -3157,10 +3157,10 @@ function SOPPhaseRow({
                           value={step.action}
                           onChange={e => onUpdateStep(si, 'action', e.target.value)}
                           rows={2}
-                          className="w-full text-xs border border-[#e8e8f0] rounded px-2 py-1 outline-none focus:border-[#F79C31] resize-none"
+                          className="w-full text-xs border border-[var(--s-e8e8f0)] rounded px-2 py-1 outline-none focus:border-[var(--s-f79c31)] resize-none"
                         />
                       ) : (
-                        <span className="text-[#1a1a2e] leading-relaxed">{step.action}</span>
+                        <span className="text-[var(--t-1a1a2e)] leading-relaxed">{step.action}</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5">
@@ -3168,10 +3168,10 @@ function SOPPhaseRow({
                         <input
                           value={step.responsible}
                           onChange={e => onUpdateStep(si, 'responsible', e.target.value)}
-                          className="w-full text-xs border border-[#e8e8f0] rounded px-1.5 py-1 outline-none focus:border-[#F79C31]"
+                          className="w-full text-xs border border-[var(--s-e8e8f0)] rounded px-1.5 py-1 outline-none focus:border-[var(--s-f79c31)]"
                         />
                       ) : (
-                        <span className="text-[#4a4a6a]">{step.responsible}</span>
+                        <span className="text-[var(--t-4a4a6a)]">{step.responsible}</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5">
@@ -3179,17 +3179,17 @@ function SOPPhaseRow({
                         <input
                           value={step.tool}
                           onChange={e => onUpdateStep(si, 'tool', e.target.value)}
-                          className="w-full text-xs border border-[#e8e8f0] rounded px-1.5 py-1 outline-none focus:border-[#F79C31]"
+                          className="w-full text-xs border border-[var(--s-e8e8f0)] rounded px-1.5 py-1 outline-none focus:border-[var(--s-f79c31)]"
                         />
                       ) : (
-                        <span className="text-[#8888a8] italic">{step.tool}</span>
+                        <span className="text-[var(--t-8888a8)] italic">{step.tool}</span>
                       )}
                     </td>
                     {editing && (
                       <td className="px-2 py-2.5">
                         <button
                           onClick={() => onRemoveStep(si)}
-                          className="w-6 h-6 rounded flex items-center justify-center text-[#c0c0d0] hover:text-red-500 hover:bg-red-50 transition-colors"
+                          className="w-6 h-6 rounded flex items-center justify-center text-[var(--t-c0c0d0)] hover:text-red-500 hover:bg-red-50 transition-colors"
                         >
                           <X className="w-3 h-3" />
                         </button>
@@ -3202,10 +3202,10 @@ function SOPPhaseRow({
           </div>
 
           {editing && (
-            <div className="px-4 py-3 border-t border-[#f0f0f0]">
+            <div className="px-4 py-3 border-t border-[var(--s-f0f0f0)]">
               <button
                 onClick={onAddStep}
-                className="flex items-center gap-1.5 text-xs font-semibold text-[#F79C31] hover:text-[#e08a20] transition-colors"
+                className="flex items-center gap-1.5 text-xs font-semibold text-[var(--t-f79c31)] hover:text-[var(--t-e08a20)] transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" /> Agregar paso
               </button>
@@ -3342,7 +3342,7 @@ function SOPsTab() {
       <div className="bg-gradient-to-r from-[#0C2054] to-[#1a3a7a] rounded-xl p-6 relative overflow-hidden">
         <div className="absolute top-[-40px] right-[-40px] w-40 h-40 rounded-full bg-[#F79C31]/10" />
         <div className="absolute bottom-[-30px] left-[250px] w-28 h-28 rounded-full bg-white/5" />
-        <p className="text-[#F79C31] text-xs font-semibold uppercase tracking-widest mb-2">Procedimientos Operativos</p>
+        <p className="text-[var(--t-f79c31)] text-xs font-semibold uppercase tracking-widest mb-2">Procedimientos Operativos</p>
         <h2 className="text-white text-2xl font-bold mb-1.5">SOPs — Marketing</h2>
         <p className="text-white/60 text-sm max-w-xl">
           Guía operativa del equipo. Define cómo se ejecuta cada proceso, quién es responsable y qué herramientas se usan.
@@ -3366,13 +3366,13 @@ function SOPsTab() {
       </div>
 
       {/* SOP sub-tabs */}
-      <div className="flex gap-1 bg-white border border-[#e8e8f0] rounded-xl p-1 w-fit flex-wrap">
+      <div className="flex gap-1 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl p-1 w-fit flex-wrap">
         {sops.map((sop, i) => (
           <button
             key={sop.id}
             onClick={() => { setActiveSOP(i); setEditing(false); setDraft(null); setActiveSection('phases'); }}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-              activeSOP === i ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+              activeSOP === i ? 'bg-[var(--s-0c2054)] text-white shadow-sm' : 'text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)]'
             }`}
           >
             {sop.name}
@@ -3381,16 +3381,16 @@ function SOPsTab() {
       </div>
 
       {/* SOP content */}
-      <div className="bg-white rounded-2xl border border-[#e8eaf0] overflow-hidden">
+      <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] overflow-hidden">
         {/* SOP header bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#f0f0f0]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--s-f0f0f0)]">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#0C2054]/10 flex items-center justify-center">
-              <ClipboardList className="w-5 h-5 text-[#0C2054]" />
+              <ClipboardList className="w-5 h-5 text-[var(--t-0c2054)]" />
             </div>
             <div>
-              <h3 className="font-bold text-[#0C2054] text-base">{d.name}</h3>
-              <p className="text-xs text-[#8888a8]">
+              <h3 className="font-bold text-[var(--t-0c2054)] text-base">{d.name}</h3>
+              <p className="text-xs text-[var(--t-8888a8)]">
                 {d.phases.length} fases · {d.phases.reduce((a, p) => a + p.steps.length, 0)} pasos · {d.roles.length} roles
               </p>
             </div>
@@ -3400,13 +3400,13 @@ function SOPsTab() {
               <>
                 <button
                   onClick={cancelEdit}
-                  className="text-xs text-[#6b7280] border border-[#e5e7eb] px-3 py-1.5 rounded-lg hover:bg-[#f9fafb] transition-colors"
+                  className="text-xs text-[var(--t-6b7280)] border border-[var(--s-e5e7eb)] px-3 py-1.5 rounded-lg hover:bg-[var(--s-f9fafb)] transition-colors"
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={saveEdit}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-white bg-[#0C2054] px-4 py-1.5 rounded-lg hover:bg-[#1a3a7a] transition-colors"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-white bg-[var(--s-0c2054)] px-4 py-1.5 rounded-lg hover:bg-[var(--s-1a3a7a)] transition-colors"
                 >
                   <CheckCircle className="w-3.5 h-3.5" /> Guardar cambios
                 </button>
@@ -3414,7 +3414,7 @@ function SOPsTab() {
             ) : (
               <button
                 onClick={startEdit}
-                className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] border border-[#0C2054]/20 bg-[#0C2054]/5 px-3 py-1.5 rounded-lg hover:bg-[#0C2054]/10 transition-colors"
+                className="flex items-center gap-1.5 text-xs font-semibold text-[var(--t-0c2054)] border border-[#0C2054]/20 bg-[#0C2054]/5 px-3 py-1.5 rounded-lg hover:bg-[#0C2054]/10 transition-colors"
               >
                 <Edit3 className="w-3.5 h-3.5" /> Editar SOP
               </button>
@@ -3423,15 +3423,15 @@ function SOPsTab() {
         </div>
 
         {/* Section tabs */}
-        <div className="flex gap-0 border-b border-[#f0f0f0] px-6">
+        <div className="flex gap-0 border-b border-[var(--s-f0f0f0)] px-6">
           {SECTION_TABS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
               onClick={() => setActiveSection(key)}
               className={`flex items-center gap-1.5 px-4 py-3 text-xs font-semibold border-b-2 transition-all -mb-px ${
                 activeSection === key
-                  ? 'border-[#0C2054] text-[#0C2054]'
-                  : 'border-transparent text-[#8888a8] hover:text-[#4a4a6a]'
+                  ? 'border-[var(--s-0c2054)] text-[var(--t-0c2054)]'
+                  : 'border-transparent text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)]'
               }`}
             >
               <Icon className="w-3.5 h-3.5" /> {label}
@@ -3462,7 +3462,7 @@ function SOPsTab() {
           {activeSection === 'roles' && (
             <div className="space-y-3">
               {d.roles.map((role, ri) => (
-                <div key={ri} className="flex items-start gap-4 p-4 rounded-xl border border-[#e8eaf0] bg-[#fafafa]">
+                <div key={ri} className="flex items-start gap-4 p-4 rounded-xl border border-[var(--s-e8eaf0)] bg-[var(--s-fafafa)]">
                   <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                     style={{ background: getInitialsColor(role.initials) }}
@@ -3475,19 +3475,19 @@ function SOPsTab() {
                         <input
                           value={role.name}
                           onChange={e => updateRole(ri, 'name', e.target.value)}
-                          className="w-full text-sm font-semibold border border-[#e8e8f0] rounded-lg px-3 py-1.5 outline-none focus:border-[#F79C31]"
+                          className="w-full text-sm font-semibold border border-[var(--s-e8e8f0)] rounded-lg px-3 py-1.5 outline-none focus:border-[var(--s-f79c31)]"
                         />
                         <input
                           value={role.desc}
                           onChange={e => updateRole(ri, 'desc', e.target.value)}
                           placeholder="Descripción del rol..."
-                          className="w-full text-sm border border-[#e8e8f0] rounded-lg px-3 py-1.5 outline-none focus:border-[#F79C31] text-[#4a4a6a]"
+                          className="w-full text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-1.5 outline-none focus:border-[var(--s-f79c31)] text-[var(--t-4a4a6a)]"
                         />
                       </div>
                     ) : (
                       <>
-                        <p className="text-sm font-semibold text-[#1a1a2e]">{role.name}</p>
-                        {role.desc && <p className="text-xs text-[#8888a8] mt-0.5 leading-relaxed">{role.desc}</p>}
+                        <p className="text-sm font-semibold text-[var(--t-1a1a2e)]">{role.name}</p>
+                        {role.desc && <p className="text-xs text-[var(--t-8888a8)] mt-0.5 leading-relaxed">{role.desc}</p>}
                       </>
                     )}
                   </div>
@@ -3503,14 +3503,14 @@ function SOPsTab() {
                 {d.tools.map((tool, ti) => (
                   <div
                     key={ti}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#f0f2f8] border border-[#e0e4f0] group"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--s-f0f2f8)] border border-[var(--s-e0e4f0)] group"
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#0C2054] flex-shrink-0" />
-                    <span className="text-xs font-medium text-[#0C2054]">{tool}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[var(--s-0c2054)] flex-shrink-0" />
+                    <span className="text-xs font-medium text-[var(--t-0c2054)]">{tool}</span>
                     {editing && (
                       <button
                         onClick={() => removeTool(ti)}
-                        className="w-4 h-4 flex items-center justify-center text-[#8888a8] hover:text-red-500 transition-colors ml-1"
+                        className="w-4 h-4 flex items-center justify-center text-[var(--t-8888a8)] hover:text-red-500 transition-colors ml-1"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -3525,18 +3525,18 @@ function SOPsTab() {
                     onChange={e => setNewTool(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addTool())}
                     placeholder="Nueva herramienta..."
-                    className="flex-1 text-sm border border-[#e8e8f0] rounded-lg px-3 py-2 outline-none focus:border-[#F79C31]"
+                    className="flex-1 text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none focus:border-[var(--s-f79c31)]"
                   />
                   <button
                     onClick={addTool}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-[#0C2054] text-white text-sm font-semibold rounded-lg hover:bg-[#1a3a7a] transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[var(--s-0c2054)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--s-1a3a7a)] transition-colors"
                   >
                     <Plus className="w-4 h-4" /> Agregar
                   </button>
                 </div>
               )}
               {d.tools.length === 0 && !editing && (
-                <p className="text-sm text-[#8888a8] italic">Sin herramientas registradas.</p>
+                <p className="text-sm text-[var(--t-8888a8)] italic">Sin herramientas registradas.</p>
               )}
             </div>
           )}
@@ -3547,10 +3547,10 @@ function SOPsTab() {
               {d.rules.map((rule, ri) => (
                 <div
                   key={ri}
-                  className="flex items-start gap-3 p-4 rounded-xl border border-[#e8eaf0] bg-[#fffbf0] group"
+                  className="flex items-start gap-3 p-4 rounded-xl border border-[var(--s-e8eaf0)] bg-[var(--s-fffbf0)] group"
                 >
                   <div className="w-5 h-5 rounded-full bg-[#F79C31]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Shield className="w-3 h-3 text-[#F79C31]" />
+                    <Shield className="w-3 h-3 text-[var(--t-f79c31)]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     {editing ? (
@@ -3558,16 +3558,16 @@ function SOPsTab() {
                         value={rule}
                         onChange={e => updateRule(ri, e.target.value)}
                         rows={2}
-                        className="w-full text-sm border border-[#e8e8f0] rounded-lg px-3 py-2 outline-none focus:border-[#F79C31] resize-none bg-white"
+                        className="w-full text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none focus:border-[var(--s-f79c31)] resize-none bg-[var(--surface)]"
                       />
                     ) : (
-                      <p className="text-sm text-[#1a1a2e] leading-relaxed">{rule}</p>
+                      <p className="text-sm text-[var(--t-1a1a2e)] leading-relaxed">{rule}</p>
                     )}
                   </div>
                   {editing && (
                     <button
                       onClick={() => removeRule(ri)}
-                      className="w-6 h-6 flex items-center justify-center text-[#c0c0d0] hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0 mt-0.5"
+                      className="w-6 h-6 flex items-center justify-center text-[var(--t-c0c0d0)] hover:text-red-500 hover:bg-red-50 rounded transition-colors flex-shrink-0 mt-0.5"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -3581,18 +3581,18 @@ function SOPsTab() {
                     onChange={e => setNewRule(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addRule())}
                     placeholder="Nueva regla o lineamiento..."
-                    className="flex-1 text-sm border border-[#e8e8f0] rounded-lg px-3 py-2 outline-none focus:border-[#F79C31]"
+                    className="flex-1 text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none focus:border-[var(--s-f79c31)]"
                   />
                   <button
                     onClick={addRule}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-[#F79C31] text-white text-sm font-semibold rounded-lg hover:bg-[#e08a20] transition-colors"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[var(--s-f79c31)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--s-e08a20)] transition-colors"
                   >
                     <Plus className="w-4 h-4" /> Agregar
                   </button>
                 </div>
               )}
               {d.rules.length === 0 && !editing && (
-                <p className="text-sm text-[#8888a8] italic">Sin reglas registradas.</p>
+                <p className="text-sm text-[var(--t-8888a8)] italic">Sin reglas registradas.</p>
               )}
             </div>
           )}
@@ -3716,7 +3716,7 @@ export default function RecursosPage() {
         actions={
           <button
             onClick={() => setUploadOpen(true)}
-            className="flex items-center gap-2 bg-[#F79C31] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm"
           >
             <Upload className="w-3.5 h-3.5" />
             Subir archivo
@@ -3726,7 +3726,7 @@ export default function RecursosPage() {
 
       <div className="px-10 py-10 space-y-10">
         {/* Tabs */}
-        <div className="flex gap-1 bg-white border border-[#e8e8f0] rounded-xl p-1 w-fit">
+        <div className="flex gap-1 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl p-1 w-fit">
           {[
             { key: 'docs', label: 'Biblioteca de Documentos', icon: FolderOpen },
             { key: 'brand', label: 'Brand Center', icon: Palette },
@@ -3739,7 +3739,7 @@ export default function RecursosPage() {
               key={key}
               onClick={() => setActiveTab(key as 'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops' | 'links')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
-                activeTab === key ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+                activeTab === key ? 'bg-[var(--s-0c2054)] text-white shadow-sm' : 'text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)]'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -3754,12 +3754,12 @@ export default function RecursosPage() {
             {/* Filters */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8888a8]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--t-8888a8)]" />
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Buscar documentos..."
-                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-[#e8e8f0] bg-white rounded-lg outline-none focus:border-[#F79C31] transition-colors"
+                  className="w-full pl-9 pr-4 py-2.5 text-sm border border-[var(--s-e8e8f0)] bg-[var(--surface)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors"
                 />
               </div>
               <div className="flex gap-2 flex-wrap">
@@ -3769,8 +3769,8 @@ export default function RecursosPage() {
                     onClick={() => setCategory(key)}
                     className={`text-xs font-semibold px-3 py-2 rounded-lg border transition-all ${
                       category === key
-                        ? 'bg-[#0C2054] text-white border-[#0C2054]'
-                        : 'bg-white text-[#4a4a6a] border-[#e8e8f0] hover:border-[#d0d0e0]'
+                        ? 'bg-[var(--s-0c2054)] text-white border-[var(--s-0c2054)]'
+                        : 'bg-[var(--surface)] text-[var(--t-4a4a6a)] border-[var(--s-e8e8f0)] hover:border-[var(--s-d0d0e0)]'
                     }`}
                   >
                     {label}
@@ -3788,8 +3788,8 @@ export default function RecursosPage() {
                 { val: totalSOP, label: 'SOPs' },
               ].map(({ val, label }) => (
                 <Card key={label} className="p-5 text-center">
-                  <p className="text-2xl font-bold text-[#0C2054]">{loading ? '—' : val}</p>
-                  <p className="text-xs text-[#8888a8] mt-1">{label}</p>
+                  <p className="text-2xl font-bold text-[var(--t-0c2054)]">{loading ? '—' : val}</p>
+                  <p className="text-xs text-[var(--t-8888a8)] mt-1">{label}</p>
                 </Card>
               ))}
             </div>
@@ -3797,25 +3797,25 @@ export default function RecursosPage() {
             {/* Content */}
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 text-[#F79C31] animate-spin" />
+                <Loader2 className="w-8 h-8 text-[var(--t-f79c31)] animate-spin" />
               </div>
             ) : apiError ? (
               <Card className="p-10 text-center">
                 <AlertCircle className="w-10 h-10 text-red-300 mx-auto mb-3" />
-                <p className="text-[#4a4a6a] font-medium">Error al cargar documentos</p>
-                <p className="text-sm text-[#8888a8] mt-1 mb-4">{apiError}</p>
+                <p className="text-[var(--t-4a4a6a)] font-medium">Error al cargar documentos</p>
+                <p className="text-sm text-[var(--t-8888a8)] mt-1 mb-4">{apiError}</p>
                 <button
                   onClick={loadDocs}
-                  className="text-sm font-semibold text-[#F79C31] hover:underline"
+                  className="text-sm font-semibold text-[var(--t-f79c31)] hover:underline"
                 >
                   Reintentar
                 </button>
               </Card>
             ) : docs.length === 0 ? (
               <Card className="p-12 text-center">
-                <FolderOpen className="w-12 h-12 text-[#d0d0e0] mx-auto mb-3" />
-                <p className="text-[#4a4a6a] font-medium">No se encontraron documentos</p>
-                <p className="text-sm text-[#8888a8] mt-1 mb-4">
+                <FolderOpen className="w-12 h-12 text-[var(--t-d0d0e0)] mx-auto mb-3" />
+                <p className="text-[var(--t-4a4a6a)] font-medium">No se encontraron documentos</p>
+                <p className="text-sm text-[var(--t-8888a8)] mt-1 mb-4">
                   {search || category !== 'all'
                     ? 'Intenta con otros filtros de búsqueda'
                     : 'Sube tu primer documento para comenzar'}
@@ -3823,7 +3823,7 @@ export default function RecursosPage() {
                 {!search && category === 'all' && (
                   <button
                     onClick={() => setUploadOpen(true)}
-                    className="flex items-center gap-2 mx-auto bg-[#F79C31] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors"
+                    className="flex items-center gap-2 mx-auto bg-[var(--s-f79c31)] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors"
                   >
                     <Upload className="w-4 h-4" />
                     Subir documento
@@ -3852,7 +3852,7 @@ export default function RecursosPage() {
             {/* Hero */}
             <div className="bg-gradient-to-r from-[#0C2054] to-[#1a3a7a] rounded-xl p-6 relative overflow-hidden">
               <div className="absolute top-[-60px] right-[-60px] w-48 h-48 rounded-full bg-[#F79C31]/10" />
-              <p className="text-[#F79C31] text-xs font-semibold uppercase tracking-widest mb-2">Brand Center</p>
+              <p className="text-[var(--t-f79c31)] text-xs font-semibold uppercase tracking-widest mb-2">Brand Center</p>
               <h2 className="text-white text-2xl font-bold mb-2">Manual de Marca</h2>
               <p className="text-white/60 text-sm max-w-md">
                 Guía oficial de identidad visual de Mangone Law Firm, LLC.
@@ -3861,7 +3861,7 @@ export default function RecursosPage() {
               <div className="flex gap-3 mt-4">
                 <button
                   onClick={() => setManualOpen(true)}
-                  className="flex items-center gap-2 bg-[#F79C31] text-[#0C2054] font-semibold text-sm px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors"
+                  className="flex items-center gap-2 bg-[var(--s-f79c31)] text-[var(--t-0c2054)] font-semibold text-sm px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors"
                 >
                   <Eye className="w-4 h-4" /> Ver manual completo
                 </button>
@@ -3878,18 +3878,18 @@ export default function RecursosPage() {
             {/* Colors */}
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <h3 className="text-base font-bold text-[#1a1a2e]">Paleta de Colores</h3>
+                <h3 className="text-base font-bold text-[var(--t-1a1a2e)]">Paleta de Colores</h3>
                 <Badge variant="outline">Clic para copiar HEX</Badge>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 {BRAND_COLORS.map(color => <ColorSwatch key={color.hex} color={color} />)}
               </div>
               <Card className="p-4 mt-4">
-                <p className="text-sm font-semibold text-[#1a1a2e] mb-3">Proporción de uso recomendada</p>
+                <p className="text-sm font-semibold text-[var(--t-1a1a2e)] mb-3">Proporción de uso recomendada</p>
                 <div className="flex h-10 rounded-lg overflow-hidden shadow-sm">
-                  <div className="flex items-center justify-center text-white text-xs font-bold" style={{ width: '40%', background: '#0C2054' }}>40% Azul</div>
-                  <div className="flex items-center justify-center text-[#3B3537] text-xs font-bold" style={{ width: '30%', background: '#f0eeec' }}>30% Blanco</div>
-                  <div className="flex items-center justify-center text-white text-xs font-bold" style={{ width: '15%', background: '#F79C31' }}>15%</div>
+                  <div className="flex items-center justify-center text-white text-xs font-bold" style={{ width: '40%', background: 'var(--s-0c2054)' }}>40% Azul</div>
+                  <div className="flex items-center justify-center text-[var(--t-3b3537)] text-xs font-bold" style={{ width: '30%', background: '#f0eeec' }}>30% Blanco</div>
+                  <div className="flex items-center justify-center text-white text-xs font-bold" style={{ width: '15%', background: 'var(--s-f79c31)' }}>15%</div>
                   <div className="flex items-center justify-center text-white text-xs font-bold" style={{ width: '10%', background: '#3B3537' }}>10%</div>
                   <div className="flex items-center justify-center text-gray-400 text-[10px]" style={{ width: '5%', background: '#e0e0e0' }}>5%</div>
                 </div>
@@ -3898,16 +3898,16 @@ export default function RecursosPage() {
 
             {/* Typography */}
             <div>
-              <h3 className="text-base font-bold text-[#1a1a2e] mb-4">Tipografías</h3>
+              <h3 className="text-base font-bold text-[var(--t-1a1a2e)] mb-4">Tipografías</h3>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 {[
-                  { name: 'Bebas Neue', role: 'Títulos principales', sample: 'MANGONE LAW FIRM', style: { fontFamily: "'Bebas Neue', sans-serif", fontSize: '32px', letterSpacing: '2px', color: '#0C2054' } },
-                  { name: 'Montserrat Bold', role: 'Subtítulos', sample: 'Tu aliado en el camino legal', style: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: '20px', color: '#0C2054' } },
-                  { name: 'Montserrat Regular', role: 'Cuerpo de texto', sample: 'Apoyamos a los nuevos americanos en su camino hacia la estabilidad legal.', style: { fontFamily: 'Montserrat', fontWeight: 400, fontSize: '15px', color: '#3B3537' } },
+                  { name: 'Bebas Neue', role: 'Títulos principales', sample: 'MANGONE LAW FIRM', style: { fontFamily: "'Bebas Neue', sans-serif", fontSize: '32px', letterSpacing: '2px', color: 'var(--t-0c2054)' } },
+                  { name: 'Montserrat Bold', role: 'Subtítulos', sample: 'Tu aliado en el camino legal', style: { fontFamily: 'Montserrat', fontWeight: 700, fontSize: '20px', color: 'var(--t-0c2054)' } },
+                  { name: 'Montserrat Regular', role: 'Cuerpo de texto', sample: 'Apoyamos a los nuevos americanos en su camino hacia la estabilidad legal.', style: { fontFamily: 'Montserrat', fontWeight: 400, fontSize: '15px', color: 'var(--t-3b3537)' } },
                 ].map(t => (
                   <Card key={t.name} className="p-5">
-                    <p className="text-[#F79C31] text-[10px] font-bold uppercase tracking-widest mb-3">{t.name}</p>
-                    <p className="text-xs text-[#8888a8] mb-3">{t.role}</p>
+                    <p className="text-[var(--t-f79c31)] text-[10px] font-bold uppercase tracking-widest mb-3">{t.name}</p>
+                    <p className="text-xs text-[var(--t-8888a8)] mb-3">{t.role}</p>
                     <p style={t.style as React.CSSProperties} className="leading-tight">{t.sample}</p>
                   </Card>
                 ))}
@@ -3917,14 +3917,14 @@ export default function RecursosPage() {
             {/* Logos */}
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-bold text-[#1a1a2e]">Logos Disponibles</h3>
-                <span className="text-xs text-[#8888a8]">PNG · Alta resolución (7800×3800 px)</span>
+                <h3 className="text-base font-bold text-[var(--t-1a1a2e)]">Logos Disponibles</h3>
+                <span className="text-xs text-[var(--t-8888a8)]">PNG · Alta resolución (7800×3800 px)</span>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 
                 {/* Logo negro — sobre fondo claro */}
                 <Card className="overflow-hidden">
-                  <div className="bg-white flex items-center justify-center px-8 py-8 min-h-[180px]">
+                  <div className="bg-[var(--surface)] flex items-center justify-center px-8 py-8 min-h-[180px]">
                     <NextImage
                       src="/brand/logo-negro.png"
                       alt="Logo Mangone Law Firm — versión negra"
@@ -3934,15 +3934,15 @@ export default function RecursosPage() {
                       priority
                     />
                   </div>
-                  <div className="flex items-center justify-between px-5 py-3 border-t border-[#f0f0f0]">
+                  <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--s-f0f0f0)]">
                     <div>
-                      <p className="text-sm font-semibold text-[#1a1a2e]">Versión negra</p>
-                      <p className="text-xs text-[#8888a8]">Uso en fondos claros / blancos</p>
+                      <p className="text-sm font-semibold text-[var(--t-1a1a2e)]">Versión negra</p>
+                      <p className="text-xs text-[var(--t-8888a8)]">Uso en fondos claros / blancos</p>
                     </div>
                     <a
                       href="/brand/logo-negro.png"
                       download="Logo_Mangone_Negro.png"
-                      className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] bg-[#f0f2f8] hover:bg-[#e4e8f5] px-3 py-1.5 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[var(--t-0c2054)] bg-[var(--s-f0f2f8)] hover:bg-[var(--s-e4e8f5)] px-3 py-1.5 rounded-lg transition-colors"
                     >
                       <Download className="w-3.5 h-3.5" /> Descargar PNG
                     </a>
@@ -3951,7 +3951,7 @@ export default function RecursosPage() {
 
                 {/* Logo blanco — sobre fondo oscuro */}
                 <Card className="overflow-hidden">
-                  <div className="bg-[#0C2054] flex items-center justify-center px-8 py-8 min-h-[180px]">
+                  <div className="bg-[var(--s-0c2054)] flex items-center justify-center px-8 py-8 min-h-[180px]">
                     <NextImage
                       src="/brand/logo-blanco.png"
                       alt="Logo Mangone Law Firm — versión blanca"
@@ -3961,15 +3961,15 @@ export default function RecursosPage() {
                       priority
                     />
                   </div>
-                  <div className="flex items-center justify-between px-5 py-3 border-t border-[#f0f0f0]">
+                  <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--s-f0f0f0)]">
                     <div>
-                      <p className="text-sm font-semibold text-[#1a1a2e]">Versión blanca</p>
-                      <p className="text-xs text-[#8888a8]">Uso en fondos oscuros / azul Mangone</p>
+                      <p className="text-sm font-semibold text-[var(--t-1a1a2e)]">Versión blanca</p>
+                      <p className="text-xs text-[var(--t-8888a8)]">Uso en fondos oscuros / azul Mangone</p>
                     </div>
                     <a
                       href="/brand/logo-blanco.png"
                       download="Logo_Mangone_Blanco.png"
-                      className="flex items-center gap-1.5 text-xs font-semibold text-[#0C2054] bg-[#f0f2f8] hover:bg-[#e4e8f5] px-3 py-1.5 rounded-lg transition-colors"
+                      className="flex items-center gap-1.5 text-xs font-semibold text-[var(--t-0c2054)] bg-[var(--s-f0f2f8)] hover:bg-[var(--s-e4e8f5)] px-3 py-1.5 rounded-lg transition-colors"
                     >
                       <Download className="w-3.5 h-3.5" /> Descargar PNG
                     </a>
@@ -3981,7 +3981,7 @@ export default function RecursosPage() {
 
             {/* Awards */}
             <div>
-              <h3 className="text-base font-bold text-[#1a1a2e] mb-4">Reconocimientos y Credenciales</h3>
+              <h3 className="text-base font-bold text-[var(--t-1a1a2e)] mb-4">Reconocimientos y Credenciales</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[
                   { icon: '🏆', title: 'Top 10 Best Law Firm', sub: 'Client Satisfaction — AILC 2026' },
@@ -3993,12 +3993,12 @@ export default function RecursosPage() {
                 ].map(({ icon, title, sub }) => (
                   <div
                     key={title}
-                    className="flex items-start gap-3 p-4 bg-white border border-[#e8e8f0] rounded-xl hover:border-[#F79C31]/40 hover:shadow-sm transition-all"
+                    className="flex items-start gap-3 p-4 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl hover:border-[#F79C31]/40 hover:shadow-sm transition-all"
                   >
                     <span className="text-2xl flex-shrink-0">{icon}</span>
                     <div>
-                      <p className="text-sm font-bold text-[#1a1a2e]">{title}</p>
-                      <p className="text-xs text-[#8888a8] mt-0.5">{sub}</p>
+                      <p className="text-sm font-bold text-[var(--t-1a1a2e)]">{title}</p>
+                      <p className="text-xs text-[var(--t-8888a8)] mt-0.5">{sub}</p>
                     </div>
                   </div>
                 ))}
@@ -4012,12 +4012,12 @@ export default function RecursosPage() {
             {/* Header del tab */}
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-[#0C2054]">Avatar del Cliente</h2>
-                <p className="text-sm text-[#8888a8] mt-0.5">Perfil detallado de tu cliente ideal de Mangone Law Firm</p>
+                <h2 className="text-xl font-bold text-[var(--t-0c2054)]">Avatar del Cliente</h2>
+                <p className="text-sm text-[var(--t-8888a8)] mt-0.5">Perfil detallado de tu cliente ideal de Mangone Law Firm</p>
               </div>
               <div className="flex items-center gap-2">
                 {avatars.length > 1 && (
-                  <div className="flex gap-1 bg-white border border-[#e8eaf0] rounded-xl p-1">
+                  <div className="flex gap-1 bg-[var(--surface)] border border-[var(--s-e8eaf0)] rounded-xl p-1">
                     {avatars.map(a => (
                       <button
                         key={a.id}
@@ -4025,8 +4025,8 @@ export default function RecursosPage() {
                         title={a.name}
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                           selectedAvatarId === a.id
-                            ? 'bg-[#0C2054] text-white'
-                            : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+                            ? 'bg-[var(--s-0c2054)] text-white'
+                            : 'text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)]'
                         }`}
                       >
                         <span>{a.emoji}</span>
@@ -4038,7 +4038,7 @@ export default function RecursosPage() {
                 )}
                 <button
                   onClick={() => setShowCreateAvatar(true)}
-                  className="flex items-center gap-2 bg-[#0C2054] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#1a3a7a] transition-all"
+                  className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"
                 >
                   <Plus className="w-4 h-4" />
                   Nuevo avatar
@@ -4048,20 +4048,20 @@ export default function RecursosPage() {
 
             {avatarLoading ? (
               <div className="flex items-center justify-center py-24">
-                <Loader2 className="w-8 h-8 text-[#F79C31] animate-spin" />
+                <Loader2 className="w-8 h-8 text-[var(--t-f79c31)] animate-spin" />
               </div>
             ) : avatars.length === 0 ? (
-              <div className="bg-white rounded-2xl border border-[#e8eaf0] p-16 text-center">
-                <div className="w-16 h-16 rounded-2xl bg-[#f0f2f8] flex items-center justify-center mx-auto mb-4 text-3xl">
+              <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] p-16 text-center">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--s-f0f2f8)] flex items-center justify-center mx-auto mb-4 text-3xl">
                   👤
                 </div>
-                <h3 className="font-bold text-[#0C2054] text-lg mb-2">Sin avatar definido</h3>
-                <p className="text-[#6b7280] text-sm mb-6 max-w-sm mx-auto">
+                <h3 className="font-bold text-[var(--t-0c2054)] text-lg mb-2">Sin avatar definido</h3>
+                <p className="text-[var(--t-6b7280)] text-sm mb-6 max-w-sm mx-auto">
                   Crea el perfil de tu cliente ideal para que todo el equipo tenga claro a quién le habla Mangone Law Firm.
                 </p>
                 <button
                   onClick={() => setShowCreateAvatar(true)}
-                  className="inline-flex items-center gap-2 bg-[#0C2054] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1a3a7a] transition-all"
+                  className="inline-flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"
                 >
                   <Plus className="w-4 h-4" />
                   Crear primer avatar
@@ -4120,10 +4120,10 @@ export default function RecursosPage() {
       {/* ── Manual viewer modal ─────────────────────────────────────────── */}
       {manualOpen && (
         <div className="fixed inset-0 z-50 flex flex-col bg-black/60 backdrop-blur-sm">
-          <div className="flex items-center justify-between bg-[#0C2054] px-5 py-3 flex-shrink-0">
+          <div className="flex items-center justify-between bg-[var(--s-0c2054)] px-5 py-3 flex-shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-lg bg-[#F79C31] flex items-center justify-center">
-                <span className="font-bold text-[#0C2054] text-sm">M</span>
+              <div className="w-7 h-7 rounded-lg bg-[var(--s-f79c31)] flex items-center justify-center">
+                <span className="font-bold text-[var(--t-0c2054)] text-sm">M</span>
               </div>
               <div>
                 <p className="text-white font-bold text-sm leading-tight">Manual de Marca</p>
@@ -4157,7 +4157,7 @@ export default function RecursosPage() {
           <iframe
             src="/brand/manual.html"
             title="Manual de Marca — Mangone Law Firm"
-            className="flex-1 w-full border-0 bg-white"
+            className="flex-1 w-full border-0 bg-[var(--surface)]"
           />
         </div>
       )}

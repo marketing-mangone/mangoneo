@@ -15,7 +15,7 @@ const EVENT_COLORS: Record<string, { bg: string; text: string; dot: string; labe
   content:  { bg: 'bg-blue-50',      text: 'text-blue-700',   dot: '#3b82f6', label: 'Contenido' },
   meeting:  { bg: 'bg-purple-50',    text: 'text-purple-700', dot: '#9333ea', label: 'Reunión'   },
   deadline: { bg: 'bg-red-50',       text: 'text-red-700',    dot: '#ef4444', label: 'Entrega'   },
-  campaign: { bg: 'bg-[#fef5e7]',    text: 'text-[#F79C31]',  dot: '#F79C31', label: 'Campaña'   },
+  campaign: { bg: 'bg-[var(--s-fef5e7)]',    text: 'text-[var(--t-f79c31)]',  dot: '#F79C31', label: 'Campaña'   },
   event:    { bg: 'bg-green-50',     text: 'text-green-700',  dot: '#10b981', label: 'Evento'    },
 };
 
@@ -62,15 +62,15 @@ function AddEventModal({ defaultDate, onClose, onSuccess }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4">
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f0f0f0]">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-md mx-4">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--s-f0f0f0)]">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F79C31]/10 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-[#F79C31]" />
+              <Calendar className="w-5 h-5 text-[var(--t-f79c31)]" />
             </div>
-            <h3 className="font-bold text-[#1a1a2e]">Nuevo evento</h3>
+            <h3 className="font-bold text-[var(--t-1a1a2e)]">Nuevo evento</h3>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#f7f8fc] text-[#8888a8]">
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--s-f7f8fc)] text-[var(--t-8888a8)]">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -78,25 +78,25 @@ function AddEventModal({ defaultDate, onClose, onSuccess }: {
         <div className="px-6 py-5 space-y-4">
           {/* Título */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Título <span className="text-red-400">*</span></label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Título <span className="text-red-400">*</span></label>
             <input
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="Nombre del evento"
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors"
             />
           </div>
 
           {/* Tipo */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Tipo</label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Tipo</label>
             <div className="flex flex-wrap gap-2">
               {Object.entries(EVENT_COLORS).map(([key, cfg]) => (
                 <button
                   key={key}
                   onClick={() => setType(key as ApiCalendarEvent['type'])}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
-                    type === key ? `${cfg.bg} ${cfg.text} border-current` : 'bg-white text-[#4a4a6a] border-[#e8e8f0]'
+                    type === key ? `${cfg.bg} ${cfg.text} border-current` : 'bg-[var(--surface)] text-[var(--t-4a4a6a)] border-[var(--s-e8e8f0)]'
                   }`}
                 >
                   {cfg.label}
@@ -108,32 +108,32 @@ function AddEventModal({ defaultDate, onClose, onSuccess }: {
           {/* Fecha y hora */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Fecha <span className="text-red-400">*</span></label>
+              <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Fecha <span className="text-red-400">*</span></label>
               <input
                 type="date"
                 value={date}
                 onChange={e => setDate(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors"
+                className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Hora <span className="text-[#8888a8] font-normal">(opcional)</span></label>
+              <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Hora <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span></label>
               <input
                 type="time"
                 value={time}
                 onChange={e => setTime(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors"
+                className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors"
               />
             </div>
           </div>
 
           {/* Canal */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Canal <span className="text-[#8888a8] font-normal">(opcional)</span></label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Canal <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span></label>
             <select
               value={channel}
               onChange={e => setChannel(e.target.value)}
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] bg-white transition-colors"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] bg-[var(--surface)] transition-colors"
             >
               <option value="">Sin canal específico</option>
               {['instagram','tiktok','youtube','linkedin','facebook','podcast','web'].map(c => (
@@ -144,13 +144,13 @@ function AddEventModal({ defaultDate, onClose, onSuccess }: {
 
           {/* Descripción */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Descripción <span className="text-[#8888a8] font-normal">(opcional)</span></label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Descripción <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span></label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
               rows={2}
               placeholder="Detalles del evento..."
-              className="w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors resize-none"
+              className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors resize-none"
             />
           </div>
 
@@ -163,10 +163,10 @@ function AddEventModal({ defaultDate, onClose, onSuccess }: {
         </div>
 
         <div className="px-6 pb-6 flex gap-3 justify-end">
-          <button onClick={onClose} disabled={saving} className="px-4 py-2 text-sm font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg hover:bg-[#f7f8fc] transition-colors disabled:opacity-50">
+          <button onClick={onClose} disabled={saving} className="px-4 py-2 text-sm font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg hover:bg-[var(--s-f7f8fc)] transition-colors disabled:opacity-50">
             Cancelar
           </button>
-          <button onClick={submit} disabled={saving} className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#F79C31] rounded-lg hover:bg-[#e08a20] transition-colors disabled:opacity-50 shadow-sm">
+          <button onClick={submit} disabled={saving} className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[var(--s-f79c31)] rounded-lg hover:bg-[var(--s-e08a20)] transition-colors disabled:opacity-50 shadow-sm">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
             {saving ? 'Guardando...' : 'Crear evento'}
           </button>
@@ -264,7 +264,7 @@ export default function CalendarioPage() {
         actions={
           <button
             onClick={() => setAddOpen(true)}
-            className="flex items-center gap-2 bg-[#F79C31] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             Nuevo evento
@@ -276,7 +276,7 @@ export default function CalendarioPage() {
         {/* Stats */}
         <div className="grid grid-cols-4 gap-6">
           {[
-            { val: stats.total,     label: 'Eventos este mes',    icon: '📅', color: 'text-[#0C2054]'  },
+            { val: stats.total,     label: 'Eventos este mes',    icon: '📅', color: 'text-[var(--t-0c2054)]'  },
             { val: stats.content,   label: 'Piezas de contenido', icon: '✍️', color: 'text-blue-600'   },
             { val: stats.meetings,  label: 'Reuniones',           icon: '👥', color: 'text-purple-600' },
             { val: stats.deadlines, label: 'Entregas',            icon: '🚩', color: 'text-red-600'    },
@@ -284,7 +284,7 @@ export default function CalendarioPage() {
             <Card key={label} className="p-6 text-center">
               <p className="text-2xl mb-2">{icon}</p>
               <p className={`text-3xl font-bold tracking-tight ${color}`}>{loading ? '—' : val}</p>
-              <p className="text-xs text-[#6b7280] mt-1.5 font-medium">{label}</p>
+              <p className="text-xs text-[var(--t-6b7280)] mt-1.5 font-medium">{label}</p>
             </Card>
           ))}
         </div>
@@ -294,18 +294,18 @@ export default function CalendarioPage() {
           <div className="lg:col-span-2">
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold text-[#111827]">{MONTHS[month]} {year}</h2>
+                <h2 className="text-lg font-bold text-[var(--t-111827)]">{MONTHS[month]} {year}</h2>
                 <div className="flex gap-1">
-                  <button onClick={() => setCurrentDate(new Date(year, month-1, 1))} className="p-2 hover:bg-[#f7f8fc] rounded-lg text-[#4a4a6a] transition-colors">
+                  <button onClick={() => setCurrentDate(new Date(year, month-1, 1))} className="p-2 hover:bg-[var(--s-f7f8fc)] rounded-lg text-[var(--t-4a4a6a)] transition-colors">
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => { const n = new Date(); setCurrentDate(new Date(n.getFullYear(), n.getMonth(), 1)); setSelectedDate(todayStr); }}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-[#f7f8fc] text-[#4a4a6a] transition-colors"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-[var(--s-f7f8fc)] text-[var(--t-4a4a6a)] transition-colors"
                   >
                     Hoy
                   </button>
-                  <button onClick={() => setCurrentDate(new Date(year, month+1, 1))} className="p-2 hover:bg-[#f7f8fc] rounded-lg text-[#4a4a6a] transition-colors">
+                  <button onClick={() => setCurrentDate(new Date(year, month+1, 1))} className="p-2 hover:bg-[var(--s-f7f8fc)] rounded-lg text-[var(--t-4a4a6a)] transition-colors">
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -313,7 +313,7 @@ export default function CalendarioPage() {
 
               <div className="grid grid-cols-7 mb-2">
                 {DAYS.map(d => (
-                  <div key={d} className="text-center text-[11px] font-bold text-[#8888a8] uppercase tracking-wide py-2">{d}</div>
+                  <div key={d} className="text-center text-[11px] font-bold text-[var(--t-8888a8)] uppercase tracking-wide py-2">{d}</div>
                 ))}
               </div>
 
@@ -327,11 +327,11 @@ export default function CalendarioPage() {
                       key={idx}
                       onClick={() => cell.currentMonth && setSelectedDate(cell.dateStr)}
                       className={`min-h-[80px] p-1.5 rounded-lg transition-all ${
-                        !cell.currentMonth ? 'opacity-30 cursor-default' : 'cursor-pointer hover:bg-[#f7f8fc]'
-                      } ${isSelected ? 'bg-[#0C2054]/5 ring-2 ring-[#F79C31]' : ''} ${isToday && !isSelected ? 'bg-[#fef5e7]' : ''}`}
+                        !cell.currentMonth ? 'opacity-30 cursor-default' : 'cursor-pointer hover:bg-[var(--s-f7f8fc)]'
+                      } ${isSelected ? 'bg-[#0C2054]/5 ring-2 ring-[var(--s-f79c31)]' : ''} ${isToday && !isSelected ? 'bg-[var(--s-fef5e7)]' : ''}`}
                     >
                       <div className={`w-6 h-6 flex items-center justify-center rounded-full text-xs font-bold mb-1 ${
-                        isToday ? 'bg-[#F79C31] text-white' : 'text-[#4a4a6a]'
+                        isToday ? 'bg-[var(--s-f79c31)] text-white' : 'text-[var(--t-4a4a6a)]'
                       }`}>
                         {cell.day}
                       </div>
@@ -341,18 +341,18 @@ export default function CalendarioPage() {
                             {ev.title}
                           </div>
                         ))}
-                        {evs.length > 2 && <p className="text-[9px] text-[#8888a8] pl-1">+{evs.length-2} más</p>}
+                        {evs.length > 2 && <p className="text-[9px] text-[var(--t-8888a8)] pl-1">+{evs.length-2} más</p>}
                       </div>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-[#f0f0f0]">
+              <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-[var(--s-f0f0f0)]">
                 {Object.entries(EVENT_COLORS).map(([type, cfg]) => (
                   <div key={type} className="flex items-center gap-1.5">
                     <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: cfg.dot }} />
-                    <span className="text-[11px] text-[#8888a8] font-medium">{cfg.label}</span>
+                    <span className="text-[11px] text-[var(--t-8888a8)] font-medium">{cfg.label}</span>
                   </div>
                 ))}
               </div>
@@ -363,16 +363,16 @@ export default function CalendarioPage() {
           <div className="space-y-4">
             {/* Día seleccionado */}
             <Card className="p-4">
-              <h3 className="text-sm font-bold text-[#1a1a2e] mb-3 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-[#F79C31]" />
+              <h3 className="text-sm font-bold text-[var(--t-1a1a2e)] mb-3 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-[var(--t-f79c31)]" />
                 {new Date(selectedDate + 'T12:00:00').toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })}
               </h3>
               {selectedEvents.length === 0 ? (
                 <div className="py-6 text-center">
-                  <p className="text-sm text-[#8888a8]">Sin eventos este día</p>
+                  <p className="text-sm text-[var(--t-8888a8)]">Sin eventos este día</p>
                   <button
                     onClick={() => setAddOpen(true)}
-                    className="mt-2 text-xs text-[#F79C31] font-semibold hover:underline"
+                    className="mt-2 text-xs text-[var(--t-f79c31)] font-semibold hover:underline"
                   >
                     + Agregar evento
                   </button>
@@ -387,7 +387,7 @@ export default function CalendarioPage() {
                           <div className="flex-1 min-w-0">
                             <p className={`text-xs font-bold ${cfg.text} leading-tight`}>{ev.title}</p>
                             {ev.time && <p className={`text-[10px] mt-0.5 ${cfg.text} opacity-70`}>{ev.time}</p>}
-                            {ev.description && <p className="text-[10px] text-[#4a4a6a] mt-1 line-clamp-2">{ev.description}</p>}
+                            {ev.description && <p className="text-[10px] text-[var(--t-4a4a6a)] mt-1 line-clamp-2">{ev.description}</p>}
                           </div>
                           <div className="flex items-center gap-1 flex-shrink-0">
                             {ev.channel && CHANNEL_ICONS[ev.channel] && (
@@ -415,13 +415,13 @@ export default function CalendarioPage() {
 
             {/* Próximos eventos */}
             <Card className="p-4">
-              <h3 className="text-sm font-bold text-[#1a1a2e] mb-3">Próximos eventos</h3>
+              <h3 className="text-sm font-bold text-[var(--t-1a1a2e)] mb-3">Próximos eventos</h3>
               {loading ? (
                 <div className="flex justify-center py-6">
-                  <Loader2 className="w-5 h-5 text-[#F79C31] animate-spin" />
+                  <Loader2 className="w-5 h-5 text-[var(--t-f79c31)] animate-spin" />
                 </div>
               ) : upcomingEvents.length === 0 ? (
-                <p className="text-xs text-[#8888a8] text-center py-4">No hay eventos próximos</p>
+                <p className="text-xs text-[var(--t-8888a8)] text-center py-4">No hay eventos próximos</p>
               ) : (
                 <div className="space-y-2.5">
                   {upcomingEvents.map(ev => {
@@ -430,16 +430,16 @@ export default function CalendarioPage() {
                     return (
                       <div
                         key={ev.id}
-                        className="flex items-center gap-3 cursor-pointer hover:bg-[#f7f8fc] rounded-lg p-1.5 -mx-1.5 transition-colors"
+                        className="flex items-center gap-3 cursor-pointer hover:bg-[var(--s-f7f8fc)] rounded-lg p-1.5 -mx-1.5 transition-colors"
                         onClick={() => setSelectedDate(ev.date)}
                       >
                         <div className="text-center min-w-[32px]">
-                          <p className="text-[#F79C31] font-bold text-sm leading-none">{evDate.getDate()}</p>
-                          <p className="text-[#8888a8] text-[10px] uppercase">{evDate.toLocaleString('es', { month: 'short' })}</p>
+                          <p className="text-[var(--t-f79c31)] font-bold text-sm leading-none">{evDate.getDate()}</p>
+                          <p className="text-[var(--t-8888a8)] text-[10px] uppercase">{evDate.toLocaleString('es', { month: 'short' })}</p>
                         </div>
                         <span className="w-1.5 h-8 rounded-full flex-shrink-0" style={{ background: cfg.dot }} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-[#1a1a2e] truncate">{ev.title}</p>
+                          <p className="text-xs font-semibold text-[var(--t-1a1a2e)] truncate">{ev.title}</p>
                           <span className={`text-[10px] font-medium ${cfg.text}`}>{cfg.label}</span>
                         </div>
                       </div>
@@ -451,21 +451,21 @@ export default function CalendarioPage() {
 
             {/* Contenido por canal */}
             <Card className="p-4">
-              <h3 className="text-sm font-bold text-[#1a1a2e] mb-3">Contenido por canal</h3>
+              <h3 className="text-sm font-bold text-[var(--t-1a1a2e)] mb-3">Contenido por canal</h3>
               {['instagram','tiktok','youtube','podcast','facebook'].map(ch => {
                 const count = events.filter(e => e.channel === ch).length;
                 const max   = Math.max(...['instagram','tiktok','youtube','podcast','facebook'].map(c => events.filter(e => e.channel === c).length), 1);
                 return (
                   <div key={ch} className="flex items-center justify-between text-xs mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-[#8888a8]">{CHANNEL_ICONS[ch]}</span>
-                      <span className="text-[#4a4a6a] font-medium capitalize">{ch}</span>
+                      <span className="text-[var(--t-8888a8)]">{CHANNEL_ICONS[ch]}</span>
+                      <span className="text-[var(--t-4a4a6a)] font-medium capitalize">{ch}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="w-16 h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-[#0C2054]" style={{ width: `${(count/max)*100}%` }} />
+                      <div className="w-16 h-1.5 bg-[var(--s-f0f0f0)] rounded-full overflow-hidden">
+                        <div className="h-full rounded-full bg-[var(--s-0c2054)]" style={{ width: `${(count/max)*100}%` }} />
                       </div>
-                      <span className="font-bold text-[#1a1a2e] w-4 text-right">{count}</span>
+                      <span className="font-bold text-[var(--t-1a1a2e)] w-4 text-right">{count}</span>
                     </div>
                   </div>
                 );

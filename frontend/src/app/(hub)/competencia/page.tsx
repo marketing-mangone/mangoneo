@@ -58,10 +58,10 @@ export default function CompetenciaPage() {
   const radarCompetitors = competitors.map((c, i) => ({ name: c.name, color: COLORS[i % COLORS.length] }));
 
   const statsItems = [
-    { label: 'Competidores', value: competitors.length, icon: Target, color: '#0C2054' },
+    { label: 'Competidores', value: competitors.length, icon: Target, color: 'var(--t-0c2054)' },
     { label: 'Oportunidades', value: insights.filter(i => i.insight_type === 'opportunity').length, icon: Lightbulb, color: '#10b981' },
     { label: 'Amenazas', value: insights.filter(i => i.insight_type === 'threat').length, icon: AlertTriangle, color: '#ef4444' },
-    { label: 'Observaciones', value: insights.filter(i => i.insight_type === 'observation').length, icon: Eye, color: '#6b7280' },
+    { label: 'Observaciones', value: insights.filter(i => i.insight_type === 'observation').length, icon: Eye, color: 'var(--t-6b7280)' },
   ];
 
   const handleDeleteInsight = async (id: number) => {
@@ -75,30 +75,30 @@ export default function CompetenciaPage() {
       <div className="flex items-start justify-between">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <div className="w-9 h-9 rounded-xl bg-[#0C2054] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
               <Target className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-[#0C2054]">Radar Competitivo</h1>
+            <h1 className="text-2xl font-bold text-[var(--t-0c2054)]">Radar Competitivo</h1>
           </div>
-          <p className="text-[#6b7280] text-sm ml-12">Monitorea las estrategias, presencia digital y publicidad de la competencia</p>
+          <p className="text-[var(--t-6b7280)] text-sm ml-12">Monitorea las estrategias, presencia digital y publicidad de la competencia</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={load}
-            className="w-9 h-9 rounded-xl border border-[#e5e7eb] flex items-center justify-center text-[#6b7280] hover:bg-white hover:text-[#0C2054] transition-all"
+            className="w-9 h-9 rounded-xl border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:bg-[var(--surface)] hover:text-[var(--t-0c2054)] transition-all"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={() => setShowAddInsight(true)}
-            className="flex items-center gap-2 border border-[#e5e7eb] bg-white text-[#374151] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[#f9fafb] transition-all"
+            className="flex items-center gap-2 border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-[var(--t-374151)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--s-f9fafb)] transition-all"
           >
-            <Lightbulb className="w-4 h-4 text-[#F79C31]" />
+            <Lightbulb className="w-4 h-4 text-[var(--t-f79c31)]" />
             Nuevo insight
           </button>
           <button
             onClick={() => setShowAddCompetitor(true)}
-            className="flex items-center gap-2 bg-[#0C2054] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[#1a3a7a] transition-all"
+            className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"
           >
             <Plus className="w-4 h-4" />
             Agregar competidor
@@ -109,13 +109,13 @@ export default function CompetenciaPage() {
       {/* Stats bar */}
       <div className="grid grid-cols-4 gap-4">
         {statsItems.map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-white rounded-2xl border border-[#e8eaf0] p-4 flex items-center gap-3">
+          <div key={label} className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] p-4 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${color}15` }}>
               <Icon className="w-5 h-5" style={{ color }} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-[#0C2054]">{value}</p>
-              <p className="text-xs text-[#9ca3af] font-medium">{label}</p>
+              <p className="text-2xl font-bold text-[var(--t-0c2054)]">{value}</p>
+              <p className="text-xs text-[var(--t-9ca3af)] font-medium">{label}</p>
             </div>
           </div>
         ))}
@@ -125,23 +125,23 @@ export default function CompetenciaPage() {
       {loading ? (
         <div className="flex items-center justify-center py-24">
           <div className="text-center">
-            <RefreshCw className="w-8 h-8 text-[#d1d5db] animate-spin mx-auto mb-3" />
-            <p className="text-[#9ca3af] text-sm">Cargando datos...</p>
+            <RefreshCw className="w-8 h-8 text-[var(--t-d1d5db)] animate-spin mx-auto mb-3" />
+            <p className="text-[var(--t-9ca3af)] text-sm">Cargando datos...</p>
           </div>
         </div>
       ) : competitors.length === 0 ? (
         /* Empty state */
-        <div className="bg-white rounded-2xl border border-[#e8eaf0] p-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#f0f2f8] flex items-center justify-center mx-auto mb-4">
-            <Target className="w-8 h-8 text-[#9ca3af]" />
+        <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] p-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--s-f0f2f8)] flex items-center justify-center mx-auto mb-4">
+            <Target className="w-8 h-8 text-[var(--t-9ca3af)]" />
           </div>
-          <h3 className="font-bold text-[#0C2054] text-lg mb-2">Sin competidores registrados</h3>
-          <p className="text-[#6b7280] text-sm mb-6 max-w-sm mx-auto">
+          <h3 className="font-bold text-[var(--t-0c2054)] text-lg mb-2">Sin competidores registrados</h3>
+          <p className="text-[var(--t-6b7280)] text-sm mb-6 max-w-sm mx-auto">
             Agrega las firmas de abogados de inmigración que compiten con Mangone Law Firm para comenzar a monitorear sus estrategias.
           </p>
           <button
             onClick={() => setShowAddCompetitor(true)}
-            className="inline-flex items-center gap-2 bg-[#0C2054] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1a3a7a] transition-all"
+            className="inline-flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-6 py-2.5 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"
           >
             <Plus className="w-4 h-4" />
             Agregar primer competidor
@@ -150,17 +150,17 @@ export default function CompetenciaPage() {
       ) : (
         <div className="grid grid-cols-5 gap-5">
           {/* Radar Chart — 3/5 */}
-          <div className="col-span-3 bg-white rounded-2xl border border-[#e8eaf0] p-6">
+          <div className="col-span-3 bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] p-6">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <h2 className="font-bold text-[#0C2054] text-base">Comparación de Dimensiones</h2>
-                <p className="text-[#9ca3af] text-xs mt-0.5">Puntuación 0–10 por área · Scores más recientes</p>
+                <h2 className="font-bold text-[var(--t-0c2054)] text-base">Comparación de Dimensiones</h2>
+                <p className="text-[var(--t-9ca3af)] text-xs mt-0.5">Puntuación 0–10 por área · Scores más recientes</p>
               </div>
             </div>
             {radarData.some(d => Object.keys(d).length > 1) ? (
               <CompetitorRadarChart data={radarData} competitors={radarCompetitors} />
             ) : (
-              <div className="flex items-center justify-center h-72 text-[#9ca3af] text-sm">
+              <div className="flex items-center justify-center h-72 text-[var(--t-9ca3af)] text-sm">
                 Agrega puntuaciones en el perfil de cada competidor para ver el radar
               </div>
             )}
@@ -168,7 +168,7 @@ export default function CompetenciaPage() {
 
           {/* Competitor cards — 2/5 */}
           <div className="col-span-2 space-y-3 overflow-y-auto max-h-[460px] pr-1">
-            <p className="text-xs font-semibold text-[#9ca3af] uppercase tracking-wide px-1">
+            <p className="text-xs font-semibold text-[var(--t-9ca3af)] uppercase tracking-wide px-1">
               {competitors.length} competidor{competitors.length !== 1 ? 'es' : ''} monitoreado{competitors.length !== 1 ? 's' : ''}
             </p>
             {competitors.map(c => (
@@ -182,10 +182,10 @@ export default function CompetenciaPage() {
       {insights.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-[#0C2054]">Insights Recientes</h2>
+            <h2 className="font-bold text-[var(--t-0c2054)]">Insights Recientes</h2>
             <button
               onClick={() => setShowAddInsight(true)}
-              className="text-xs text-[#0C2054] font-medium hover:text-[#1a3a7a] flex items-center gap-1"
+              className="text-xs text-[var(--t-0c2054)] font-medium hover:text-[#1a3a7a] flex items-center gap-1"
             >
               <Plus className="w-3.5 h-3.5" /> Nuevo
             </button>

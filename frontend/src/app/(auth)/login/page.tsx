@@ -47,7 +47,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex overflow-hidden bg-[#0C2054]">
+    <div className="min-h-screen flex overflow-hidden bg-[var(--s-0c2054)]">
 
       {/* ── LEFT PANEL: equipo con parallax ── */}
       <div className="hidden lg:block relative w-[58%] overflow-hidden">
@@ -96,8 +96,8 @@ export default function LoginPage() {
 
           {/* Copy inferior */}
           <div>
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F79C31]/15 border border-[#F79C31]/25 text-[#F79C31] text-[11px] font-semibold tracking-wider uppercase mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F79C31] animate-pulse" />
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F79C31]/15 border border-[#F79C31]/25 text-[var(--t-f79c31)] text-[11px] font-semibold tracking-wider uppercase mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--s-f79c31)] animate-pulse" />
               Equipo de Marketing
             </span>
 
@@ -111,7 +111,7 @@ export default function LoginPage() {
             >
               TU CENTRO<br />
               DE{' '}
-              <span style={{ color: '#F79C31' }}>OPERACIONES</span>
+              <span style={{ color: 'var(--t-f79c31)' }}>OPERACIONES</span>
             </h2>
 
             <p className="text-white/55 text-sm max-w-[280px] leading-relaxed">
@@ -136,7 +136,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── RIGHT PANEL: formulario ── */}
-      <div className="flex-1 flex items-center justify-center px-8 py-12 bg-[#f0f2f8] relative overflow-hidden">
+      <div className="flex-1 flex items-center justify-center px-8 py-12 bg-[var(--s-f0f2f8)] relative overflow-hidden">
 
         {/* Pattern de fondo sutil */}
         <div
@@ -173,18 +173,18 @@ export default function LoginPage() {
 
           {/* Card principal */}
           <div
-            className="bg-white rounded-2xl border border-[#e5e7eb]/80 p-8"
+            className="bg-[var(--surface)] rounded-2xl border border-[#e5e7eb]/80 p-8"
             style={{ boxShadow: '0 24px 64px rgba(12,32,84,0.11), 0 4px 16px rgba(12,32,84,0.06)' }}
           >
             {/* Header */}
             <div className="mb-8">
-              <div className="w-12 h-12 rounded-xl bg-[#0C2054] flex items-center justify-center mb-5 shadow-sm">
-                <Shield className="w-5 h-5 text-[#F79C31]" />
+              <div className="w-12 h-12 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center mb-5 shadow-sm">
+                <Shield className="w-5 h-5 text-[var(--t-f79c31)]" />
               </div>
-              <h1 className="text-[22px] font-bold text-[#0C2054] leading-tight mb-1.5">
+              <h1 className="text-[22px] font-bold text-[var(--t-0c2054)] leading-tight mb-1.5">
                 Bienvenido de vuelta
               </h1>
-              <p className="text-[#9ca3af] text-sm leading-relaxed">
+              <p className="text-[var(--t-9ca3af)] text-sm leading-relaxed">
                 Ingresa con tus credenciales del Marketing Hub
               </p>
             </div>
@@ -193,18 +193,18 @@ export default function LoginPage() {
 
               {/* Usuario */}
               <div>
-                <label className="block text-[11px] font-semibold text-[#6b7280] uppercase tracking-widest mb-2">
+                <label className="block text-[11px] font-semibold text-[var(--t-6b7280)] uppercase tracking-widest mb-2">
                   Usuario
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9ca3af]" />
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--t-9ca3af)]" />
                   <input
                     type="text"
                     value={username}
                     onChange={e => setUsername(e.target.value)}
                     placeholder="tu.usuario"
                     autoComplete="username"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] placeholder-[#c4c8d4] outline-none transition-all"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--s-f9fafb)] text-sm text-[var(--t-111827)] placeholder-[var(--t-c4c8d4)] outline-none transition-all"
                     style={{ '--tw-ring-color': 'rgba(12,32,84,0.12)' } as React.CSSProperties}
                     onFocus={e => {
                       e.currentTarget.style.borderColor = '#0C2054';
@@ -224,26 +224,26 @@ export default function LoginPage() {
               {/* Contraseña */}
               <div>
                 <div className="flex justify-between items-center mb-2">
-                  <label className="block text-[11px] font-semibold text-[#6b7280] uppercase tracking-widest">
+                  <label className="block text-[11px] font-semibold text-[var(--t-6b7280)] uppercase tracking-widest">
                     Contraseña
                   </label>
                   <button
                     type="button"
                     onClick={() => setForgotOpen(true)}
-                    className="text-xs text-[#F79C31] hover:text-[#e08a20] font-medium transition-colors"
+                    className="text-xs text-[var(--t-f79c31)] hover:text-[var(--t-e08a20)] font-medium transition-colors"
                   >
                     ¿Olvidaste tu contraseña?
                   </button>
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9ca3af]" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--t-9ca3af)]" />
                   <input
                     type={showPass ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••••"
                     autoComplete="current-password"
-                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] outline-none transition-all"
+                    className="w-full pl-10 pr-11 py-3 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--s-f9fafb)] text-sm text-[var(--t-111827)] outline-none transition-all"
                     onFocus={e => {
                       e.currentTarget.style.borderColor = '#0C2054';
                       e.currentTarget.style.backgroundColor = '#ffffff';
@@ -259,7 +259,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9ca3af] hover:text-[#374151] transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--t-9ca3af)] hover:text-[var(--t-374151)] transition-colors"
                   >
                     {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -307,16 +307,16 @@ export default function LoginPage() {
             </form>
 
             {/* Footer del card */}
-            <div className="mt-6 pt-5 border-t border-[#f0f2f8] flex items-center justify-center gap-2">
+            <div className="mt-6 pt-5 border-t border-[var(--s-f0f2f8)] flex items-center justify-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <p className="text-xs text-[#9ca3af]">
+              <p className="text-xs text-[var(--t-9ca3af)]">
                 Todos los sistemas operativos
               </p>
             </div>
           </div>
 
           {/* Texto bajo la card */}
-          <p className="text-center text-xs text-[#9ca3af] mt-5">
+          <p className="text-center text-xs text-[var(--t-9ca3af)] mt-5">
             Uso exclusivo del equipo de Marketing · Mangone Law Firm, LLC
           </p>
         </div>
@@ -329,29 +329,29 @@ export default function LoginPage() {
           onClick={() => setForgotOpen(false)}
         >
           <div
-            className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl"
+            className="bg-[var(--surface)] rounded-2xl p-8 w-full max-w-sm shadow-2xl"
             style={{ boxShadow: '0 32px 80px rgba(12,32,84,0.2)' }}
             onClick={e => e.stopPropagation()}
           >
-            <div className="w-12 h-12 rounded-xl bg-[#fef6e7] flex items-center justify-center mb-5">
-              <Lock className="w-5 h-5 text-[#F79C31]" />
+            <div className="w-12 h-12 rounded-xl bg-[var(--s-fef6e7)] flex items-center justify-center mb-5">
+              <Lock className="w-5 h-5 text-[var(--t-f79c31)]" />
             </div>
-            <h3 className="text-lg font-bold text-[#0C2054] mb-1.5">¿Olvidaste tu contraseña?</h3>
-            <p className="text-sm text-[#6b7280] leading-relaxed mb-6">
+            <h3 className="text-lg font-bold text-[var(--t-0c2054)] mb-1.5">¿Olvidaste tu contraseña?</h3>
+            <p className="text-sm text-[var(--t-6b7280)] leading-relaxed mb-6">
               Contacta con el administrador del sistema para restablecer tu acceso.
             </p>
-            <div className="flex items-center gap-3 p-4 bg-[#f0f2f8] rounded-xl mb-6">
-              <div className="w-10 h-10 rounded-full bg-[#0C2054] flex items-center justify-center text-white font-bold text-sm shrink-0">
+            <div className="flex items-center gap-3 p-4 bg-[var(--s-f0f2f8)] rounded-xl mb-6">
+              <div className="w-10 h-10 rounded-full bg-[var(--s-0c2054)] flex items-center justify-center text-white font-bold text-sm shrink-0">
                 SQ
               </div>
               <div>
-                <p className="font-semibold text-[#0C2054] text-sm">Sebastian Quijada</p>
-                <p className="text-xs text-[#9ca3af]">Director de Marketing</p>
+                <p className="font-semibold text-[var(--t-0c2054)] text-sm">Sebastian Quijada</p>
+                <p className="text-xs text-[var(--t-9ca3af)]">Director de Marketing</p>
               </div>
             </div>
             <button
               onClick={() => setForgotOpen(false)}
-              className="w-full py-3 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-colors"
+              className="w-full py-3 rounded-xl bg-[var(--s-0c2054)] text-white text-sm font-semibold hover:bg-[var(--s-0f2960)] transition-colors"
             >
               Entendido
             </button>

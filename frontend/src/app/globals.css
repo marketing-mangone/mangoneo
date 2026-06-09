@@ -1,7 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@300;400;500;600;700;800;900&family=Bebas+Neue&display=swap');
 @import "tailwindcss";
 
-/* ─── Variables de marca ─── */
+/* Dark mode driven by a `.dark` class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Variables de marca (LIGHT) ─── */
 :root {
   --azul: #0C2054;
   --azul-mid: #0f2960;
@@ -12,6 +15,7 @@
 
   --bg: #f0f2f8;
   --card: #ffffff;
+  --surface: #ffffff;
   --sidebar-bg: #0C2054;
 
   --ink: #111827;
@@ -27,6 +31,14 @@
   --red: #ef4444;
   --blue: #3b82f6;
 
+  /* Shell surfaces */
+  --app-main-top: #f4f6fb;
+  --app-main-bottom: #eef0f6;
+  --header-bg: rgba(244,246,251,0.92);
+  --header-border: rgba(0,0,0,0.07);
+  --scrollbar-thumb: #d1d5db;
+  --scrollbar-thumb-hover: #9ca3af;
+
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.05);
   --shadow-lg: 0 10px 30px rgba(0,0,0,0.1), 0 2px 8px rgba(0,0,0,0.06);
@@ -35,6 +47,178 @@
   --r-md: 12px;
   --r-lg: 16px;
   --r-xl: 20px;
+
+  color-scheme: light;
+}
+
+/* ─── Overrides DARK de variables semánticas ─── */
+.dark {
+  --bg: #0d1320;
+  --card: #161d2e;
+  --surface: #161d2e;
+  /* sidebar stays dark in both themes */
+
+  --ink: #eef1f8;
+  --ink-2: #c3c9d6;
+  --ink-3: #9097a8;
+  --ink-4: #6f7283;
+
+  --border: #2a3344;
+  --border-2: #38435a;
+
+  --app-main-top: #0f1422;
+  --app-main-bottom: #0b0f1a;
+  --header-bg: rgba(18,24,38,0.85);
+  --header-border: rgba(255,255,255,0.08);
+  --scrollbar-thumb: #353f55;
+  --scrollbar-thumb-hover: #4a5573;
+
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.45), 0 1px 3px rgba(0,0,0,0.35);
+  --shadow-lg: 0 10px 30px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.4);
+
+  color-scheme: dark;
+}
+
+/* ===== GENERATED THEME TOKENS (scripts/theme-migrate.py) ===== */
+:root {
+  --t-0c2054: #0c2054;
+  --t-111827: #111827;
+  --t-1a1a2e: #1a1a2e;
+  --t-1a1a3e: #1a1a3e;
+  --t-374151: #374151;
+  --t-3b3537: #3b3537;
+  --t-4a4a6a: #4a4a6a;
+  --t-4b5563: #4b5563;
+  --t-6b7280: #6b7280;
+  --t-8888a8: #8888a8;
+  --t-8888aa: #8888aa;
+  --t-92400e: #92400e;
+  --t-9898bb: #9898bb;
+  --t-9ca3af: #9ca3af;
+  --t-b45309: #b45309;
+  --t-b8720f: #b8720f;
+  --t-b97a00: #b97a00;
+  --t-c0c0d0: #c0c0d0;
+  --t-c0c0d8: #c0c0d8;
+  --t-c4c8d4: #c4c8d4;
+  --t-d0d0e0: #d0d0e0;
+  --t-d1d5db: #d1d5db;
+  --t-e08a20: #e08a20;
+  --t-f79c31: #f79c31;
+  --s-0a1a3e: #0a1a3e;
+  --s-0a1a44: #0a1a44;
+  --s-0c2054: #0c2054;
+  --s-0f2860: #0f2860;
+  --s-0f2960: #0f2960;
+  --s-1a3a7a: #1a3a7a;
+  --s-9ca3af: #9ca3af;
+  --s-c0c0d8: #c0c0d8;
+  --s-cdd0de: #cdd0de;
+  --s-d0d0e0: #d0d0e0;
+  --s-d1d5db: #d1d5db;
+  --s-dde0ea: #dde0ea;
+  --s-e08a20: #e08a20;
+  --s-e0e4f0: #e0e4f0;
+  --s-e4e8f5: #e4e8f5;
+  --s-e5e7eb: #e5e7eb;
+  --s-e8e8f0: #e8e8f0;
+  --s-e8eaf0: #e8eaf0;
+  --s-ebebeb: #ebebeb;
+  --s-edeef5: #edeef5;
+  --s-eeeef5: #eeeef5;
+  --s-eef0f6: #eef0f6;
+  --s-eef0f7: #eef0f7;
+  --s-f0f0f0: #f0f0f0;
+  --s-f0f0f8: #f0f0f8;
+  --s-f0f2f8: #f0f2f8;
+  --s-f0f2ff: #f0f2ff;
+  --s-f3f4f6: #f3f4f6;
+  --s-f4f4f8: #f4f4f8;
+  --s-f79c31: #f79c31;
+  --s-f7f8fc: #f7f8fc;
+  --s-f8f8f8: #f8f8f8;
+  --s-f8f9fb: #f8f9fb;
+  --s-f9fafb: #f9fafb;
+  --s-faf0ff: #faf0ff;
+  --s-fafafa: #fafafa;
+  --s-fafafe: #fafafe;
+  --s-fdf5ff: #fdf5ff;
+  --s-fef3c7: #fef3c7;
+  --s-fef5e7: #fef5e7;
+  --s-fef6e7: #fef6e7;
+  --s-fff7ed: #fff7ed;
+  --s-fffbf0: #fffbf0;
+}
+
+.dark {
+  --t-0c2054: #e7ebf6;
+  --t-111827: #eef1f8;
+  --t-1a1a2e: #eef1f8;
+  --t-1a1a3e: #eef1f8;
+  --t-374151: #c3c9d6;
+  --t-3b3537: #eef1f8;
+  --t-4a4a6a: #c3c9d6;
+  --t-4b5563: #c3c9d6;
+  --t-6b7280: #9097a8;
+  --t-8888a8: #9097a8;
+  --t-8888aa: #9097a8;
+  --t-92400e: #f0a94a;
+  --t-9898bb: #9097a8;
+  --t-9ca3af: #6f7283;
+  --t-b45309: #f0a94a;
+  --t-b8720f: #f0a94a;
+  --t-b97a00: #f0a94a;
+  --t-c0c0d0: #6f7283;
+  --t-c0c0d8: #6f7283;
+  --t-c4c8d4: #6f7283;
+  --t-d0d0e0: #6f7283;
+  --t-d1d5db: #6f7283;
+  --t-e08a20: #f79c31;
+  --t-f79c31: #f79c31;
+  --s-0a1a3e: #28386e;
+  --s-0a1a44: #28386e;
+  --s-0c2054: #28386e;
+  --s-0f2860: #28386e;
+  --s-0f2960: #28386e;
+  --s-1a3a7a: #2f4e94;
+  --s-9ca3af: #38435a;
+  --s-c0c0d8: #38435a;
+  --s-cdd0de: #38435a;
+  --s-d0d0e0: #38435a;
+  --s-d1d5db: #38435a;
+  --s-dde0ea: #2a3344;
+  --s-e08a20: #e08a20;
+  --s-e0e4f0: #232c40;
+  --s-e4e8f5: #232c40;
+  --s-e5e7eb: #2a3344;
+  --s-e8e8f0: #232c40;
+  --s-e8eaf0: #232c40;
+  --s-ebebeb: #232c40;
+  --s-edeef5: #1e2638;
+  --s-eeeef5: #1e2638;
+  --s-eef0f6: #1e2638;
+  --s-eef0f7: #1e2638;
+  --s-f0f0f0: #232c40;
+  --s-f0f0f8: #1e2638;
+  --s-f0f2f8: #1e2638;
+  --s-f0f2ff: #1e2638;
+  --s-f3f4f6: #1a2233;
+  --s-f4f4f8: #1e2638;
+  --s-f79c31: #f79c31;
+  --s-f7f8fc: #1e2638;
+  --s-f8f8f8: #1a2233;
+  --s-f8f9fb: #1a2233;
+  --s-f9fafb: #1a2233;
+  --s-faf0ff: #2a2440;
+  --s-fafafa: #161d2e;
+  --s-fafafe: #161d2e;
+  --s-fdf5ff: #2a2440;
+  --s-fef3c7: #3a2c17;
+  --s-fef5e7: #3a2c17;
+  --s-fef6e7: #3a2c17;
+  --s-fff7ed: #3a2c17;
+  --s-fffbf0: #3a2c17;
 }
 
 /* ─── Reset dentro de @layer base para no competir con utilities ─── */
@@ -62,8 +246,8 @@
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
 }
 
 /* ─── Componentes (no afectan utilities) ─── */

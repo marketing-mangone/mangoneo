@@ -784,14 +784,14 @@ export default function HerramientasPage() {
   const barColor = charCount > 2200 ? 'bg-red-500' : charCount > 1800 ? 'bg-amber-400' : 'bg-emerald-500';
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f7f8fc]">
+    <div className="flex flex-col min-h-screen bg-[var(--s-f7f8fc)]">
       <Header title="Herramientas" subtitle="Utilidades para el equipo de marketing" />
 
       <div className="px-10 py-8 space-y-8">
 
         {/* Tab bar */}
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-[#0C2054] text-white shadow-sm">
+          <button className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--s-0c2054)] text-white shadow-sm">
             <ClipboardCheck className="w-4 h-4" />
             Auditor de Contenido
           </button>
@@ -799,9 +799,9 @@ export default function HerramientasPage() {
 
         {/* Legal basis notice */}
         <div className="flex items-start gap-3 bg-[#0C2054]/5 border border-[#0C2054]/12 rounded-xl px-5 py-3.5">
-          <ShieldAlert className="w-4 h-4 text-[#0C2054] flex-shrink-0 mt-0.5" />
-          <p className="text-[12px] text-[#4a4a6a] leading-relaxed">
-            <span className="font-bold text-[#0C2054]">Base normativa:</span>{' '}
+          <ShieldAlert className="w-4 h-4 text-[var(--t-0c2054)] flex-shrink-0 mt-0.5" />
+          <p className="text-[12px] text-[var(--t-4a4a6a)] leading-relaxed">
+            <span className="font-bold text-[var(--t-0c2054)]">Base normativa:</span>{' '}
             Documento Maestro de Cumplimiento Ético v2.0 (Mayo 2026) · NJ RPC 7.1 / 7.2 / 7.3 / 7.4 / 1.18 · ABA Model Rule 7.1 · Opiniones ACPE · USPTO Trademark Serial 90227319
           </p>
         </div>
@@ -812,8 +812,8 @@ export default function HerramientasPage() {
           <div className="space-y-5">
 
             {/* Content type selector */}
-            <div className="bg-white rounded-2xl border border-[#e8e8f0] p-6 shadow-sm space-y-3">
-              <h2 className="text-[15px] font-bold text-[#1a1a3e]">Tipo de contenido</h2>
+            <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8e8f0)] p-6 shadow-sm space-y-3">
+              <h2 className="text-[15px] font-bold text-[var(--t-1a1a3e)]">Tipo de contenido</h2>
               <div className="grid grid-cols-1 gap-2">
                 {CONTENT_TYPES.map(ct => (
                   <button
@@ -821,16 +821,16 @@ export default function HerramientasPage() {
                     onClick={() => setContentType(ct.id)}
                     className={`flex items-center gap-3 px-4 py-2.5 rounded-xl border-2 text-left transition-all ${
                       contentType === ct.id
-                        ? 'bg-[#0C2054]/5 border-[#0C2054] text-[#0C2054]'
-                        : 'border-[#e8e8f0] text-[#8888aa] hover:border-[#c0c0d8]'
+                        ? 'bg-[#0C2054]/5 border-[var(--s-0c2054)] text-[var(--t-0c2054)]'
+                        : 'border-[var(--s-e8e8f0)] text-[var(--t-8888aa)] hover:border-[var(--s-c0c0d8)]'
                     }`}
                   >
                     <div className={`w-3 h-3 rounded-full flex-shrink-0 border-2 transition-all ${
-                      contentType === ct.id ? 'bg-[#0C2054] border-[#0C2054]' : 'border-[#c0c0d8]'
+                      contentType === ct.id ? 'bg-[var(--s-0c2054)] border-[var(--s-0c2054)]' : 'border-[var(--s-c0c0d8)]'
                     }`} />
                     <div>
-                      <p className={`text-[13px] font-semibold leading-tight ${contentType === ct.id ? 'text-[#0C2054]' : 'text-[#4a4a6a]'}`}>{ct.label}</p>
-                      <p className="text-[11px] text-[#9898bb] mt-0.5">{ct.desc}</p>
+                      <p className={`text-[13px] font-semibold leading-tight ${contentType === ct.id ? 'text-[var(--t-0c2054)]' : 'text-[var(--t-4a4a6a)]'}`}>{ct.label}</p>
+                      <p className="text-[11px] text-[var(--t-9898bb)] mt-0.5">{ct.desc}</p>
                     </div>
                   </button>
                 ))}
@@ -838,15 +838,15 @@ export default function HerramientasPage() {
             </div>
 
             {/* Contenido — tabs Texto / Imagen */}
-            <div className="bg-white rounded-2xl border border-[#e8e8f0] shadow-sm overflow-hidden">
+            <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8e8f0)] shadow-sm overflow-hidden">
               {/* Mode toggle header */}
-              <div className="flex items-center gap-0 border-b border-[#e8e8f0]">
+              <div className="flex items-center gap-0 border-b border-[var(--s-e8e8f0)]">
                 <button
                   onClick={() => setInputMode('text')}
                   className={`flex items-center gap-2 flex-1 justify-center px-4 py-3.5 text-[13px] font-semibold transition-all border-b-2 ${
                     inputMode === 'text'
-                      ? 'text-[#0C2054] border-[#0C2054] bg-white'
-                      : 'text-[#9898bb] border-transparent hover:text-[#4a4a6a] bg-[#f7f8fc]'
+                      ? 'text-[var(--t-0c2054)] border-[var(--s-0c2054)] bg-[var(--surface)]'
+                      : 'text-[var(--t-9898bb)] border-transparent hover:text-[var(--t-4a4a6a)] bg-[var(--s-f7f8fc)]'
                   }`}
                 >
                   <FileText className="w-4 h-4" /> Pegar texto
@@ -855,8 +855,8 @@ export default function HerramientasPage() {
                   onClick={() => setInputMode('image')}
                   className={`flex items-center gap-2 flex-1 justify-center px-4 py-3.5 text-[13px] font-semibold transition-all border-b-2 ${
                     inputMode === 'image'
-                      ? 'text-[#0C2054] border-[#0C2054] bg-white'
-                      : 'text-[#9898bb] border-transparent hover:text-[#4a4a6a] bg-[#f7f8fc]'
+                      ? 'text-[var(--t-0c2054)] border-[var(--s-0c2054)] bg-[var(--surface)]'
+                      : 'text-[var(--t-9898bb)] border-transparent hover:text-[var(--t-4a4a6a)] bg-[var(--s-f7f8fc)]'
                   }`}
                 >
                   <ImageIcon className="w-4 h-4" /> Analizar imagen
@@ -868,11 +868,11 @@ export default function HerramientasPage() {
                 {inputMode === 'text' && (
                   <>
                     <div className="flex items-center justify-between">
-                      <p className="text-[13px] font-semibold text-[#4a4a6a]">Contenido a auditar</p>
-                      <div className="flex items-center gap-3 text-[12px] text-[#9898bb]">
-                        <span><span className={charCount > 0 ? 'font-bold text-[#1a1a3e]' : ''}>{charCount.toLocaleString('es')}</span> chars</span>
-                        {hashtagCount > 0 && <span className="font-semibold text-[#F79C31]">{hashtagCount} #</span>}
-                        {mentionCount > 0 && <span className="font-semibold text-[#0C2054]">{mentionCount} @</span>}
+                      <p className="text-[13px] font-semibold text-[var(--t-4a4a6a)]">Contenido a auditar</p>
+                      <div className="flex items-center gap-3 text-[12px] text-[var(--t-9898bb)]">
+                        <span><span className={charCount > 0 ? 'font-bold text-[var(--t-1a1a3e)]' : ''}>{charCount.toLocaleString('es')}</span> chars</span>
+                        {hashtagCount > 0 && <span className="font-semibold text-[var(--t-f79c31)]">{hashtagCount} #</span>}
+                        {mentionCount > 0 && <span className="font-semibold text-[var(--t-0c2054)]">{mentionCount} @</span>}
                         {linkCount > 0 && <span className="font-semibold text-blue-500">{linkCount} link{linkCount !== 1 ? 's' : ''}</span>}
                       </div>
                     </div>
@@ -887,18 +887,18 @@ export default function HerramientasPage() {
                         }
                       }}
                       placeholder="Pega aquí el caption, descripción, guión o texto que quieres auditar…"
-                      className="w-full h-48 resize-none text-[14px] text-[#1a1a3e] placeholder:text-[#c0c0d8] border border-[#e8e8f0] rounded-xl p-4 focus:outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/8 transition-all leading-relaxed"
+                      className="w-full h-48 resize-none text-[14px] text-[var(--t-1a1a3e)] placeholder:text-[var(--t-c0c0d8)] border border-[var(--s-e8e8f0)] rounded-xl p-4 focus:outline-none focus:border-[var(--s-0c2054)] focus:ring-2 focus:ring-[#0C2054]/8 transition-all leading-relaxed"
                     />
                     <div className="flex items-center justify-between">
-                      <button onClick={reset} className="flex items-center gap-1.5 text-[12px] text-[#9898bb] hover:text-red-500 transition-colors">
+                      <button onClick={reset} className="flex items-center gap-1.5 text-[12px] text-[var(--t-9898bb)] hover:text-red-500 transition-colors">
                         <Trash2 className="w-3.5 h-3.5" /> Limpiar
                       </button>
                       <div className="flex items-center gap-2">
-                        <span className="text-[11px] text-[#c0c0d8]">Límite IG</span>
-                        <div className="w-24 h-1.5 bg-[#e8e8f0] rounded-full overflow-hidden">
+                        <span className="text-[11px] text-[var(--t-c0c0d8)]">Límite IG</span>
+                        <div className="w-24 h-1.5 bg-[var(--s-e8e8f0)] rounded-full overflow-hidden">
                           <div className={`h-full rounded-full transition-all duration-300 ${barColor}`} style={{ width: `${charPct}%` }} />
                         </div>
-                        <span className="text-[11px] text-[#c0c0d8]">2,200</span>
+                        <span className="text-[11px] text-[var(--t-c0c0d8)]">2,200</span>
                       </div>
                     </div>
 
@@ -906,7 +906,7 @@ export default function HerramientasPage() {
                     <button
                       onClick={checkSpelling}
                       disabled={!text.trim() || spellStatus === 'checking'}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-[#e8e8f0] text-[13px] font-semibold text-[#4a4a6a] hover:border-[#0C2054]/30 hover:text-[#0C2054] hover:bg-[#f0f2ff] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-[var(--s-e8e8f0)] text-[13px] font-semibold text-[var(--t-4a4a6a)] hover:border-[#0C2054]/30 hover:text-[var(--t-0c2054)] hover:bg-[var(--s-f0f2ff)] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       {spellStatus === 'checking' ? (
                         <>
@@ -947,19 +947,19 @@ export default function HerramientasPage() {
 
                     {/* ── Spell results: corrections list ── */}
                     {spellStatus === 'done' && spellMatches.length > 0 && (
-                      <div className="border border-[#e8e8f0] rounded-xl overflow-hidden">
+                      <div className="border border-[var(--s-e8e8f0)] rounded-xl overflow-hidden">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-4 py-3 bg-[#f7f8fc] border-b border-[#e8e8f0]">
+                        <div className="flex items-center justify-between px-4 py-3 bg-[var(--s-f7f8fc)] border-b border-[var(--s-e8e8f0)]">
                           <div className="flex items-center gap-2">
-                            <span className="text-[12px] font-bold text-[#1a1a3e]">
+                            <span className="text-[12px] font-bold text-[var(--t-1a1a3e)]">
                               {spellMatches.length} corrección{spellMatches.length !== 1 ? 'es' : ''} sugerida{spellMatches.length !== 1 ? 's' : ''}
                             </span>
-                            <span className="text-[11px] text-[#9898bb]">· LanguageTool</span>
+                            <span className="text-[11px] text-[var(--t-9898bb)]">· LanguageTool</span>
                           </div>
                           {spellMatches.some(m => m.replacements.length > 0) && (
                             <button
                               onClick={applyAllCorrections}
-                              className="text-[12px] font-semibold text-[#0C2054] hover:underline"
+                              className="text-[12px] font-semibold text-[var(--t-0c2054)] hover:underline"
                             >
                               Aplicar todas
                             </button>
@@ -967,7 +967,7 @@ export default function HerramientasPage() {
                         </div>
 
                         {/* Corrections */}
-                        <div className="divide-y divide-[#f0f0f8] max-h-72 overflow-y-auto">
+                        <div className="divide-y divide-[var(--s-f0f0f8)] max-h-72 overflow-y-auto">
                           {spellMatches.map(match => {
                             const catLabel = SPELL_CATEGORY_LABEL[match.rule.category.id] ?? 'Sugerencia';
                             const isTypo = match.rule.category.id === 'TYPOS';
@@ -986,11 +986,11 @@ export default function HerramientasPage() {
                                     }`}>
                                       {catLabel}
                                     </span>
-                                    <span className="text-[12px] text-[#4a4a6a]">{match.message}</span>
+                                    <span className="text-[12px] text-[var(--t-4a4a6a)]">{match.message}</span>
                                   </div>
                                   <button
                                     onClick={() => dismissCorrection(match.offset)}
-                                    className="text-[#c0c0d8] hover:text-[#8888aa] flex-shrink-0 text-[14px] leading-none"
+                                    className="text-[var(--t-c0c0d8)] hover:text-[var(--t-8888aa)] flex-shrink-0 text-[14px] leading-none"
                                     title="Ignorar"
                                   >
                                     ×
@@ -998,7 +998,7 @@ export default function HerramientasPage() {
                                 </div>
 
                                 {/* Context with error underlined */}
-                                <p className="text-[12px] text-[#8888aa] font-mono">
+                                <p className="text-[12px] text-[var(--t-8888aa)] font-mono">
                                   …{ctxBefore}
                                   <span className={`font-semibold underline decoration-wavy ${isTypo ? 'text-red-600 decoration-red-500' : 'text-amber-600 decoration-amber-500'}`}>
                                     {ctxError}
@@ -1009,7 +1009,7 @@ export default function HerramientasPage() {
                                 {/* Suggestions */}
                                 {match.replacements.length > 0 && (
                                   <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="text-[11px] text-[#9898bb]">Sugerencias:</span>
+                                    <span className="text-[11px] text-[var(--t-9898bb)]">Sugerencias:</span>
                                     {match.replacements.slice(0, 4).map(r => (
                                       <button
                                         key={r.value}
@@ -1051,24 +1051,24 @@ export default function HerramientasPage() {
                         onClick={() => fileInputRef.current?.click()}
                         className={`border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center cursor-pointer transition-all ${
                           isDragging
-                            ? 'border-[#0C2054] bg-[#0C2054]/4'
-                            : 'border-[#e8e8f0] hover:border-[#0C2054]/40 hover:bg-[#f7f8fc]'
+                            ? 'border-[var(--s-0c2054)] bg-[#0C2054]/4'
+                            : 'border-[var(--s-e8e8f0)] hover:border-[#0C2054]/40 hover:bg-[var(--s-f7f8fc)]'
                         }`}
                       >
-                        <div className="w-12 h-12 rounded-2xl bg-[#f0f2ff] flex items-center justify-center mb-4">
-                          <Upload className="w-6 h-6 text-[#0C2054]" />
+                        <div className="w-12 h-12 rounded-2xl bg-[var(--s-f0f2ff)] flex items-center justify-center mb-4">
+                          <Upload className="w-6 h-6 text-[var(--t-0c2054)]" />
                         </div>
-                        <p className="text-[14px] font-semibold text-[#1a1a3e] mb-1">
+                        <p className="text-[14px] font-semibold text-[var(--t-1a1a3e)] mb-1">
                           {isDragging ? 'Suelta la imagen aquí' : 'Arrastra una imagen o haz clic'}
                         </p>
-                        <p className="text-[12px] text-[#9898bb] text-center">
+                        <p className="text-[12px] text-[var(--t-9898bb)] text-center">
                           PNG, JPG, WEBP, GIF · Flyers, graphics de Canva,<br />capturas de anuncios, posts con texto
                         </p>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         {/* Image preview + change button */}
-                        <div className="relative rounded-xl overflow-hidden border border-[#e8e8f0] bg-[#f7f8fc]">
+                        <div className="relative rounded-xl overflow-hidden border border-[var(--s-e8e8f0)] bg-[var(--s-f7f8fc)]">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={imagePreview}
@@ -1077,7 +1077,7 @@ export default function HerramientasPage() {
                           />
                           <button
                             onClick={resetImage}
-                            className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-white/90 shadow flex items-center justify-center text-[#9898bb] hover:text-red-500 transition-colors"
+                            className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-white/90 shadow flex items-center justify-center text-[var(--t-9898bb)] hover:text-red-500 transition-colors"
                           >
                             <RotateCcw className="w-3.5 h-3.5" />
                           </button>
@@ -1087,7 +1087,7 @@ export default function HerramientasPage() {
                         {ocrStatus === 'idle' && (
                           <button
                             onClick={runOcr}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0C2054] text-white text-[13px] font-bold shadow-sm hover:bg-[#0f2860] transition-all"
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[var(--s-0c2054)] text-white text-[13px] font-bold shadow-sm hover:bg-[var(--s-0f2860)] transition-all"
                           >
                             <ScanText className="w-4 h-4" />
                             Extraer texto de la imagen
@@ -1098,16 +1098,16 @@ export default function HerramientasPage() {
                         {ocrStatus === 'processing' && (
                           <div className="space-y-2">
                             <div className="flex items-center justify-between text-[12px]">
-                              <span className="text-[#4a4a6a] font-medium">Extrayendo texto (ES + EN)…</span>
-                              <span className="font-bold text-[#0C2054]">{ocrProgress}%</span>
+                              <span className="text-[var(--t-4a4a6a)] font-medium">Extrayendo texto (ES + EN)…</span>
+                              <span className="font-bold text-[var(--t-0c2054)]">{ocrProgress}%</span>
                             </div>
-                            <div className="h-2 bg-[#e8e8f0] rounded-full overflow-hidden">
+                            <div className="h-2 bg-[var(--s-e8e8f0)] rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-[#0C2054] rounded-full transition-all duration-200"
+                                className="h-full bg-[var(--s-0c2054)] rounded-full transition-all duration-200"
                                 style={{ width: `${ocrProgress}%` }}
                               />
                             </div>
-                            <p className="text-[11px] text-[#9898bb]">Procesando en el navegador — sin enviar datos externos</p>
+                            <p className="text-[11px] text-[var(--t-9898bb)]">Procesando en el navegador — sin enviar datos externos</p>
                           </div>
                         )}
 
@@ -1126,18 +1126,18 @@ export default function HerramientasPage() {
                         {/* Extracted text */}
                         {ocrStatus === 'done' && ocrText && (
                           <div className="space-y-3">
-                            <div className="bg-[#f7f8fc] rounded-xl border border-[#e8e8f0] p-4">
+                            <div className="bg-[var(--s-f7f8fc)] rounded-xl border border-[var(--s-e8e8f0)] p-4">
                               <div className="flex items-center justify-between mb-2">
-                                <p className="text-[11px] font-bold text-[#9898bb] uppercase tracking-wider">Texto extraído</p>
-                                <span className="text-[11px] text-[#c0c0d8]">{ocrText.length} chars</span>
+                                <p className="text-[11px] font-bold text-[var(--t-9898bb)] uppercase tracking-wider">Texto extraído</p>
+                                <span className="text-[11px] text-[var(--t-c0c0d8)]">{ocrText.length} chars</span>
                               </div>
-                              <p className="text-[13px] text-[#4a4a6a] whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto">
+                              <p className="text-[13px] text-[var(--t-4a4a6a)] whitespace-pre-wrap leading-relaxed max-h-36 overflow-y-auto">
                                 {ocrText}
                               </p>
                             </div>
                             <button
                               onClick={useOcrText}
-                              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#0C2054] text-white text-[13px] font-bold shadow-sm hover:bg-[#0f2860] transition-all"
+                              className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[var(--s-0c2054)] text-white text-[13px] font-bold shadow-sm hover:bg-[var(--s-0f2860)] transition-all"
                             >
                               <ArrowRight className="w-4 h-4" />
                               Usar texto extraído para auditar
@@ -1147,7 +1147,7 @@ export default function HerramientasPage() {
                       </div>
                     )}
 
-                    <p className="text-[11px] text-[#c0c0d8] text-center">
+                    <p className="text-[11px] text-[var(--t-c0c0d8)] text-center">
                       OCR local con Tesseract.js · Español + Inglés · Sin envío de datos a servidores externos
                     </p>
                   </>
@@ -1156,8 +1156,8 @@ export default function HerramientasPage() {
             </div>
 
             {/* Platform selector */}
-            <div className="bg-white rounded-2xl border border-[#e8e8f0] p-6 shadow-sm space-y-4">
-              <h2 className="text-[15px] font-bold text-[#1a1a3e]">Redes sociales a auditar</h2>
+            <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8e8f0)] p-6 shadow-sm space-y-4">
+              <h2 className="text-[15px] font-bold text-[var(--t-1a1a3e)]">Redes sociales a auditar</h2>
               <div className="flex flex-wrap gap-2">
                 {PLATFORMS.map(p => {
                   const active = selectedPlatforms.includes(p.id);
@@ -1166,7 +1166,7 @@ export default function HerramientasPage() {
                       key={p.id}
                       onClick={() => togglePlatform(p.id)}
                       className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-[13px] font-semibold border-2 transition-all ${
-                        active ? 'text-white border-transparent shadow-sm' : 'bg-white border-[#e8e8f0] text-[#8888aa] hover:border-[#c0c0d8]'
+                        active ? 'text-white border-transparent shadow-sm' : 'bg-[var(--surface)] border-[var(--s-e8e8f0)] text-[var(--t-8888aa)] hover:border-[var(--s-c0c0d8)]'
                       }`}
                       style={active ? { backgroundColor: p.color, borderColor: p.color } : {}}
                     >
@@ -1182,7 +1182,7 @@ export default function HerramientasPage() {
             <button
               onClick={analyze}
               disabled={!text.trim() || selectedPlatforms.length === 0}
-              className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#0C2054] text-white text-[14px] font-bold shadow-md hover:bg-[#0f2860] active:scale-[0.99] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[var(--s-0c2054)] text-white text-[14px] font-bold shadow-md hover:bg-[var(--s-0f2860)] active:scale-[0.99] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Wand2 className="w-4 h-4" />
               Analizar Contenido
@@ -1192,14 +1192,14 @@ export default function HerramientasPage() {
           {/* ── RIGHT: results ────────────────────────────────────────────── */}
           <div className="space-y-4">
             {results === null ? (
-              <div className="bg-white rounded-2xl border border-[#e8e8f0] p-12 shadow-sm flex flex-col items-center justify-center text-center min-h-[420px]">
-                <div className="w-16 h-16 rounded-2xl bg-[#f0f2ff] flex items-center justify-center mb-5">
-                  <ClipboardCheck className="w-8 h-8 text-[#0C2054]" />
+              <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8e8f0)] p-12 shadow-sm flex flex-col items-center justify-center text-center min-h-[420px]">
+                <div className="w-16 h-16 rounded-2xl bg-[var(--s-f0f2ff)] flex items-center justify-center mb-5">
+                  <ClipboardCheck className="w-8 h-8 text-[var(--t-0c2054)]" />
                 </div>
-                <p className="text-[16px] font-bold text-[#1a1a3e] mb-2">Listo para auditar</p>
-                <p className="text-[13px] text-[#9898bb] max-w-xs leading-relaxed">
+                <p className="text-[16px] font-bold text-[var(--t-1a1a3e)] mb-2">Listo para auditar</p>
+                <p className="text-[13px] text-[var(--t-9898bb)] max-w-xs leading-relaxed">
                   Selecciona el tipo de contenido, pega el texto, elige las redes y haz clic en{' '}
-                  <span className="font-semibold text-[#0C2054]">Analizar Contenido</span>.
+                  <span className="font-semibold text-[var(--t-0c2054)]">Analizar Contenido</span>.
                 </p>
                 <div className="mt-6 grid grid-cols-2 gap-2 text-left w-full max-w-xs">
                   {[
@@ -1208,9 +1208,9 @@ export default function HerramientasPage() {
                     ['5', 'tipos de contenido'],
                     ['NJ RPC', '7.1 · 7.2 · 7.3 · 7.4 · 1.18'],
                   ].map(([val, lbl]) => (
-                    <div key={lbl} className="bg-[#f7f8fc] rounded-xl px-3 py-2.5">
-                      <p className="text-[15px] font-bold text-[#0C2054]">{val}</p>
-                      <p className="text-[11px] text-[#9898bb] leading-tight">{lbl}</p>
+                    <div key={lbl} className="bg-[var(--s-f7f8fc)] rounded-xl px-3 py-2.5">
+                      <p className="text-[15px] font-bold text-[var(--t-0c2054)]">{val}</p>
+                      <p className="text-[11px] text-[var(--t-9898bb)] leading-tight">{lbl}</p>
                     </div>
                   ))}
                 </div>
@@ -1249,7 +1249,7 @@ export default function HerramientasPage() {
                       {totalCritical === 0 && totalFail === 0 && totalWarn > 0 && (
                         <span className="text-[12px] text-amber-700 font-medium">— revisar advertencias antes de publicar</span>
                       )}
-                      <span className="ml-auto text-[11px] text-[#9898bb]">{results.length} red{results.length !== 1 ? 'es' : ''}</span>
+                      <span className="ml-auto text-[11px] text-[var(--t-9898bb)]">{results.length} red{results.length !== 1 ? 'es' : ''}</span>
                     </div>
                   );
                 })()}
@@ -1262,16 +1262,16 @@ export default function HerramientasPage() {
                   const legalRules = result.rules.filter(r => r.category === 'legal');
 
                   return (
-                    <div key={result.platformId} className="bg-white rounded-2xl border border-[#e8e8f0] shadow-sm overflow-hidden">
+                    <div key={result.platformId} className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8e8f0)] shadow-sm overflow-hidden">
                       {/* Header */}
                       <button
                         onClick={() => toggleExpanded(result.platformId)}
-                        className="w-full flex items-center gap-3 px-5 py-4 hover:bg-[#f7f8fc] transition-colors text-left"
+                        className="w-full flex items-center gap-3 px-5 py-4 hover:bg-[var(--s-f7f8fc)] transition-colors text-left"
                       >
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: platform.bgColor }}>
                           <PlatformIcon id={platform.id} size={18} color={platform.color} />
                         </div>
-                        <span className="font-bold text-[14px] text-[#1a1a3e] flex-1">{platform.name}</span>
+                        <span className="font-bold text-[14px] text-[var(--t-1a1a3e)] flex-1">{platform.name}</span>
                         <div className="flex items-center gap-1.5">
                           {result.criticalCount > 0 && (
                             <span className="flex items-center gap-1 text-[11px] font-bold text-white bg-red-600 px-2 py-0.5 rounded-full whitespace-nowrap">
@@ -1294,17 +1294,17 @@ export default function HerramientasPage() {
                             </span>
                           )}
                         </div>
-                        {isExpanded ? <ChevronUp className="w-4 h-4 text-[#c0c0d8] flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-[#c0c0d8] flex-shrink-0" />}
+                        {isExpanded ? <ChevronUp className="w-4 h-4 text-[var(--t-c0c0d8)] flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-[var(--t-c0c0d8)] flex-shrink-0" />}
                       </button>
 
                       {/* Expanded rules */}
                       {isExpanded && (
-                        <div className="border-t border-[#f0f0f8]">
+                        <div className="border-t border-[var(--s-f0f0f8)]">
                           {/* Technical rules */}
                           {techRules.length > 0 && (
                             <>
-                              <div className="px-5 py-2 bg-[#f7f8fc]">
-                                <p className="text-[10px] font-bold text-[#9898bb] uppercase tracking-wider">Reglas técnicas de plataforma</p>
+                              <div className="px-5 py-2 bg-[var(--s-f7f8fc)]">
+                                <p className="text-[10px] font-bold text-[var(--t-9898bb)] uppercase tracking-wider">Reglas técnicas de plataforma</p>
                               </div>
                               <div className="divide-y divide-[#f7f7fc]">
                                 {techRules.map(rule => (
@@ -1314,7 +1314,7 @@ export default function HerramientasPage() {
                             </>
                           )}
                           {/* Legal compliance rules */}
-                          <div className="px-5 py-2 bg-[#fdf5ff]">
+                          <div className="px-5 py-2 bg-[var(--s-fdf5ff)]">
                             <p className="text-[10px] font-bold text-[#7c3aed]/60 uppercase tracking-wider">Cumplimiento ético y legal</p>
                           </div>
                           <div className="divide-y divide-[#f7f7fc]">
@@ -1360,13 +1360,13 @@ function RuleRow({ rule }: { rule: { id: string; label: string; result: RuleResu
         )}
       </div>
       <div className="min-w-0">
-        <p className={`text-[12px] font-semibold leading-snug ${isCritical ? 'text-red-700' : 'text-[#4a4a6a]'}`}>
+        <p className={`text-[12px] font-semibold leading-snug ${isCritical ? 'text-red-700' : 'text-[var(--t-4a4a6a)]'}`}>
           {rule.label}
         </p>
         <p className={`text-[12px] mt-0.5 leading-snug ${
           isCritical ? 'text-red-700 font-medium' :
           isFail ? 'text-orange-600' :
-          isWarn ? 'text-amber-600' : 'text-[#9898bb]'
+          isWarn ? 'text-amber-600' : 'text-[var(--t-9898bb)]'
         }`}>
           {result.message}
         </p>

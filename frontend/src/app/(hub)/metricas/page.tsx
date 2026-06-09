@@ -54,17 +54,17 @@ function MetricRow({ kpi }: { kpi: (typeof MOCK_KPIS)[0] }) {
   };
 
   return (
-    <div className="flex items-center gap-4 py-4 border-b border-[#f0f0f0] last:border-0 hover:bg-[#fafafe] -mx-5 px-5 transition-colors">
+    <div className="flex items-center gap-4 py-4 border-b border-[var(--s-f0f0f0)] last:border-0 hover:bg-[var(--s-fafafe)] -mx-5 px-5 transition-colors">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <span className="text-sm font-semibold text-[#1a1a2e]">{kpi.name}</span>
+          <span className="text-sm font-semibold text-[var(--t-1a1a2e)]">{kpi.name}</span>
           <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${src.color}`}>{src.label}</span>
         </div>
-        <span className="text-xs text-[#8888a8]">{categoryLabels[kpi.category]}</span>
+        <span className="text-xs text-[var(--t-8888a8)]">{categoryLabels[kpi.category]}</span>
       </div>
       <div className="text-right min-w-[80px]">
-        <p className="text-base font-bold text-[#1a1a2e]">{formatVal(kpi.value)}</p>
-        <p className="text-xs text-[#8888a8]">de {formatVal(kpi.target)}</p>
+        <p className="text-base font-bold text-[var(--t-1a1a2e)]">{formatVal(kpi.value)}</p>
+        <p className="text-xs text-[var(--t-8888a8)]">de {formatVal(kpi.target)}</p>
       </div>
       <div className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-full min-w-[64px] justify-center ${
         positiveChange ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
@@ -73,18 +73,18 @@ function MetricRow({ kpi }: { kpi: (typeof MOCK_KPIS)[0] }) {
         {Math.abs(change).toFixed(1)}%
       </div>
       <div className="w-32">
-        <div className="flex justify-between text-[10px] text-[#8888a8] mb-1">
+        <div className="flex justify-between text-[10px] text-[var(--t-8888a8)] mb-1">
           <span>Progreso</span>
           <span>{progress.toFixed(0)}%</span>
         </div>
-        <div className="w-full h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-[var(--s-f0f0f0)] rounded-full overflow-hidden">
           <div
-            className={`h-full rounded-full ${progress >= 100 ? 'bg-[#00b894]' : progress >= 70 ? 'bg-[#F79C31]' : 'bg-red-400'}`}
+            className={`h-full rounded-full ${progress >= 100 ? 'bg-[#00b894]' : progress >= 70 ? 'bg-[var(--s-f79c31)]' : 'bg-red-400'}`}
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
-      <div className="text-xs text-[#8888a8] hidden lg:block min-w-[90px]">
+      <div className="text-xs text-[var(--t-8888a8)] hidden lg:block min-w-[90px]">
         {kpi.lastUpdated ? new Date(kpi.lastUpdated).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' }) : '—'}
       </div>
     </div>
@@ -124,11 +124,11 @@ export default function MetricasPage() {
         subtitle="Seguimiento de indicadores clave del departamento"
         actions={
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 text-xs font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg px-3 py-2 hover:bg-[#f7f8fc] transition-colors">
+            <button className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors">
               <RefreshCw className="w-3.5 h-3.5" />
               Actualizar
             </button>
-            <button className="flex items-center gap-2 text-xs font-semibold text-[#4a4a6a] border border-[#e8e8f0] rounded-lg px-3 py-2 hover:bg-[#f7f8fc] transition-colors">
+            <button className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors">
               <Download className="w-3.5 h-3.5" />
               Exportar
             </button>
@@ -139,15 +139,15 @@ export default function MetricasPage() {
       <div className="px-10 py-10 space-y-10">
 
         {/* ── Tabs ── */}
-        <div className="flex items-center gap-1 border-b border-[#e8e8f0]">
+        <div className="flex items-center gap-1 border-b border-[var(--s-e8e8f0)]">
           {TABS.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2.5 border-b-2 -mb-px transition-all ${
                 activeTab === tab
-                  ? 'border-[#0C2054] text-[#0C2054]'
-                  : 'border-transparent text-[#8888a8] hover:text-[#4a4a6a]'
+                  ? 'border-[var(--s-0c2054)] text-[var(--t-0c2054)]'
+                  : 'border-transparent text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)]'
               }`}
             >
               {tab === 'YouTube'          && <PlaySquare className="w-3.5 h-3.5 text-red-500" />}
@@ -166,21 +166,21 @@ export default function MetricasPage() {
         {activeTab === 'Departamentales' && <>
           {/* Period selector */}
           <div className="flex items-center gap-3">
-            <span className="text-sm text-[#8888a8] font-medium">Período:</span>
-            <div className="flex gap-1 bg-white border border-[#e8e8f0] rounded-lg p-1">
+            <span className="text-sm text-[var(--t-8888a8)] font-medium">Período:</span>
+            <div className="flex gap-1 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-lg p-1">
               {PERIODS.map(p => (
                 <button
                   key={p}
                   onClick={() => setPeriod(p)}
                   className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all ${
-                    period === p ? 'bg-[#0C2054] text-white shadow-sm' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+                    period === p ? 'bg-[var(--s-0c2054)] text-white shadow-sm' : 'text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)]'
                   }`}
                 >
                   {p}
                 </button>
               ))}
             </div>
-            <div className="ml-auto text-xs text-[#8888a8] flex items-center gap-1.5">
+            <div className="ml-auto text-xs text-[var(--t-8888a8)] flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-[#00b894] animate-pulse" />
               Última actualización: hace 12 minutos
             </div>
@@ -201,9 +201,9 @@ export default function MetricasPage() {
                 <Card key={kpi.id} className="p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-xl">{icon}</span>
-                    <p className="text-xs font-medium text-[#8888a8]">{label}</p>
+                    <p className="text-xs font-medium text-[var(--t-8888a8)]">{label}</p>
                   </div>
-                  <p className="text-2xl font-bold text-[#1a1a2e] mb-1">
+                  <p className="text-2xl font-bold text-[var(--t-1a1a2e)] mb-1">
                     {kpi.unit === 'currency' ? formatCurrency(kpi.value)
                       : kpi.unit === 'percentage' ? `${kpi.value}%`
                       : formatNumber(kpi.value)}
@@ -220,8 +220,8 @@ export default function MetricasPage() {
           <Card className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-[15px] font-bold text-[#111827]">Evolución de Métricas Clave</h3>
-                <p className="text-xs text-[#6b7280] mt-0.5">Leads, sesiones y gasto — últimos 5 meses</p>
+                <h3 className="text-[15px] font-bold text-[var(--t-111827)]">Evolución de Métricas Clave</h3>
+                <p className="text-xs text-[var(--t-6b7280)] mt-0.5">Leads, sesiones y gasto — últimos 5 meses</p>
               </div>
             </div>
             <ResponsiveContainer width="100%" height={260}>
@@ -232,8 +232,8 @@ export default function MetricasPage() {
                 <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 11, fill: '#8888a8' }} axisLine={false} tickLine={false} tickFormatter={v => `$${v/1000}K`} />
                 <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.1)', fontSize: '12px' }} />
                 <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '12px' }} />
-                <Line yAxisId="left" type="monotone" dataKey="leads" name="Leads" stroke="#F79C31" strokeWidth={2.5} dot={{ fill: '#F79C31', r: 4 }} />
-                <Line yAxisId="left" type="monotone" dataKey="sesiones" name="Sesiones" stroke="#0C2054" strokeWidth={2} dot={{ fill: '#0C2054', r: 3 }} strokeDasharray="5 5" />
+                <Line yAxisId="left" type="monotone" dataKey="leads" name="Leads" stroke="#F79C31" strokeWidth={2.5} dot={{ fill: 'var(--s-f79c31)', r: 4 }} />
+                <Line yAxisId="left" type="monotone" dataKey="sesiones" name="Sesiones" stroke="#0C2054" strokeWidth={2} dot={{ fill: 'var(--s-0c2054)', r: 3 }} strokeDasharray="5 5" />
                 <Line yAxisId="right" type="monotone" dataKey="spend" name="Ad Spend" stroke="#00b894" strokeWidth={2} dot={{ fill: '#00b894', r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
@@ -242,7 +242,7 @@ export default function MetricasPage() {
           {/* Channel breakdown */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card className="p-6">
-              <h3 className="text-[15px] font-bold text-[#111827] mb-5">Rendimiento por Canal</h3>
+              <h3 className="text-[15px] font-bold text-[var(--t-111827)] mb-5">Rendimiento por Canal</h3>
               <ResponsiveContainer width="100%" height={200}>
                 <BarChart data={MOCK_CHANNEL_DATA} layout="vertical" barSize={16}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
@@ -255,15 +255,15 @@ export default function MetricasPage() {
             </Card>
 
             <Card className="p-6">
-              <h3 className="text-[15px] font-bold text-[#111827] mb-5">Costo por Lead por Canal</h3>
+              <h3 className="text-[15px] font-bold text-[var(--t-111827)] mb-5">Costo por Lead por Canal</h3>
               <div className="space-y-3">
                 {MOCK_CHANNEL_DATA.filter(d => d.cpl > 0).map((d) => (
                   <div key={d.channel}>
                     <div className="flex items-center justify-between text-sm mb-1.5">
-                      <span className="font-medium text-[#4a4a6a]">{d.channel}</span>
-                      <span className="font-bold text-[#1a1a2e]">{formatCurrency(d.cpl)}</span>
+                      <span className="font-medium text-[var(--t-4a4a6a)]">{d.channel}</span>
+                      <span className="font-bold text-[var(--t-1a1a2e)]">{formatCurrency(d.cpl)}</span>
                     </div>
-                    <div className="w-full h-2 bg-[#f0f0f0] rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-[var(--s-f0f0f0)] rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all"
                         style={{
@@ -272,7 +272,7 @@ export default function MetricasPage() {
                         }}
                       />
                     </div>
-                    <p className="text-[10px] text-[#8888a8] mt-1">
+                    <p className="text-[10px] text-[var(--t-8888a8)] mt-1">
                       Target: $35.00 · {d.leads} leads · {formatCurrency(d.spend)} gasto
                     </p>
                   </div>
@@ -284,14 +284,14 @@ export default function MetricasPage() {
           {/* KPI Table */}
           <Card className="p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="text-[15px] font-bold text-[#111827]">Todos los KPIs</h3>
-              <div className="flex gap-1 bg-[#f7f8fc] rounded-lg p-1">
+              <h3 className="text-[15px] font-bold text-[var(--t-111827)]">Todos los KPIs</h3>
+              <div className="flex gap-1 bg-[var(--s-f7f8fc)] rounded-lg p-1">
                 {[['all', 'Todos'], ['acquisition', 'Adquisición'], ['engagement', 'Engagement'], ['conversion', 'Conversión'], ['brand', 'Marca']].map(([val, label]) => (
                   <button
                     key={val}
                     onClick={() => setActiveCategory(val)}
                     className={`text-xs font-semibold px-2.5 py-1 rounded-md transition-all ${
-                      activeCategory === val ? 'bg-white text-[#0C2054] shadow-sm' : 'text-[#8888a8] hover:text-[#4a4a6a]'
+                      activeCategory === val ? 'bg-[var(--surface)] text-[var(--t-0c2054)] shadow-sm' : 'text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)]'
                     }`}
                   >
                     {label}
@@ -299,13 +299,13 @@ export default function MetricasPage() {
                 ))}
               </div>
             </div>
-            <div className="border border-[#f0f0f0] rounded-lg overflow-hidden">
-              <div className="flex items-center gap-4 py-2.5 px-5 bg-[#f7f8fc] border-b border-[#f0f0f0]">
-                <span className="flex-1 text-xs font-semibold text-[#8888a8] uppercase tracking-wide">Métrica</span>
-                <span className="text-xs font-semibold text-[#8888a8] uppercase tracking-wide min-w-[80px] text-right">Valor</span>
-                <span className="text-xs font-semibold text-[#8888a8] uppercase tracking-wide min-w-[64px] text-center">Cambio</span>
-                <span className="text-xs font-semibold text-[#8888a8] uppercase tracking-wide w-32">Progreso</span>
-                <span className="text-xs font-semibold text-[#8888a8] uppercase tracking-wide hidden lg:block min-w-[90px]">Actualizado</span>
+            <div className="border border-[var(--s-f0f0f0)] rounded-lg overflow-hidden">
+              <div className="flex items-center gap-4 py-2.5 px-5 bg-[var(--s-f7f8fc)] border-b border-[var(--s-f0f0f0)]">
+                <span className="flex-1 text-xs font-semibold text-[var(--t-8888a8)] uppercase tracking-wide">Métrica</span>
+                <span className="text-xs font-semibold text-[var(--t-8888a8)] uppercase tracking-wide min-w-[80px] text-right">Valor</span>
+                <span className="text-xs font-semibold text-[var(--t-8888a8)] uppercase tracking-wide min-w-[64px] text-center">Cambio</span>
+                <span className="text-xs font-semibold text-[var(--t-8888a8)] uppercase tracking-wide w-32">Progreso</span>
+                <span className="text-xs font-semibold text-[var(--t-8888a8)] uppercase tracking-wide hidden lg:block min-w-[90px]">Actualizado</span>
               </div>
               <div className="px-5">
                 {filtered.map(kpi => <MetricRow key={kpi.id} kpi={kpi} />)}
@@ -384,13 +384,13 @@ function GA4Section() {
 
       {/* Controles de período */}
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex gap-1 bg-white border border-[#e8e8f0] rounded-lg p-1">
+        <div className="flex gap-1 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-lg p-1">
           {(['monthly', 'weekly'] as const).map(m => (
             <button
               key={m}
               onClick={() => setViewMode(m)}
               className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all ${
-                viewMode === m ? 'bg-[#0C2054] text-white' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+                viewMode === m ? 'bg-[var(--s-0c2054)] text-white' : 'text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)]'
               }`}
             >
               {m === 'monthly' ? '28 días' : 'Por semana'}
@@ -402,24 +402,24 @@ function GA4Section() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setWeekStr(w => addWeeks(w, -1))}
-              className="w-8 h-8 rounded-lg border border-[#e5e7eb] flex items-center justify-center text-[#6b7280] hover:border-[#0C2054] hover:text-[#0C2054] transition-all"
+              className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="text-sm font-bold text-[#111827] min-w-[80px] text-center">
+            <span className="text-sm font-bold text-[var(--t-111827)] min-w-[80px] text-center">
               {weekStr}
             </span>
             <button
               onClick={() => setWeekStr(w => addWeeks(w, 1))}
               disabled={weekStr === currentWeek}
-              className="w-8 h-8 rounded-lg border border-[#e5e7eb] flex items-center justify-center text-[#6b7280] hover:border-[#0C2054] hover:text-[#0C2054] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        {loading && <span className="text-xs text-[#9ca3af] animate-pulse ml-2">Cargando...</span>}
+        {loading && <span className="text-xs text-[var(--t-9ca3af)] animate-pulse ml-2">Cargando...</span>}
       </div>
 
       {/* Tarjetas de métricas */}
@@ -445,16 +445,16 @@ function GA4Section() {
                   </span>
                 )}
               </div>
-              <p className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-[0.08em] mb-1.5">{label}</p>
+              <p className="text-[10px] font-bold text-[var(--t-9ca3af)] uppercase tracking-[0.08em] mb-1.5">{label}</p>
               {value !== null ? (
-                <p className="text-2xl font-extrabold text-[#111827] leading-none tracking-tight">
+                <p className="text-2xl font-extrabold text-[var(--t-111827)] leading-none tracking-tight">
                   {fmt(value)}
                 </p>
               ) : (
-                <p className="text-base font-semibold text-[#d1d5db] leading-none">Sin datos</p>
+                <p className="text-base font-semibold text-[var(--t-d1d5db)] leading-none">Sin datos</p>
               )}
               {entry?.prev_value != null && (
-                <p className="text-[10px] text-[#9ca3af] mt-1.5">
+                <p className="text-[10px] text-[var(--t-9ca3af)] mt-1.5">
                   Anterior: {fmt(entry.prev_value)}
                 </p>
               )}
@@ -564,27 +564,27 @@ function YouTubeSection({ subscribersTotal }: { subscribersTotal: number | null 
         <div className="flex items-center gap-3">
           <button
             onClick={() => setWeekStr(w => addWeeks(w, -1))}
-            className="w-8 h-8 rounded-lg border border-[#e5e7eb] flex items-center justify-center text-[#6b7280] hover:border-[#0C2054] hover:text-[#0C2054] transition-all"
+            className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <div className="text-center min-w-[160px]">
-            <p className="text-sm font-bold text-[#111827]">
+            <p className="text-sm font-bold text-[var(--t-111827)]">
               {weekData ? fmtDateRange(weekData.period_start, weekData.period_end) : weekStr}
             </p>
-            <p className="text-[11px] text-[#9ca3af]">
+            <p className="text-[11px] text-[var(--t-9ca3af)]">
               {weekStr}{isCurrentWeek ? ' · Semana actual' : ''}
             </p>
           </div>
           <button
             onClick={() => setWeekStr(w => addWeeks(w, 1))}
             disabled={isCurrentWeek}
-            className="w-8 h-8 rounded-lg border border-[#e5e7eb] flex items-center justify-center text-[#6b7280] hover:border-[#0C2054] hover:text-[#0C2054] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+            className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
-        {loading && <span className="text-xs text-[#9ca3af] animate-pulse">Cargando...</span>}
+        {loading && <span className="text-xs text-[var(--t-9ca3af)] animate-pulse">Cargando...</span>}
       </div>
 
       {/* Weekly metric cards */}
@@ -612,16 +612,16 @@ function YouTubeSection({ subscribersTotal }: { subscribersTotal: number | null 
                   </span>
                 )}
               </div>
-              <p className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-[0.1em] mb-2">{label}</p>
+              <p className="text-[11px] font-bold text-[var(--t-9ca3af)] uppercase tracking-[0.1em] mb-2">{label}</p>
               {value !== null ? (
-                <p className="text-[26px] font-extrabold text-[#111827] leading-none tracking-tight">
+                <p className="text-[26px] font-extrabold text-[var(--t-111827)] leading-none tracking-tight">
                   {fmt(value)}
                 </p>
               ) : (
-                <p className="text-[16px] font-semibold text-[#d1d5db] leading-none">Sin datos</p>
+                <p className="text-[16px] font-semibold text-[var(--t-d1d5db)] leading-none">Sin datos</p>
               )}
               {entry?.prev_value != null && (
-                <p className="text-[11px] text-[#9ca3af] mt-1.5">
+                <p className="text-[11px] text-[var(--t-9ca3af)] mt-1.5">
                   Semana anterior: {fmt(entry.prev_value)}
                 </p>
               )}

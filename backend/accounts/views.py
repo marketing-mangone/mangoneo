@@ -14,7 +14,10 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
 from .models import UserProfile
-from .serializers import UserManagementSerializer, MeSerializer
+from .serializers import (
+    UserManagementSerializer, MeSerializer, MeUpdateSerializer,
+    ChangePasswordSerializer,
+)
 
 
 # ── Permissions ───────────────────────────────────────────────────────────────
@@ -124,10 +127,31 @@ class LogoutView(APIView):
 
 # ── User views ────────────────────────────────────────────────────────────────
 
-@api_view(['GET'])
+@api_view(['GET', 'PATCH', 'PUT'])
 @permission_classes([IsAuthenticated])
 def me_view(request):
+    if request.method == 'GET':
+        return Response(MeSerializer(request.user).data)
+
+    # PATCH / PUT — user edits their own profile
+    serializer = MeUpdateSerializer(
+        instance=request.user,
+        data=request.data,
+        partial=request.method == 'PATCH',
+        context={'request': request},
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
     return Response(MeSerializer(request.user).data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password_view(request):
+    serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response({'status': 'ok', 'detail': 'Contraseña actualizada.'})
 
 
 class UserManagementViewSet(viewsets.ModelViewSet):

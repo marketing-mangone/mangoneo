@@ -129,21 +129,21 @@ function TaskModal({
     }
   };
 
-  const inputCls = "w-full px-3 py-2.5 text-sm border border-[#e8e8f0] rounded-lg outline-none focus:border-[#F79C31] transition-colors";
+  const inputCls = "w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors";
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#f0f0f0] sticky top-0 bg-white z-10">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--s-f0f0f0)] sticky top-0 bg-[var(--surface)] z-10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#F79C31]/10 flex items-center justify-center">
-              <CheckSquare className="w-5 h-5 text-[#F79C31]" />
+              <CheckSquare className="w-5 h-5 text-[var(--t-f79c31)]" />
             </div>
-            <h3 className="font-bold text-[#1a1a2e]">{isEdit ? 'Editar tarea' : 'Nueva tarea'}</h3>
+            <h3 className="font-bold text-[var(--t-1a1a2e)]">{isEdit ? 'Editar tarea' : 'Nueva tarea'}</h3>
           </div>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#f7f8fc] text-[#8888a8]">
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--s-f7f8fc)] text-[var(--t-8888a8)]">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -151,7 +151,7 @@ function TaskModal({
         <div className="px-6 py-5 space-y-4">
           {/* Título */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
               Título <span className="text-red-400">*</span>
             </label>
             <input
@@ -164,8 +164,8 @@ function TaskModal({
 
           {/* Descripción */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
-              Descripción <span className="text-[#8888a8] font-normal">(opcional)</span>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
+              Descripción <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span>
             </label>
             <textarea
               value={description}
@@ -178,7 +178,7 @@ function TaskModal({
 
           {/* Estado */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Estado</label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Estado</label>
             <div className="flex flex-wrap gap-2">
               {(Object.entries(STATUS_CONFIG) as [ApiTask['status'], typeof STATUS_CONFIG[keyof typeof STATUS_CONFIG]][]).map(([key, cfg]) => (
                 <button
@@ -187,7 +187,7 @@ function TaskModal({
                   className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                     status === key
                       ? `${cfg.bg} ${cfg.color} border-current`
-                      : 'bg-white text-[#4a4a6a] border-[#e8e8f0] hover:bg-[#f7f8fc]'
+                      : 'bg-[var(--surface)] text-[var(--t-4a4a6a)] border-[var(--s-e8e8f0)] hover:bg-[var(--s-f7f8fc)]'
                   }`}
                 >
                   {cfg.label}
@@ -198,7 +198,7 @@ function TaskModal({
 
           {/* Prioridad */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Prioridad</label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Prioridad</label>
             <div className="flex flex-wrap gap-2">
               {(Object.entries(PRIORITY_CONFIG) as [ApiTask['priority'], typeof PRIORITY_CONFIG[keyof typeof PRIORITY_CONFIG]][]).map(([key, cfg]) => (
                 <button
@@ -207,7 +207,7 @@ function TaskModal({
                   className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all ${
                     priority === key
                       ? `${cfg.text} border-current`
-                      : 'bg-white text-[#4a4a6a] border-[#e8e8f0] hover:bg-[#f7f8fc]'
+                      : 'bg-[var(--surface)] text-[var(--t-4a4a6a)] border-[var(--s-e8e8f0)] hover:bg-[var(--s-f7f8fc)]'
                   }`}
                 >
                   {cfg.label}
@@ -218,10 +218,10 @@ function TaskModal({
 
           {/* Fechas */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Fechas</label>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Fechas</label>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-[10px] text-[#8888a8] mb-1">Fecha de inicio</label>
+                <label className="block text-[10px] text-[var(--t-8888a8)] mb-1">Fecha de inicio</label>
                 <input
                   type="date"
                   value={startDate}
@@ -230,7 +230,7 @@ function TaskModal({
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-[#8888a8] mb-1">Fecha límite</label>
+                <label className="block text-[10px] text-[var(--t-8888a8)] mb-1">Fecha límite</label>
                 <input
                   type="date"
                   value={dueDate}
@@ -243,8 +243,8 @@ function TaskModal({
 
           {/* Proyecto */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
-              Proyecto <span className="text-[#8888a8] font-normal">(opcional)</span>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
+              Proyecto <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span>
             </label>
             <input
               value={project}
@@ -256,9 +256,9 @@ function TaskModal({
 
           {/* Progreso */}
           <div>
-            <div className="flex justify-between text-xs font-semibold text-[#4a4a6a] mb-1.5">
+            <div className="flex justify-between text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
               <label>Progreso</label>
-              <span className="text-[#F79C31]">{progress}%</span>
+              <span className="text-[var(--t-f79c31)]">{progress}%</span>
             </div>
             <input
               type="range"
@@ -272,8 +272,8 @@ function TaskModal({
 
           {/* Tags */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
-              Etiquetas <span className="text-[#8888a8] font-normal">(separadas por coma)</span>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
+              Etiquetas <span className="text-[var(--t-8888a8)] font-normal">(separadas por coma)</span>
             </label>
             <input
               value={tagsInput}
@@ -285,13 +285,13 @@ function TaskModal({
 
           {/* Responsable */}
           <div>
-            <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
-              Responsable <span className="text-[#8888a8] font-normal">(opcional)</span>
+            <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
+              Responsable <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span>
             </label>
             <select
               value={assignee ?? ''}
               onChange={e => setAssignee(e.target.value ? Number(e.target.value) : null)}
-              className={`${inputCls} text-[#1a1a2e] bg-white`}
+              className={`${inputCls} text-[var(--t-1a1a2e)] bg-[var(--surface)]`}
             >
               <option value="">— Sin asignar —</option>
               {teamMembers
@@ -313,14 +313,14 @@ function TaskModal({
         <div className="flex gap-3 px-6 pb-6">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 text-sm font-semibold border border-[#e8e8f0] rounded-lg text-[#4a4a6a] hover:bg-[#f7f8fc] transition-colors"
+            className="flex-1 py-2.5 text-sm font-semibold border border-[var(--s-e8e8f0)] rounded-lg text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)] transition-colors"
           >
             Cancelar
           </button>
           <button
             onClick={submit}
             disabled={saving}
-            className="flex-1 py-2.5 text-sm font-semibold bg-[#F79C31] text-white rounded-lg hover:bg-[#e08a20] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+            className="flex-1 py-2.5 text-sm font-semibold bg-[var(--s-f79c31)] text-white rounded-lg hover:bg-[var(--s-e08a20)] transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             {isEdit ? 'Guardar cambios' : 'Crear tarea'}
@@ -370,14 +370,14 @@ function TaskCard({
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <p className={`text-sm font-semibold leading-tight ${task.status === 'done' ? 'line-through text-[#8888a8]' : 'text-[#1a1a2e]'}`}>
+            <p className={`text-sm font-semibold leading-tight ${task.status === 'done' ? 'line-through text-[var(--t-8888a8)]' : 'text-[var(--t-1a1a2e)]'}`}>
               {task.title}
             </p>
 
             <div className="relative flex-shrink-0">
               <button
                 onClick={() => { setMenuOpen(v => !v); setConfirmDelete(false); }}
-                className="text-[#8888a8] hover:text-[#4a4a6a] p-0.5"
+                className="text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)] p-0.5"
               >
                 <MoreVertical className="w-4 h-4" />
               </button>
@@ -385,10 +385,10 @@ function TaskCard({
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => { setMenuOpen(false); setConfirmDelete(false); }} />
-                  <div className="absolute right-0 top-6 z-20 bg-white border border-[#e8e8f0] rounded-xl shadow-lg py-1 w-36 overflow-hidden">
+                  <div className="absolute right-0 top-6 z-20 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl shadow-lg py-1 w-36 overflow-hidden">
                     <button
                       onClick={() => { onEdit(task); setMenuOpen(false); }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[#4a4a6a] hover:bg-[#f7f8fc] transition-colors"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)] transition-colors"
                     >
                       <Pencil className="w-3.5 h-3.5" />
                       Editar
@@ -411,16 +411,16 @@ function TaskCard({
           </div>
 
           {task.description && (
-            <p className="text-xs text-[#8888a8] line-clamp-2 mb-2">{task.description}</p>
+            <p className="text-xs text-[var(--t-8888a8)] line-clamp-2 mb-2">{task.description}</p>
           )}
 
           {task.progress > 0 && task.status !== 'done' && (
             <div className="mb-2">
-              <div className="flex justify-between text-[10px] text-[#8888a8] mb-1">
+              <div className="flex justify-between text-[10px] text-[var(--t-8888a8)] mb-1">
                 <span>Progreso</span>
                 <span>{task.progress}%</span>
               </div>
-              <div className="w-full h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-[var(--s-f0f0f0)] rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{ width: `${task.progress}%`, background: task.progress >= 80 ? '#00b894' : '#F79C31' }}
@@ -432,7 +432,7 @@ function TaskCard({
           {task.tags.length > 0 && (
             <div className="flex flex-wrap gap-1 mb-2">
               {task.tags.slice(0, 3).map(tag => (
-                <span key={tag} className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[#f7f8fc] text-[#8888a8]">
+                <span key={tag} className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-[var(--s-f7f8fc)] text-[var(--t-8888a8)]">
                   #{tag}
                 </span>
               ))}
@@ -447,7 +447,7 @@ function TaskCard({
               >
                 {getInitials(task.assignee_name)}
               </div>
-              <span className="text-xs text-[#8888a8] truncate max-w-[100px]">
+              <span className="text-xs text-[var(--t-8888a8)] truncate max-w-[100px]">
                 {task.assignee_name ? task.assignee_name.split(' ')[0] : '—'}
               </span>
             </div>
@@ -457,7 +457,7 @@ function TaskCard({
                 {pr.label}
               </span>
               {task.due_date && (
-                <span className={`flex items-center gap-0.5 text-[10px] font-medium ${overdue ? 'text-red-600' : 'text-[#8888a8]'}`}>
+                <span className={`flex items-center gap-0.5 text-[10px] font-medium ${overdue ? 'text-red-600' : 'text-[var(--t-8888a8)]'}`}>
                   <Calendar className="w-3 h-3" />
                   {overdue ? '¡Vencida!' : formatDate(task.due_date)}
                 </span>
@@ -493,7 +493,7 @@ function KanbanColumn({
       <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg mb-3 border ${config.bg} ${config.border}`}>
         <StatusIcon className={`w-4 h-4 ${config.color}`} />
         <span className={`text-sm font-bold ${config.color}`}>{config.label}</span>
-        <span className="ml-auto text-xs font-bold bg-white rounded-full w-5 h-5 flex items-center justify-center text-[#4a4a6a] shadow-sm">
+        <span className="ml-auto text-xs font-bold bg-[var(--surface)] rounded-full w-5 h-5 flex items-center justify-center text-[var(--t-4a4a6a)] shadow-sm">
           {tasks.length}
         </span>
       </div>
@@ -502,8 +502,8 @@ function KanbanColumn({
           <TaskCard key={task.id} task={task} onStatusToggle={onStatusToggle} onEdit={onEdit} onDelete={onDelete} />
         ))}
         {tasks.length === 0 && (
-          <div className="border-2 border-dashed border-[#e8e8f0] rounded-xl p-6 text-center">
-            <p className="text-sm text-[#8888a8]">Sin tareas</p>
+          <div className="border-2 border-dashed border-[var(--s-e8e8f0)] rounded-xl p-6 text-center">
+            <p className="text-sm text-[var(--t-8888a8)]">Sin tareas</p>
           </div>
         )}
       </div>
@@ -603,23 +603,23 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
   const GridLines = () => (
     <>
       {monthBoundaries.map((px, i) => (
-        <div key={i} className="absolute top-0 bottom-0 w-px bg-[#f0f0f0]" style={{ left: px }} />
+        <div key={i} className="absolute top-0 bottom-0 w-px bg-[var(--s-f0f0f0)]" style={{ left: px }} />
       ))}
     </>
   );
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e8e8f0] overflow-hidden">
+    <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8e8f0)] overflow-hidden">
 
       {/* Barra superior: rango visible + botón Hoy */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-[#f0f0f0] bg-[#fafafe]">
-        <span className="text-xs text-[#8888a8] font-medium">
+      <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--s-f0f0f0)] bg-[var(--s-fafafe)]">
+        <span className="text-xs text-[var(--t-8888a8)] font-medium">
           {rangeStart.getFullYear()} – {rangeEnd.getFullYear() - 1}
-          <span className="ml-2 text-[#c0c0d0]">· Arrastra para navegar</span>
+          <span className="ml-2 text-[var(--t-c0c0d0)]">· Arrastra para navegar</span>
         </span>
         <button
           onClick={scrollToToday}
-          className="text-xs font-semibold text-[#F79C31] px-3 py-1.5 rounded-lg border border-[#F79C31]/40 hover:bg-[#F79C31]/5 transition-colors"
+          className="text-xs font-semibold text-[var(--t-f79c31)] px-3 py-1.5 rounded-lg border border-[#F79C31]/40 hover:bg-[#F79C31]/5 transition-colors"
         >
           Hoy
         </button>
@@ -630,37 +630,37 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
         <div style={{ width: `${LABEL_PX + timelinePx}px` }}>
 
           {/* Fila año */}
-          <div className="flex border-b border-[#dde0ea] bg-[#eef0f7]" style={{ height: 28 }}>
-            <div className="flex-shrink-0 border-r border-[#dde0ea]" style={{ width: LABEL_PX }} />
+          <div className="flex border-b border-[var(--s-dde0ea)] bg-[var(--s-eef0f7)]" style={{ height: 28 }}>
+            <div className="flex-shrink-0 border-r border-[var(--s-dde0ea)]" style={{ width: LABEL_PX }} />
             <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
               {years.map(y => (
                 <div
                   key={y.year}
-                  className="absolute top-0 bottom-0 border-l border-[#cdd0de] flex items-center justify-center"
+                  className="absolute top-0 bottom-0 border-l border-[var(--s-cdd0de)] flex items-center justify-center"
                   style={{ left: y.startPx, width: y.widthPx }}
                 >
-                  <span className="text-[11px] font-bold text-[#4a4a6a] tracking-wide">{y.year}</span>
+                  <span className="text-[11px] font-bold text-[var(--t-4a4a6a)] tracking-wide">{y.year}</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Fila mes */}
-          <div className="flex border-b border-[#e8e8f0] bg-[#fafafe]" style={{ height: 30 }}>
+          <div className="flex border-b border-[var(--s-e8e8f0)] bg-[var(--s-fafafe)]" style={{ height: 30 }}>
             <div
-              className="flex-shrink-0 border-r border-[#e8e8f0] px-4 flex items-center"
+              className="flex-shrink-0 border-r border-[var(--s-e8e8f0)] px-4 flex items-center"
               style={{ width: LABEL_PX }}
             >
-              <span className="text-[10px] font-bold text-[#8888a8] uppercase tracking-wider">Tarea</span>
+              <span className="text-[10px] font-bold text-[var(--t-8888a8)] uppercase tracking-wider">Tarea</span>
             </div>
             <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
               {months.map((m, i) => (
                 <div
                   key={i}
-                  className="absolute top-0 bottom-0 border-l border-[#ebebeb] flex items-center justify-center overflow-hidden"
+                  className="absolute top-0 bottom-0 border-l border-[var(--s-ebebeb)] flex items-center justify-center overflow-hidden"
                   style={{ left: m.startPx, width: m.widthPx }}
                 >
-                  <span className="text-[11px] font-semibold text-[#8888a8] capitalize select-none">{m.label}</span>
+                  <span className="text-[11px] font-semibold text-[var(--t-8888a8)] capitalize select-none">{m.label}</span>
                 </div>
               ))}
               {/* Línea hoy en cabecera */}
@@ -670,7 +670,7 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
 
           {/* Estado vacío */}
           {groups.length === 0 && withoutDates.length === 0 && (
-            <div className="py-16 text-center text-[#8888a8] text-sm">
+            <div className="py-16 text-center text-[var(--t-8888a8)] text-sm">
               No hay tareas con fechas. Edita las tareas para agregar fechas de inicio y límite.
             </div>
           )}
@@ -679,12 +679,12 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
           {groups.map(group => (
             <div key={group.name}>
               {/* Cabecera de grupo */}
-              <div className="flex bg-[#f7f8fc] border-b border-[#edeef5]" style={{ height: 28 }}>
+              <div className="flex bg-[var(--s-f7f8fc)] border-b border-[var(--s-edeef5)]" style={{ height: 28 }}>
                 <div
-                  className="flex-shrink-0 px-4 flex items-center border-r border-[#e8e8f0] sticky left-0 bg-[#f7f8fc] z-10"
+                  className="flex-shrink-0 px-4 flex items-center border-r border-[var(--s-e8e8f0)] sticky left-0 bg-[var(--s-f7f8fc)] z-10"
                   style={{ width: LABEL_PX }}
                 >
-                  <span className="text-[10px] font-bold text-[#4a4a6a] uppercase tracking-wider truncate">{group.name}</span>
+                  <span className="text-[10px] font-bold text-[var(--t-4a4a6a)] uppercase tracking-wider truncate">{group.name}</span>
                 </div>
                 <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
                   <GridLines />
@@ -700,16 +700,16 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
                 const avatarBg = AVATAR_COLORS[task.assignee_name ?? ''] ?? '#8888a8';
 
                 return (
-                  <div key={task.id} className="flex h-12 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group">
+                  <div key={task.id} className="flex h-12 border-b border-[var(--s-f8f8f8)] hover:bg-[var(--s-fafafe)] transition-colors group">
 
                     {/* Nombre (sticky) */}
                     <div
-                      className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors border-r border-[#f0f0f0]"
+                      className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-[var(--surface)] group-hover:bg-[var(--s-fafafe)] z-10 transition-colors border-r border-[var(--s-f0f0f0)]"
                       style={{ width: LABEL_PX }}
                     >
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${stCfg.bar}`} />
                       <span
-                        className={`text-xs font-medium truncate ${task.status === 'done' ? 'line-through text-[#8888a8]' : 'text-[#1a1a2e]'}`}
+                        className={`text-xs font-medium truncate ${task.status === 'done' ? 'line-through text-[var(--t-8888a8)]' : 'text-[var(--t-1a1a2e)]'}`}
                         title={task.title}
                       >
                         {task.title}
@@ -755,12 +755,12 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
           {/* Sin fechas */}
           {withoutDates.length > 0 && (
             <div>
-              <div className="flex bg-[#f7f8fc] border-b border-[#edeef5]" style={{ height: 28 }}>
+              <div className="flex bg-[var(--s-f7f8fc)] border-b border-[var(--s-edeef5)]" style={{ height: 28 }}>
                 <div
-                  className="flex-shrink-0 px-4 flex items-center border-r border-[#e8e8f0] sticky left-0 bg-[#f7f8fc] z-10"
+                  className="flex-shrink-0 px-4 flex items-center border-r border-[var(--s-e8e8f0)] sticky left-0 bg-[var(--s-f7f8fc)] z-10"
                   style={{ width: LABEL_PX }}
                 >
-                  <span className="text-[10px] font-bold text-[#8888a8] uppercase tracking-wider">Sin fechas</span>
+                  <span className="text-[10px] font-bold text-[var(--t-8888a8)] uppercase tracking-wider">Sin fechas</span>
                 </div>
                 <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
                   <GridLines />
@@ -769,13 +769,13 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
               {withoutDates.map(task => {
                 const stCfg = STATUS_CONFIG[task.status];
                 return (
-                  <div key={task.id} className="flex h-10 border-b border-[#f8f8f8] hover:bg-[#fafafe] transition-colors group">
+                  <div key={task.id} className="flex h-10 border-b border-[var(--s-f8f8f8)] hover:bg-[var(--s-fafafe)] transition-colors group">
                     <div
-                      className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-white group-hover:bg-[#fafafe] z-10 transition-colors border-r border-[#f0f0f0]"
+                      className="flex-shrink-0 px-4 flex items-center gap-2.5 sticky left-0 bg-[var(--surface)] group-hover:bg-[var(--s-fafafe)] z-10 transition-colors border-r border-[var(--s-f0f0f0)]"
                       style={{ width: LABEL_PX }}
                     >
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${stCfg.bar}`} />
-                      <button onClick={() => onEdit(task)} className="text-xs text-[#8888a8] truncate hover:text-[#4a4a6a] transition-colors">
+                      <button onClick={() => onEdit(task)} className="text-xs text-[var(--t-8888a8)] truncate hover:text-[var(--t-4a4a6a)] transition-colors">
                         {task.title}
                       </button>
                     </div>
@@ -789,8 +789,8 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
           )}
 
           {/* Fila inferior con label "Hoy" */}
-          <div className="flex bg-[#fafafe] border-t border-[#f0f0f0]" style={{ height: 22 }}>
-            <div className="flex-shrink-0 border-r border-[#e8e8f0]" style={{ width: LABEL_PX }} />
+          <div className="flex bg-[var(--s-fafafe)] border-t border-[var(--s-f0f0f0)]" style={{ height: 22 }}>
+            <div className="flex-shrink-0 border-r border-[var(--s-e8e8f0)]" style={{ width: LABEL_PX }} />
             <div className="relative flex-shrink-0" style={{ width: timelinePx }}>
               <div className="absolute top-0 bottom-0 w-0.5 bg-red-400" style={{ left: todayPx }} />
               <div
@@ -805,14 +805,14 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
       </div>
 
       {/* Leyenda */}
-      <div className="flex items-center gap-4 px-5 py-3 border-t border-[#f0f0f0] flex-wrap">
+      <div className="flex items-center gap-4 px-5 py-3 border-t border-[var(--s-f0f0f0)] flex-wrap">
         {(Object.entries(STATUS_CONFIG) as [string, typeof STATUS_CONFIG[keyof typeof STATUS_CONFIG]][]).map(([, cfg]) => (
-          <span key={cfg.label} className="flex items-center gap-1.5 text-[11px] text-[#8888a8]">
+          <span key={cfg.label} className="flex items-center gap-1.5 text-[11px] text-[var(--t-8888a8)]">
             <span className={`w-2.5 h-2.5 rounded-sm inline-block ${cfg.bar}`} />
             {cfg.label}
           </span>
         ))}
-        <span className="flex items-center gap-1.5 text-[11px] text-[#8888a8] ml-auto">
+        <span className="flex items-center gap-1.5 text-[11px] text-[var(--t-8888a8)] ml-auto">
           <span className="w-2.5 h-1 bg-red-400 inline-block rounded" />
           Hoy
         </span>
@@ -902,7 +902,7 @@ export default function TareasPage() {
         actions={
           <button
             onClick={openCreate}
-            className="flex items-center gap-2 bg-[#F79C31] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             Nueva tarea
@@ -914,14 +914,14 @@ export default function TareasPage() {
         {/* Stats */}
         <div className="grid grid-cols-4 gap-6">
           {[
-            { val: stats.total,      label: 'Total tareas',  color: 'text-[#0C2054]' },
+            { val: stats.total,      label: 'Total tareas',  color: 'text-[var(--t-0c2054)]' },
             { val: stats.inProgress, label: 'En progreso',   color: 'text-blue-600'  },
             { val: stats.done,       label: 'Completadas',   color: 'text-green-600' },
             { val: stats.overdue,    label: 'Vencidas',      color: 'text-red-600'   },
           ].map(({ val, label, color }) => (
             <Card key={label} className="p-5 text-center">
               <p className={`text-3xl font-bold tracking-tight ${color}`}>{val}</p>
-              <p className="text-xs text-[#6b7280] mt-1.5 font-medium">{label}</p>
+              <p className="text-xs text-[var(--t-6b7280)] mt-1.5 font-medium">{label}</p>
             </Card>
           ))}
         </div>
@@ -929,19 +929,19 @@ export default function TareasPage() {
         {/* Controles */}
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8888a8]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--t-8888a8)]" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Buscar tarea..."
-              className="pl-9 pr-4 py-2.5 text-sm border border-[#e8e8f0] bg-white rounded-lg outline-none focus:border-[#F79C31] transition-colors w-60"
+              className="pl-9 pr-4 py-2.5 text-sm border border-[var(--s-e8e8f0)] bg-[var(--surface)] rounded-lg outline-none focus:border-[var(--s-f79c31)] transition-colors w-60"
             />
           </div>
 
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
-            className="text-sm font-medium border border-[#e8e8f0] bg-white rounded-lg px-3 py-2.5 outline-none focus:border-[#F79C31] transition-colors text-[#4a4a6a]"
+            className="text-sm font-medium border border-[var(--s-e8e8f0)] bg-[var(--surface)] rounded-lg px-3 py-2.5 outline-none focus:border-[var(--s-f79c31)] transition-colors text-[var(--t-4a4a6a)]"
           >
             <option value="all">Todos los estados</option>
             {(Object.entries(STATUS_CONFIG) as [string, { label: string }][]).map(([key, cfg]) => (
@@ -950,13 +950,13 @@ export default function TareasPage() {
           </select>
 
           {/* View toggle */}
-          <div className="flex gap-1 bg-white border border-[#e8e8f0] rounded-lg p-1 ml-auto">
+          <div className="flex gap-1 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-lg p-1 ml-auto">
             {(['kanban', 'list', 'roadmap'] as const).map(key => (
               <button
                 key={key}
                 onClick={() => setView(key)}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-md transition-all flex items-center gap-1.5 ${
-                  view === key ? 'bg-[#0C2054] text-white' : 'text-[#4a4a6a] hover:bg-[#f7f8fc]'
+                  view === key ? 'bg-[var(--s-0c2054)] text-white' : 'text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)]'
                 }`}
               >
                 {key === 'roadmap' && <GanttChart className="w-3.5 h-3.5" />}
@@ -969,7 +969,7 @@ export default function TareasPage() {
         {/* Contenido */}
         {loading ? (
           <div className="flex items-center justify-center py-24">
-            <Loader2 className="w-8 h-8 animate-spin text-[#F79C31]" />
+            <Loader2 className="w-8 h-8 animate-spin text-[var(--t-f79c31)]" />
           </div>
         ) : view === 'kanban' ? (
           <div className="flex gap-4 overflow-x-auto pb-4">
@@ -988,10 +988,10 @@ export default function TareasPage() {
           <RoadmapView tasks={filtered} onEdit={openEdit} />
         ) : (
           <Card>
-            <div className="divide-y divide-[#f0f0f0]">
+            <div className="divide-y divide-[var(--s-f0f0f0)]">
               {filtered.length === 0 ? (
                 <div className="p-12 text-center">
-                  <p className="text-[#4a4a6a] font-medium">No hay tareas que coincidan</p>
+                  <p className="text-[var(--t-4a4a6a)] font-medium">No hay tareas que coincidan</p>
                 </div>
               ) : filtered.map(task => {
                 const st        = STATUS_CONFIG[task.status];
@@ -1001,22 +1001,22 @@ export default function TareasPage() {
                 const avatarBg  = AVATAR_COLORS[task.assignee_name ?? ''] ?? '#8888a8';
 
                 return (
-                  <div key={task.id} className="flex items-center gap-4 p-4 hover:bg-[#fafafe] transition-colors group">
+                  <div key={task.id} className="flex items-center gap-4 p-4 hover:bg-[var(--s-fafafe)] transition-colors group">
                     <button onClick={() => handleStatusToggle(task.id)} className={st.color}>
                       <StatusIcon className="w-5 h-5" />
                     </button>
                     <div className="flex-1 min-w-0">
-                      <p className={`text-sm font-semibold ${task.status === 'done' ? 'line-through text-[#8888a8]' : 'text-[#1a1a2e]'}`}>
+                      <p className={`text-sm font-semibold ${task.status === 'done' ? 'line-through text-[var(--t-8888a8)]' : 'text-[var(--t-1a1a2e)]'}`}>
                         {task.title}
                       </p>
-                      {task.project && <p className="text-xs text-[#8888a8] truncate">{task.project}</p>}
+                      {task.project && <p className="text-xs text-[var(--t-8888a8)] truncate">{task.project}</p>}
                     </div>
                     <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: avatarBg }}>
                       <span className="text-[9px] font-bold text-white">{getInitials(task.assignee_name)}</span>
                     </div>
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${pr.text} flex-shrink-0`}>{pr.label}</span>
                     {task.due_date && (
-                      <span className={`text-xs flex-shrink-0 ${overdue ? 'text-red-600 font-semibold' : 'text-[#8888a8]'}`}>
+                      <span className={`text-xs flex-shrink-0 ${overdue ? 'text-red-600 font-semibold' : 'text-[var(--t-8888a8)]'}`}>
                         {formatDate(task.due_date)}
                       </span>
                     )}
@@ -1026,13 +1026,13 @@ export default function TareasPage() {
                     <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => openEdit(task)}
-                        className="p-1.5 rounded-lg hover:bg-[#f0f0f0] text-[#8888a8] hover:text-[#4a4a6a] transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-[var(--s-f0f0f0)] text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)] transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleDelete(task.id)}
-                        className="p-1.5 rounded-lg hover:bg-red-50 text-[#8888a8] hover:text-red-600 transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-red-50 text-[var(--t-8888a8)] hover:text-red-600 transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

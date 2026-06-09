@@ -6,10 +6,11 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, ChevronLeft, ChevronRight,
-  LogOut, Target, Wrench, Link2,
+  LogOut, Target, Wrench, Link2, Sun, Moon,
 } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { auth } from '@/lib/api';
+import { useTheme } from '@/components/theme/ThemeProvider';
 
 type SubNavItem = { href: string; label: string; exact?: boolean };
 type NavItem = {
@@ -108,7 +109,7 @@ function FlyoutCard({
 
       {/* Card */}
       <div
-        className="bg-white rounded-2xl overflow-hidden"
+        className="bg-[var(--surface)] rounded-2xl overflow-hidden"
         style={{
           minWidth: 200,
           boxShadow: '0 8px 32px rgba(12,32,84,0.14), 0 2px 8px rgba(12,32,84,0.08)',
@@ -116,13 +117,13 @@ function FlyoutCard({
         }}
       >
         {/* Header */}
-        <div className="flex items-center gap-2.5 px-4 py-3 border-b border-[#f0f2f8]">
-          <div className="w-7 h-7 rounded-lg bg-[#0C2054] flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center gap-2.5 px-4 py-3 border-b border-[var(--s-f0f2f8)]">
+          <div className="w-7 h-7 rounded-lg bg-[var(--s-0c2054)] flex items-center justify-center flex-shrink-0">
             <item.icon style={{ width: 13, height: 13, color: '#F79C31' }} />
           </div>
           <div>
-            <p className="text-[13px] font-bold text-[#0C2054] leading-tight">{item.label}</p>
-            <p className="text-[11px] text-[#9ca3af] leading-tight">{item.desc}</p>
+            <p className="text-[13px] font-bold text-[var(--t-0c2054)] leading-tight">{item.label}</p>
+            <p className="text-[11px] text-[var(--t-9ca3af)] leading-tight">{item.desc}</p>
           </div>
         </div>
 
@@ -139,19 +140,19 @@ function FlyoutCard({
                 className={cn(
                   'w-full flex items-center gap-2.5 px-4 py-2 text-left transition-all group',
                   active
-                    ? 'bg-[#f0f2f8] text-[#0C2054]'
-                    : 'text-[#374151] hover:bg-[#f7f8fc] hover:text-[#0C2054]'
+                    ? 'bg-[var(--s-f0f2f8)] text-[var(--t-0c2054)]'
+                    : 'text-[var(--t-374151)] hover:bg-[var(--s-f7f8fc)] hover:text-[var(--t-0c2054)]'
                 )}
               >
                 <span className={cn(
                   'w-1.5 h-1.5 rounded-full flex-shrink-0 transition-colors',
-                  active ? 'bg-[#F79C31]' : 'bg-[#d1d5db] group-hover:bg-[#F79C31]'
+                  active ? 'bg-[var(--s-f79c31)]' : 'bg-[var(--s-d1d5db)] group-hover:bg-[var(--s-f79c31)]'
                 )} />
                 <span className={cn('text-[13px] font-medium', active && 'font-semibold')}>
                   {sub.label}
                 </span>
                 {active && (
-                  <ChevronRight className="w-3 h-3 ml-auto text-[#F79C31]" />
+                  <ChevronRight className="w-3 h-3 ml-auto text-[var(--t-f79c31)]" />
                 )}
               </button>
             );
@@ -171,7 +172,14 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sidebarRef = useRef<HTMLElement>(null);
 
-  const currentUser = auth.getCurrentUser();
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === 'dark';
+
+  // Read session only after mount to avoid SSR/client hydration mismatch
+  // (localStorage is unavailable during server render).
+  const [currentUser, setCurrentUser] = useState<ReturnType<typeof auth.getCurrentUser>>(null);
+  useEffect(() => { setCurrentUser(auth.getCurrentUser()); }, []);
+
   const displayName = currentUser?.name || currentUser?.username || 'Usuario';
   const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
   const roleLabel = currentUser?.role === 'admin' ? 'Admin' : currentUser?.role || '';
@@ -219,7 +227,7 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
         {/* Collapse toggle */}
         <button
           onClick={() => { setCollapsed(v => !v); setFlyout(null); }}
-          className="absolute -right-3 top-[72px] z-30 w-6 h-6 rounded-full bg-white border border-[#e5e7eb] shadow-md flex items-center justify-center text-[#6b7280] hover:text-[#0C2054] hover:border-[#0C2054] transition-all"
+          className="absolute -right-3 top-[72px] z-30 w-6 h-6 rounded-full bg-[var(--surface)] border border-[var(--s-e5e7eb)] shadow-md flex items-center justify-center text-[var(--t-6b7280)] hover:text-[var(--t-0c2054)] hover:border-[var(--s-0c2054)] transition-all"
         >
           {collapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
@@ -264,14 +272,14 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
                 'flex items-center justify-center rounded-lg flex-shrink-0 transition-all',
                 collapsed ? 'w-9 h-9' : 'w-8 h-8',
                 active
-                  ? 'bg-[#F79C31] text-[#0C2054] shadow-[0_2px_8px_rgba(247,156,49,0.4)]'
+                  ? 'bg-[var(--s-f79c31)] text-[var(--t-0c2054)] shadow-[0_2px_8px_rgba(247,156,49,0.4)]'
                   : 'bg-white/6 text-white/60 group-hover:bg-white/10 group-hover:text-white'
               );
 
               const innerContent = (
                 <>
                   {active && (
-                    <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-[#F79C31]" />
+                    <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-[var(--s-f79c31)]" />
                   )}
                   <div className={iconClass}>
                     <Icon style={{ width: '16px', height: '16px' }} strokeWidth={active ? 2.5 : 2} />
@@ -325,36 +333,70 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
 
         {/* ── BOTTOM ── */}
         <div className={cn(
-          'relative z-10 border-t border-white/8',
+          'relative z-10 border-t border-white/8 space-y-1',
           collapsed ? 'px-0 py-3' : 'px-3 py-3'
         )}>
+          {/* Theme toggle */}
+          <button
+            onClick={toggleTheme}
+            title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+            className={cn(
+              'group flex items-center rounded-xl transition-all text-white/55 hover:bg-white/6 hover:text-white w-full',
+              collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5'
+            )}
+          >
+            <span className={cn(
+              'flex items-center justify-center rounded-lg flex-shrink-0 bg-white/6 group-hover:bg-white/10 transition-all',
+              collapsed ? 'w-9 h-9' : 'w-8 h-8'
+            )}>
+              {isDark
+                ? <Sun style={{ width: 16, height: 16 }} className="text-[#F79C31]" />
+                : <Moon style={{ width: 16, height: 16 }} />}
+            </span>
+            {!collapsed && (
+              <span className="flex-1 text-left text-[13px] font-semibold text-white/70 group-hover:text-white/90">
+                {isDark ? 'Modo claro' : 'Modo oscuro'}
+              </span>
+            )}
+          </button>
+
+          {/* User → perfil + logout */}
           <div className={cn(
             'flex items-center rounded-xl transition-all',
-            collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-3 px-3 py-2.5'
+            collapsed ? 'justify-center w-12 h-12 mx-auto' : 'gap-2'
           )}>
-            <div
+            <Link
+              href="/perfil"
+              title="Mi perfil"
               className={cn(
-                'rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-[#0C2054] shadow-md',
-                collapsed ? 'w-9 h-9 text-sm' : 'w-8 h-8 text-[13px]'
+                'group flex items-center rounded-xl transition-all hover:bg-white/6',
+                collapsed ? 'justify-center w-12 h-12 mx-auto' : 'flex-1 min-w-0 gap-3 px-3 py-2'
               )}
-              style={{ background: 'linear-gradient(135deg, #F79C31 0%, #f0a94a 100%)' }}
             >
-              {initials}
-            </div>
-            {!collapsed && (
-              <>
+              <div
+                className={cn(
+                  'rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-[#0C2054] shadow-md',
+                  collapsed ? 'w-9 h-9 text-sm' : 'w-8 h-8 text-[13px]'
+                )}
+                style={{ background: 'linear-gradient(135deg, #F79C31 0%, #f0a94a 100%)' }}
+              >
+                {initials}
+              </div>
+              {!collapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-white text-[13px] font-semibold truncate leading-tight">{displayName}</p>
+                  <p className="text-white text-[13px] font-semibold truncate leading-tight group-hover:text-white">{displayName}</p>
                   <p className="text-white/35 text-[11px] truncate">{currentUser?.position || roleLabel}</p>
                 </div>
-                <button
-                  onClick={() => auth.logout()}
-                  title="Cerrar sesión"
-                  className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 hover:bg-white/6 transition-all"
-                >
-                  <LogOut style={{ width: '14px', height: '14px' }} />
-                </button>
-              </>
+              )}
+            </Link>
+            {!collapsed && (
+              <button
+                onClick={() => auth.logout()}
+                title="Cerrar sesión"
+                className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-white/30 hover:text-red-400 hover:bg-white/6 transition-all"
+              >
+                <LogOut style={{ width: '14px', height: '14px' }} />
+              </button>
             )}
           </div>
         </div>

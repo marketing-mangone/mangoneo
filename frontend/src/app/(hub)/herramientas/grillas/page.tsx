@@ -63,7 +63,7 @@ const SLOT_CONFIG = {
 } as const;
 
 const STATUS_CONFIG = {
-  borrador:  { label: 'Borrador',           cls: 'bg-[#f0f0f0] text-[#4a4a6a]' },
+  borrador:  { label: 'Borrador',           cls: 'bg-[var(--s-f0f0f0)] text-[var(--t-4a4a6a)]' },
   lista:     { label: 'Lista para revisar', cls: 'bg-emerald-100 text-emerald-700' },
   publicada: { label: 'Publicada',          cls: 'bg-blue-100 text-blue-700' },
 } as const;
@@ -178,12 +178,12 @@ function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void 
         }
       `}</style>
 
-      <div className="fixed inset-0 z-50 flex flex-col bg-white overflow-y-auto" id="brief-modal">
+      <div className="fixed inset-0 z-50 flex flex-col bg-[var(--surface)] overflow-y-auto" id="brief-modal">
         {/* Toolbar — hidden on print */}
-        <div className="no-print sticky top-0 z-10 flex items-center justify-between bg-[#0C2054] px-6 py-3">
+        <div className="no-print sticky top-0 z-10 flex items-center justify-between bg-[var(--s-0c2054)] px-6 py-3">
           <div className="flex items-center gap-3">
-            <div className="w-7 h-7 rounded-lg bg-[#F79C31] flex items-center justify-center">
-              <FileText size={14} className="text-[#0C2054]" />
+            <div className="w-7 h-7 rounded-lg bg-[var(--s-f79c31)] flex items-center justify-center">
+              <FileText size={14} className="text-[var(--t-0c2054)]" />
             </div>
             <div>
               <p className="text-white font-bold text-sm">Brief de Diseño — {grid.tema_display}</p>
@@ -193,7 +193,7 @@ function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void 
           <div className="flex items-center gap-2">
             <button
               onClick={handlePrint}
-              className="flex items-center gap-1.5 text-xs font-semibold bg-[#F79C31] text-[#0C2054] px-4 py-2 rounded-lg hover:bg-[#e08a20] transition-colors"
+              className="flex items-center gap-1.5 text-xs font-semibold bg-[var(--s-f79c31)] text-[var(--t-0c2054)] px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors"
             >
               <Printer size={13} /> Imprimir / PDF
             </button>
@@ -206,20 +206,20 @@ function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void 
         {/* Brief content */}
         <div className="max-w-4xl mx-auto px-8 py-8 w-full space-y-10">
           {/* Cover */}
-          <div className="text-center pb-8 border-b border-[#e8eaf0]">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#F79C31] mb-2">Brief de Diseño · Mangone Law Firm</p>
-            <h1 className="text-3xl font-bold text-[#0C2054] mb-1">{grid.tema_display}</h1>
-            <p className="text-[#8888a8]">{formatWeekRange(grid.week_start)}</p>
+          <div className="text-center pb-8 border-b border-[var(--s-e8eaf0)]">
+            <p className="text-xs font-bold uppercase tracking-widest text-[var(--t-f79c31)] mb-2">Brief de Diseño · Mangone Law Firm</p>
+            <h1 className="text-3xl font-bold text-[var(--t-0c2054)] mb-1">{grid.tema_display}</h1>
+            <p className="text-[var(--t-8888a8)]">{formatWeekRange(grid.week_start)}</p>
             <div className="flex justify-center gap-6 mt-6">
               {SLOTS.map(slot => {
                 const cfg = SLOT_CONFIG[slot];
                 const count = grid.posts.filter(p => p.slot === slot).length;
                 return (
                   <div key={slot} className="text-center">
-                    <p className="text-2xl font-bold text-[#0C2054]">{count}</p>
+                    <p className="text-2xl font-bold text-[var(--t-0c2054)]">{count}</p>
                     <div className="flex items-center gap-1.5 justify-center mt-1">
                       <div className={`w-2 h-2 rounded-full ${cfg.dot}`} />
-                      <p className="text-xs text-[#8888a8]">{cfg.label}</p>
+                      <p className="text-xs text-[var(--t-8888a8)]">{cfg.label}</p>
                     </div>
                   </div>
                 );
@@ -235,12 +235,12 @@ function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void 
             return (
               <div key={dayIdx} className="brief-page">
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-10 h-10 rounded-xl bg-[#0C2054] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                     {dayIdx + 1}
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-[#0C2054]">{dayName}</h2>
-                    <p className="text-xs text-[#8888a8]">{new Date(date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    <h2 className="text-lg font-bold text-[var(--t-0c2054)]">{dayName}</h2>
+                    <p className="text-xs text-[var(--t-8888a8)]">{new Date(date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                   </div>
                 </div>
 
@@ -263,18 +263,18 @@ function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void 
                               <>
                                 {post.headline && (
                                   <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Headline para Sara</p>
-                                    <p className="text-sm font-semibold text-[#0C2054] bg-[#f0f2f8] rounded-lg px-3 py-2">{post.headline}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--t-8888a8)] mb-1">Headline para Sara</p>
+                                    <p className="text-sm font-semibold text-[var(--t-0c2054)] bg-[var(--s-f0f2f8)] rounded-lg px-3 py-2">{post.headline}</p>
                                   </div>
                                 )}
                                 {post.slide_titles?.length > 0 && (
                                   <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Slides ({post.slide_titles.length})</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--t-8888a8)] mb-1">Slides ({post.slide_titles.length})</p>
                                     <div className="space-y-1">
                                       {post.slide_titles.map((t, i) => (
                                         <div key={i} className="flex items-start gap-2">
-                                          <span className="text-[10px] font-mono text-[#8888a8] w-4 mt-0.5">{i + 1}.</span>
-                                          <p className="text-xs text-[#1a1a2e]">{t}</p>
+                                          <span className="text-[10px] font-mono text-[var(--t-8888a8)] w-4 mt-0.5">{i + 1}.</span>
+                                          <p className="text-xs text-[var(--t-1a1a2e)]">{t}</p>
                                         </div>
                                       ))}
                                     </div>
@@ -284,26 +284,26 @@ function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void 
                             )}
                             {post.slot === 'foto' && post.photo_suggestion && (
                               <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Sugerencia de foto</p>
-                                <p className="text-sm text-[#1a1a2e] bg-[#faf0ff] rounded-lg px-3 py-2">{post.photo_suggestion}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--t-8888a8)] mb-1">Sugerencia de foto</p>
+                                <p className="text-sm text-[var(--t-1a1a2e)] bg-[var(--s-faf0ff)] rounded-lg px-3 py-2">{post.photo_suggestion}</p>
                               </div>
                             )}
                             {post.slot === 'reel' && (
                               <>
                                 {post.video_title && (
                                   <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Título en pantalla</p>
-                                    <p className="text-sm font-semibold text-[#1a1a2e] bg-[#fff7ed] rounded-lg px-3 py-2">{post.video_title}</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--t-8888a8)] mb-1">Título en pantalla</p>
+                                    <p className="text-sm font-semibold text-[var(--t-1a1a2e)] bg-[var(--s-fff7ed)] rounded-lg px-3 py-2">{post.video_title}</p>
                                   </div>
                                 )}
                                 {post.script_points?.length > 0 && (
                                   <div>
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Guión para Gloriana</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--t-8888a8)] mb-1">Guión para Gloriana</p>
                                     <div className="space-y-1.5">
                                       {post.script_points.map((s, i) => (
                                         <div key={i} className="flex items-start gap-2">
-                                          <span className="text-[10px] font-mono text-[#8888a8] w-4 mt-0.5">{i + 1}.</span>
-                                          <p className="text-xs text-[#1a1a2e] leading-relaxed">{s}</p>
+                                          <span className="text-[10px] font-mono text-[var(--t-8888a8)] w-4 mt-0.5">{i + 1}.</span>
+                                          <p className="text-xs text-[var(--t-1a1a2e)] leading-relaxed">{s}</p>
                                         </div>
                                       ))}
                                     </div>
@@ -315,9 +315,9 @@ function BriefModal({ grid, onClose }: { grid: ContentGrid; onClose: () => void 
 
                           {/* Right: caption */}
                           <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#8888a8] mb-1">Caption</p>
-                            <p className="text-xs text-[#1a1a2e] leading-relaxed whitespace-pre-wrap bg-[#f7f8fc] rounded-lg px-3 py-2 border border-[#e8eaf0]">
-                              {post.caption || <span className="italic text-[#c0c0d0]">Sin caption</span>}
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--t-8888a8)] mb-1">Caption</p>
+                            <p className="text-xs text-[var(--t-1a1a2e)] leading-relaxed whitespace-pre-wrap bg-[var(--s-f7f8fc)] rounded-lg px-3 py-2 border border-[var(--s-e8eaf0)]">
+                              {post.caption || <span className="italic text-[var(--t-c0c0d0)]">Sin caption</span>}
                             </p>
                           </div>
                         </div>
@@ -364,17 +364,17 @@ function FeedPreview({ posts }: { posts: GridPost[] }) {
             >
               {/* Day badge */}
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[8px] font-bold text-[#8888a8]">{day}</span>
+                <span className="text-[8px] font-bold text-[var(--t-8888a8)]">{day}</span>
                 <div className={`w-3.5 h-3.5 rounded flex items-center justify-center ${cfg.badge}`}>
                   <cfg.Icon size={7} />
                 </div>
               </div>
               {/* Preview text */}
-              <p className="text-[9px] leading-tight text-[#1a1a2e] line-clamp-4 flex-1">
-                {preview || <span className="italic text-[#c0c0d0]">vacío</span>}
+              <p className="text-[9px] leading-tight text-[var(--t-1a1a2e)] line-clamp-4 flex-1">
+                {preview || <span className="italic text-[var(--t-c0c0d0)]">vacío</span>}
               </p>
               {/* Post number */}
-              <p className="text-[7px] text-[#c0c0d0] mt-1 font-mono text-right">#{i + 1}</p>
+              <p className="text-[7px] text-[var(--t-c0c0d0)] mt-1 font-mono text-right">#{i + 1}</p>
               {/* Approved overlay */}
               {post.approved && (
                 <div className="absolute top-1 left-1 w-3 h-3 bg-emerald-500 rounded-full flex items-center justify-center">
@@ -385,7 +385,7 @@ function FeedPreview({ posts }: { posts: GridPost[] }) {
           );
         })}
       </div>
-      <p className="text-[10px] text-[#8888a8] mt-2">
+      <p className="text-[10px] text-[var(--t-8888a8)] mt-2">
         Orden de publicación: Lun → Dom · 3 posts/día · {posts.length} total
       </p>
     </div>
@@ -436,7 +436,7 @@ function ExportMenu({ grid, onCalendarPush }: {
             'flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg border transition-all',
             pushed
               ? 'bg-emerald-100 border-emerald-300 text-emerald-700'
-              : 'bg-white border-[#e8eaf0] text-[#4a4a6a] hover:border-[#0C2054]/30 hover:text-[#0C2054]'
+              : 'bg-[var(--surface)] border-[var(--s-e8eaf0)] text-[var(--t-4a4a6a)] hover:border-[#0C2054]/30 hover:text-[var(--t-0c2054)]'
           )}
         >
           {pushing ? <Loader2 size={12} className="animate-spin" /> : pushed ? <Check size={12} /> : <Download size={12} />}
@@ -445,47 +445,47 @@ function ExportMenu({ grid, onCalendarPush }: {
         </button>
 
         {open && (
-          <div className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-[#e8eaf0] rounded-xl shadow-lg overflow-hidden z-30">
+          <div className="absolute right-0 top-full mt-1.5 w-52 bg-[var(--surface)] border border-[var(--s-e8eaf0)] rounded-xl shadow-lg overflow-hidden z-30">
             <button
               onClick={handleCalendar}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[#f7f8fc] transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[var(--s-f7f8fc)] transition-colors"
             >
               <div className="w-7 h-7 rounded-lg bg-[#0C2054]/10 flex items-center justify-center flex-shrink-0">
-                <CalendarPlus size={13} className="text-[#0C2054]" />
+                <CalendarPlus size={13} className="text-[var(--t-0c2054)]" />
               </div>
               <div>
-                <p className="text-xs font-bold text-[#1a1a2e]">Enviar al Calendario</p>
-                <p className="text-[10px] text-[#8888a8]">Crea 21 eventos programados</p>
+                <p className="text-xs font-bold text-[var(--t-1a1a2e)]">Enviar al Calendario</p>
+                <p className="text-[10px] text-[var(--t-8888a8)]">Crea 21 eventos programados</p>
               </div>
             </button>
 
-            <div className="h-px bg-[#f0f0f0]" />
+            <div className="h-px bg-[var(--s-f0f0f0)]" />
 
             <button
               onClick={handleCSV}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[#f7f8fc] transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[var(--s-f7f8fc)] transition-colors"
             >
               <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
                 <Download size={13} className="text-emerald-600" />
               </div>
               <div>
-                <p className="text-xs font-bold text-[#1a1a2e]">Descargar CSV</p>
-                <p className="text-[10px] text-[#8888a8]">Para Meta Business Suite</p>
+                <p className="text-xs font-bold text-[var(--t-1a1a2e)]">Descargar CSV</p>
+                <p className="text-[10px] text-[var(--t-8888a8)]">Para Meta Business Suite</p>
               </div>
             </button>
 
-            <div className="h-px bg-[#f0f0f0]" />
+            <div className="h-px bg-[var(--s-f0f0f0)]" />
 
             <button
               onClick={handleBrief}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[#f7f8fc] transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-[var(--s-f7f8fc)] transition-colors"
             >
               <div className="w-7 h-7 rounded-lg bg-[#F79C31]/10 flex items-center justify-center flex-shrink-0">
-                <Printer size={13} className="text-[#F79C31]" />
+                <Printer size={13} className="text-[var(--t-f79c31)]" />
               </div>
               <div>
-                <p className="text-xs font-bold text-[#1a1a2e]">Brief para Sara</p>
-                <p className="text-[10px] text-[#8888a8]">Vista imprimible de diseño</p>
+                <p className="text-xs font-bold text-[var(--t-1a1a2e)]">Brief para Sara</p>
+                <p className="text-[10px] text-[var(--t-8888a8)]">Vista imprimible de diseño</p>
               </div>
             </button>
           </div>
@@ -502,7 +502,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={async () => { await navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-      className="p-1.5 rounded hover:bg-[#f0f0f0] text-[#8888a8] hover:text-[#4a4a6a] transition-colors"
+      className="p-1.5 rounded hover:bg-[var(--s-f0f0f0)] text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)] transition-colors"
       title="Copiar"
     >
       {copied ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
@@ -549,9 +549,9 @@ function CommentsPanel({ postId, comments: initial }: { postId: number; comments
       <div className="flex-1 overflow-y-auto space-y-3 pr-1 mb-4">
         {comments.length === 0 ? (
           <div className="text-center py-8">
-            <MessageCircle size={24} className="mx-auto mb-2 text-[#d0d0e0]" />
-            <p className="text-xs text-[#8888a8]">Sin comentarios aún.</p>
-            <p className="text-[10px] text-[#c0c0d0] mt-0.5">Sé el primero en dejar feedback.</p>
+            <MessageCircle size={24} className="mx-auto mb-2 text-[var(--t-d0d0e0)]" />
+            <p className="text-xs text-[var(--t-8888a8)]">Sin comentarios aún.</p>
+            <p className="text-[10px] text-[var(--t-c0c0d0)] mt-0.5">Sé el primero en dejar feedback.</p>
           </div>
         ) : (
           comments.map(c => (
@@ -564,10 +564,10 @@ function CommentsPanel({ postId, comments: initial }: { postId: number; comments
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-1.5 mb-0.5">
-                  <span className="text-[11px] font-bold text-[#1a1a2e]">{c.author_name}</span>
-                  <span className="text-[10px] text-[#c0c0d0]">{formatRelative(c.created_at)}</span>
+                  <span className="text-[11px] font-bold text-[var(--t-1a1a2e)]">{c.author_name}</span>
+                  <span className="text-[10px] text-[var(--t-c0c0d0)]">{formatRelative(c.created_at)}</span>
                 </div>
-                <p className="text-xs text-[#4a4a6a] leading-relaxed bg-[#f7f8fc] rounded-xl px-3 py-2 border border-[#f0f0f0]">
+                <p className="text-xs text-[var(--t-4a4a6a)] leading-relaxed bg-[var(--s-f7f8fc)] rounded-xl px-3 py-2 border border-[var(--s-f0f0f0)]">
                   {c.text}
                 </p>
               </div>
@@ -578,19 +578,19 @@ function CommentsPanel({ postId, comments: initial }: { postId: number; comments
       </div>
 
       {/* Input */}
-      <div className="flex gap-2 flex-shrink-0 border-t border-[#f0f0f0] pt-3">
+      <div className="flex gap-2 flex-shrink-0 border-t border-[var(--s-f0f0f0)] pt-3">
         <textarea
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
           rows={2}
           placeholder="Escribe un comentario… (Enter para enviar)"
-          className="flex-1 text-sm bg-[#f7f8fc] border border-[#e8e8f0] rounded-xl px-3 py-2 outline-none focus:border-[#F79C31] focus:bg-white resize-none transition-colors"
+          className="flex-1 text-sm bg-[var(--s-f7f8fc)] border border-[var(--s-e8e8f0)] rounded-xl px-3 py-2 outline-none focus:border-[var(--s-f79c31)] focus:bg-[var(--surface)] resize-none transition-colors"
         />
         <button
           onClick={send}
           disabled={!text.trim() || sending}
-          className="w-8 h-8 self-end flex items-center justify-center rounded-xl bg-[#0C2054] text-white hover:bg-[#1a3a7a] disabled:opacity-40 transition-all flex-shrink-0"
+          className="w-8 h-8 self-end flex items-center justify-center rounded-xl bg-[var(--s-0c2054)] text-white hover:bg-[var(--s-1a3a7a)] disabled:opacity-40 transition-all flex-shrink-0"
         >
           {sending ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
         </button>
@@ -616,41 +616,41 @@ function HistoryPanel({ postId, onRestore }: {
 
   if (loading) return (
     <div className="flex items-center justify-center py-16">
-      <Loader2 size={20} className="animate-spin text-[#F79C31]" />
+      <Loader2 size={20} className="animate-spin text-[var(--t-f79c31)]" />
     </div>
   );
 
   if (versions.length === 0) return (
     <div className="text-center py-10">
-      <History size={24} className="mx-auto mb-2 text-[#d0d0e0]" />
-      <p className="text-xs text-[#8888a8]">Sin versiones anteriores.</p>
-      <p className="text-[10px] text-[#c0c0d0] mt-0.5">El historial se crea al guardar cambios en el caption.</p>
+      <History size={24} className="mx-auto mb-2 text-[var(--t-d0d0e0)]" />
+      <p className="text-xs text-[var(--t-8888a8)]">Sin versiones anteriores.</p>
+      <p className="text-[10px] text-[var(--t-c0c0d0)] mt-0.5">El historial se crea al guardar cambios en el caption.</p>
     </div>
   );
 
   return (
     <div className="space-y-3">
       {versions.map((v, i) => (
-        <div key={v.id} className="rounded-xl border border-[#e8eaf0] bg-[#fafafa] overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-[#f0f0f0]">
+        <div key={v.id} className="rounded-xl border border-[var(--s-e8eaf0)] bg-[var(--s-fafafa)] overflow-hidden">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-[var(--s-f0f0f0)]">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] font-bold text-[#8888a8] bg-[#f0f0f0] px-1.5 py-0.5 rounded-md font-mono">
+              <span className="text-[10px] font-bold text-[var(--t-8888a8)] bg-[var(--s-f0f0f0)] px-1.5 py-0.5 rounded-md font-mono">
                 v{versions.length - i}
               </span>
-              <span className="text-[11px] text-[#8888a8]">{formatRelative(v.created_at)}</span>
+              <span className="text-[11px] text-[var(--t-8888a8)]">{formatRelative(v.created_at)}</span>
               {v.changed_by_name && (
-                <span className="text-[10px] text-[#c0c0d0]">· {v.changed_by_name}</span>
+                <span className="text-[10px] text-[var(--t-c0c0d0)]">· {v.changed_by_name}</span>
               )}
             </div>
             <button
               onClick={() => onRestore(v.caption)}
-              className="flex items-center gap-1 text-[10px] font-semibold text-[#F79C31] hover:text-[#e08a20] transition-colors"
+              className="flex items-center gap-1 text-[10px] font-semibold text-[var(--t-f79c31)] hover:text-[var(--t-e08a20)] transition-colors"
             >
               <RotateCcw size={10} /> Restaurar
             </button>
           </div>
-          <p className="px-3 py-2 text-[11px] text-[#4a4a6a] font-mono leading-relaxed line-clamp-4 whitespace-pre-wrap">
-            {v.caption || <span className="italic text-[#c0c0d0]">Caption vacío</span>}
+          <p className="px-3 py-2 text-[11px] text-[var(--t-4a4a6a)] font-mono leading-relaxed line-clamp-4 whitespace-pre-wrap">
+            {v.caption || <span className="italic text-[var(--t-c0c0d0)]">Caption vacío</span>}
           </p>
         </div>
       ))}
@@ -731,49 +731,49 @@ function ScheduleModal({ post, onClose, onDone }: {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
+        className="bg-[var(--surface)] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden"
         style={{ boxShadow: '0 32px 80px rgba(12,32,84,0.22)' }}
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#f0f2f8]">
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--s-f0f2f8)]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0C2054] flex items-center justify-center">
-              <Globe className="w-4 h-4 text-[#F79C31]" />
+            <div className="w-9 h-9 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
+              <Globe className="w-4 h-4 text-[var(--t-f79c31)]" />
             </div>
             <div>
-              <h3 className="font-bold text-[#0C2054] text-sm">Publicar en redes sociales</h3>
-              <p className="text-xs text-[#9ca3af] mt-0.5 truncate max-w-[220px]">
+              <h3 className="font-bold text-[var(--t-0c2054)] text-sm">Publicar en redes sociales</h3>
+              <p className="text-xs text-[var(--t-9ca3af)] mt-0.5 truncate max-w-[220px]">
                 {post.slot === 'carousel' ? post.headline : post.slot === 'reel' ? post.video_title : post.photo_suggestion || 'Post seleccionado'}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="text-[#9ca3af] hover:text-[#374151] transition-colors">
+          <button onClick={onClose} className="text-[var(--t-9ca3af)] hover:text-[var(--t-374151)] transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-6 space-y-5">
           {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-[#f0f2f8] rounded-xl">
+          <div className="flex gap-1 p-1 bg-[var(--s-f0f2f8)] rounded-xl">
             {([['schedule', '🕐  Programar', 'Elige fecha y hora'], ['now', '⚡  Ahora mismo', 'Publica inmediatamente']] as const).map(([id, label, desc]) => (
               <button
                 key={id}
                 onClick={() => setTab(id)}
                 className={cn(
                   'flex-1 py-2 px-3 rounded-lg text-xs font-semibold transition-all text-center',
-                  tab === id ? 'bg-white text-[#0C2054] shadow-sm' : 'text-[#6b7280] hover:text-[#374151]'
+                  tab === id ? 'bg-[var(--surface)] text-[var(--t-0c2054)] shadow-sm' : 'text-[var(--t-6b7280)] hover:text-[var(--t-374151)]'
                 )}
               >
                 {label}
-                <span className={cn('block text-[10px] font-normal mt-0.5', tab === id ? 'text-[#9ca3af]' : 'text-[#c4c8d4]')}>{desc}</span>
+                <span className={cn('block text-[10px] font-normal mt-0.5', tab === id ? 'text-[var(--t-9ca3af)]' : 'text-[var(--t-c4c8d4)]')}>{desc}</span>
               </button>
             ))}
           </div>
 
           {/* Plataformas */}
           <div>
-            <p className="text-xs font-semibold text-[#374151] uppercase tracking-widest mb-3">Plataformas</p>
+            <p className="text-xs font-semibold text-[var(--t-374151)] uppercase tracking-widest mb-3">Plataformas</p>
             <div className="flex flex-wrap gap-2">
               {PLATFORMS.map(p => (
                 <button
@@ -783,7 +783,7 @@ function ScheduleModal({ post, onClose, onDone }: {
                     'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all',
                     platforms.includes(p.id)
                       ? p.color + ' border-current shadow-sm'
-                      : 'bg-white border-[#e5e7eb] text-[#9ca3af] hover:border-[#d1d5db]'
+                      : 'bg-[var(--surface)] border-[var(--s-e5e7eb)] text-[var(--t-9ca3af)] hover:border-[var(--s-d1d5db)]'
                   )}
                 >
                   <span>{p.icon}</span> {p.label}
@@ -796,21 +796,21 @@ function ScheduleModal({ post, onClose, onDone }: {
           {/* Fecha/hora (solo tab schedule) */}
           {tab === 'schedule' && (
             <div>
-              <p className="text-xs font-semibold text-[#374151] uppercase tracking-widest mb-2">Fecha y hora de publicación</p>
+              <p className="text-xs font-semibold text-[var(--t-374151)] uppercase tracking-widest mb-2">Fecha y hora de publicación</p>
               <input
                 type="datetime-local"
                 value={scheduledAt}
                 onChange={e => setScheduledAt(e.target.value)}
                 min={new Date().toISOString().slice(0, 16)}
-                className="w-full px-4 py-3 rounded-xl border border-[#e5e7eb] bg-[#f9fafb] text-sm text-[#111827] outline-none focus:border-[#0C2054] focus:ring-2 focus:ring-[#0C2054]/10 focus:bg-white transition-all"
+                className="w-full px-4 py-3 rounded-xl border border-[var(--s-e5e7eb)] bg-[var(--s-f9fafb)] text-sm text-[var(--t-111827)] outline-none focus:border-[var(--s-0c2054)] focus:ring-2 focus:ring-[#0C2054]/10 focus:bg-[var(--surface)] transition-all"
               />
             </div>
           )}
 
           {/* Caption preview */}
-          <div className="bg-[#f9fafb] rounded-xl p-4 border border-[#f0f2f8]">
-            <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-widest mb-2">Vista previa del caption</p>
-            <p className="text-xs text-[#374151] leading-relaxed line-clamp-4 whitespace-pre-line">
+          <div className="bg-[var(--s-f9fafb)] rounded-xl p-4 border border-[var(--s-f0f2f8)]">
+            <p className="text-[10px] font-semibold text-[var(--t-9ca3af)] uppercase tracking-widest mb-2">Vista previa del caption</p>
+            <p className="text-xs text-[var(--t-374151)] leading-relaxed line-clamp-4 whitespace-pre-line">
               {post.caption || 'Sin caption generado.'}
             </p>
           </div>
@@ -825,14 +825,14 @@ function ScheduleModal({ post, onClose, onDone }: {
           <div className="flex gap-3 pt-1">
             <button
               onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-[#e5e7eb] text-sm text-[#6b7280] font-medium hover:bg-[#f9fafb] transition-colors"
+              className="flex-1 py-3 rounded-xl border border-[var(--s-e5e7eb)] text-sm text-[var(--t-6b7280)] font-medium hover:bg-[var(--s-f9fafb)] transition-colors"
             >
               Cancelar
             </button>
             <button
               onClick={tab === 'schedule' ? handleSchedule : handlePublishNow}
               disabled={loading || !platforms.length}
-              className="flex-1 py-3 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="flex-1 py-3 rounded-xl bg-[var(--s-0c2054)] text-white text-sm font-semibold hover:bg-[var(--s-0f2960)] transition-all shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading
                 ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -905,8 +905,8 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
     finally { setImproving(false); }
   };
 
-  const ta  = 'w-full bg-[#f7f8fc] border border-[#e8e8f0] rounded-lg px-3 py-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#F79C31] focus:bg-white resize-none transition-colors';
-  const inp = 'w-full bg-[#f7f8fc] border border-[#e8e8f0] rounded-lg px-3 py-2 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#F79C31] focus:bg-white transition-colors';
+  const ta  = 'w-full bg-[var(--s-f7f8fc)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 text-sm text-[var(--t-1a1a2e)] focus:outline-none focus:border-[var(--s-f79c31)] focus:bg-[var(--surface)] resize-none transition-colors';
+  const inp = 'w-full bg-[var(--s-f7f8fc)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 text-sm text-[var(--t-1a1a2e)] focus:outline-none focus:border-[var(--s-f79c31)] focus:bg-[var(--surface)] transition-colors';
   const day = DAYS[post.day_of_week] ?? '';
 
   const TABS: { key: PanelTab; label: string; icon: React.ElementType; count?: number }[] = [
@@ -919,18 +919,18 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
     <>
       <div className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px]" onClick={onClose} />
 
-      <div className="fixed right-0 top-0 bottom-0 z-50 w-[500px] bg-white shadow-2xl flex flex-col overflow-hidden"
+      <div className="fixed right-0 top-0 bottom-0 z-50 w-[500px] bg-[var(--surface)] shadow-2xl flex flex-col overflow-hidden"
         style={{ borderLeft: '1px solid #e8eaf0' }}>
 
         {/* Header */}
-        <div className={`flex items-center justify-between px-5 py-3.5 border-b border-[#f0f0f0] ${cfg.header} flex-shrink-0`}>
+        <div className={`flex items-center justify-between px-5 py-3.5 border-b border-[var(--s-f0f0f0)] ${cfg.header} flex-shrink-0`}>
           <div className="flex items-center gap-2.5">
             <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${cfg.badge}`}>
               <cfg.Icon size={13} />
             </div>
             <div>
-              <p className="text-xs font-bold text-[#1a1a2e]">{cfg.label}</p>
-              <p className="text-[10px] text-[#8888a8]">{day}</p>
+              <p className="text-xs font-bold text-[var(--t-1a1a2e)]">{cfg.label}</p>
+              <p className="text-[10px] text-[var(--t-8888a8)]">{day}</p>
             </div>
           </div>
 
@@ -944,7 +944,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
                 'flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border transition-all',
                 post.approved
                   ? 'bg-emerald-500 border-emerald-500 text-white shadow-sm'
-                  : 'bg-white border-[#e8eaf0] text-[#8888a8] hover:border-emerald-400 hover:text-emerald-600',
+                  : 'bg-[var(--surface)] border-[var(--s-e8eaf0)] text-[var(--t-8888a8)] hover:border-emerald-400 hover:text-emerald-600',
                 approving && 'opacity-60 cursor-not-allowed'
               )}
             >
@@ -968,7 +968,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
             {post.approved && !currentPost.publish_status && (
               <button
                 onClick={() => setShowSchedule(true)}
-                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border bg-[#0C2054] border-[#0C2054] text-white hover:bg-[#1a3a7a] transition-all shadow-sm"
+                className="flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-lg border bg-[var(--s-0c2054)] border-[var(--s-0c2054)] text-white hover:bg-[var(--s-1a3a7a)] transition-all shadow-sm"
               >
                 <Globe size={11} />
                 Publicar
@@ -990,7 +990,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
                 disabled={saving}
                 className={cn(
                   'flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all',
-                  saved ? 'bg-emerald-100 text-emerald-700' : 'bg-[#0C2054] text-white hover:bg-[#1a3a7a]',
+                  saved ? 'bg-emerald-100 text-emerald-700' : 'bg-[var(--s-0c2054)] text-white hover:bg-[var(--s-1a3a7a)]',
                   saving && 'opacity-60 cursor-not-allowed'
                 )}
               >
@@ -999,7 +999,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
               </button>
             )}
 
-            <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[#8888a8] hover:text-[#1a1a2e] hover:bg-white/60 transition-colors">
+            <button onClick={onClose} className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--t-8888a8)] hover:text-[var(--t-1a1a2e)] hover:bg-white/60 transition-colors">
               <X size={15} />
             </button>
           </div>
@@ -1017,7 +1017,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
         )}
 
         {/* Tabs */}
-        <div className="flex border-b border-[#f0f0f0] px-5 flex-shrink-0">
+        <div className="flex border-b border-[var(--s-f0f0f0)] px-5 flex-shrink-0">
           {TABS.map(({ key, label, icon: Icon, count }) => (
             <button
               key={key}
@@ -1025,8 +1025,8 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
               className={cn(
                 'flex items-center gap-1.5 px-3 py-2.5 text-[11px] font-semibold border-b-2 -mb-px transition-all',
                 tab === key
-                  ? 'border-[#0C2054] text-[#0C2054]'
-                  : 'border-transparent text-[#8888a8] hover:text-[#4a4a6a]'
+                  ? 'border-[var(--s-0c2054)] text-[var(--t-0c2054)]'
+                  : 'border-transparent text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)]'
               )}
             >
               <Icon size={12} />
@@ -1034,7 +1034,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
               {count !== undefined && count > 0 && (
                 <span className={cn(
                   'text-[9px] font-bold px-1.5 py-0.5 rounded-full',
-                  tab === key ? 'bg-[#0C2054] text-white' : 'bg-[#f0f0f0] text-[#8888a8]'
+                  tab === key ? 'bg-[var(--s-0c2054)] text-white' : 'bg-[var(--s-f0f0f0)] text-[var(--t-8888a8)]'
                 )}>
                   {count}
                 </span>
@@ -1052,18 +1052,18 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
               {post.slot === 'carousel' && (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Headline de la imagen</label>
+                    <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Headline de la imagen</label>
                     <textarea rows={2} value={val('headline')} onChange={e => setDraft(d => ({ ...d, headline: e.target.value }))} className={ta} placeholder="Texto para la gráfica…" />
                   </div>
                   {post.format === 'carousel' && arr('slide_titles').length > 0 && (
                     <div>
-                      <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
-                        Títulos de slides <span className="text-[#F79C31] font-normal">— para Sara</span>
+                      <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
+                        Títulos de slides <span className="text-[var(--t-f79c31)] font-normal">— para Sara</span>
                       </label>
                       <div className="space-y-1.5">
                         {arr('slide_titles').map((t, i) => (
                           <div key={i} className="flex items-center gap-2">
-                            <span className="text-[10px] text-[#8888a8] w-5 shrink-0 font-mono">{i + 1}.</span>
+                            <span className="text-[10px] text-[var(--t-8888a8)] w-5 shrink-0 font-mono">{i + 1}.</span>
                             <input value={t} onChange={e => setArr('slide_titles', i, e.target.value)} className={inp} />
                           </div>
                         ))}
@@ -1075,7 +1075,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
 
               {post.slot === 'foto' && (
                 <div>
-                  <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Sugerencia de foto</label>
+                  <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Sugerencia de foto</label>
                   <textarea rows={3} value={val('photo_suggestion')} onChange={e => setDraft(d => ({ ...d, photo_suggestion: e.target.value }))} className={ta} placeholder="Ej: Auguy en oficina mirando a cámara, traje azul…" />
                 </div>
               )}
@@ -1083,18 +1083,18 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
               {post.slot === 'reel' && (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">Título en pantalla</label>
+                    <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Título en pantalla</label>
                     <input value={val('video_title')} onChange={e => setDraft(d => ({ ...d, video_title: e.target.value }))} className={inp} placeholder="Texto corto para el inicio del video…" />
                   </div>
                   {arr('script_points').length > 0 && (
                     <div>
-                      <label className="block text-xs font-semibold text-[#4a4a6a] mb-1.5">
-                        Guión <span className="text-[#F79C31] font-normal">— para Gloriana</span>
+                      <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">
+                        Guión <span className="text-[var(--t-f79c31)] font-normal">— para Gloriana</span>
                       </label>
                       <div className="space-y-1.5">
                         {arr('script_points').map((p, i) => (
                           <div key={i} className="flex items-start gap-2">
-                            <span className="text-[10px] text-[#8888a8] mt-2.5 w-5 shrink-0 font-mono">{i + 1}.</span>
+                            <span className="text-[10px] text-[var(--t-8888a8)] mt-2.5 w-5 shrink-0 font-mono">{i + 1}.</span>
                             <textarea rows={2} value={p} onChange={e => setArr('script_points', i, e.target.value)} className={ta} />
                           </div>
                         ))}
@@ -1106,7 +1106,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-[#4a4a6a]">Caption completo</label>
+                  <label className="text-xs font-semibold text-[var(--t-4a4a6a)]">Caption completo</label>
                   <div className="flex items-center gap-1">
                     <button
                       onClick={handleImprove}
@@ -1115,8 +1115,8 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
                       className={cn(
                         'flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-lg border transition-all',
                         improving
-                          ? 'bg-[#F79C31]/10 border-[#F79C31]/30 text-[#F79C31] cursor-not-allowed'
-                          : 'bg-white border-[#e8e8f0] text-[#8888a8] hover:border-[#F79C31] hover:text-[#F79C31]'
+                          ? 'bg-[#F79C31]/10 border-[#F79C31]/30 text-[var(--t-f79c31)] cursor-not-allowed'
+                          : 'bg-[var(--surface)] border-[var(--s-e8e8f0)] text-[var(--t-8888a8)] hover:border-[var(--s-f79c31)] hover:text-[var(--t-f79c31)]'
                       )}
                     >
                       {improving
@@ -1134,7 +1134,7 @@ function PostPanel({ post, onClose, onSave, onApprove }: {
                   onChange={e => setDraft(d => ({ ...d, caption: e.target.value }))}
                   className={cn(ta, 'font-mono text-[13px] leading-relaxed')}
                 />
-                <p className="text-[10px] text-[#8888a8] mt-1 text-right">
+                <p className="text-[10px] text-[var(--t-8888a8)] mt-1 text-right">
                   <span className={val('caption').length > 2000 ? 'text-amber-500 font-semibold' : ''}>
                     {val('caption').length}
                   </span>{' / 2,200'}
@@ -1183,16 +1183,16 @@ function WeeklyGrid({ posts, onSelectPost }: {
   onSelectPost: (post: GridPost) => void;
 }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-[#e8eaf0] bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-2xl border border-[var(--s-e8eaf0)] bg-[var(--surface)] shadow-sm">
       <table className="w-full min-w-[720px]">
         <thead>
-          <tr className="border-b border-[#e8eaf0]">
+          <tr className="border-b border-[var(--s-e8eaf0)]">
             <th className="w-28 px-4 py-3 text-left">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-[#8888a8]">Slot</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-[var(--t-8888a8)]">Slot</span>
             </th>
             {DAYS_SHORT.map((d, i) => (
               <th key={i} className="px-2 py-3 text-center">
-                <p className="text-[11px] font-bold text-[#0C2054]">{d}</p>
+                <p className="text-[11px] font-bold text-[var(--t-0c2054)]">{d}</p>
               </th>
             ))}
           </tr>
@@ -1201,11 +1201,11 @@ function WeeklyGrid({ posts, onSelectPost }: {
           {SLOTS.map((slot, ri) => {
             const cfg = SLOT_CONFIG[slot];
             return (
-              <tr key={slot} className={ri < SLOTS.length - 1 ? 'border-b border-[#f4f4f8]' : ''}>
+              <tr key={slot} className={ri < SLOTS.length - 1 ? 'border-b border-[var(--s-f4f4f8)]' : ''}>
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${cfg.dot} flex-shrink-0`} />
-                    <span className="text-[11px] font-semibold text-[#4a4a6a]">{cfg.label}</span>
+                    <span className="text-[11px] font-semibold text-[var(--t-4a4a6a)]">{cfg.label}</span>
                   </div>
                 </td>
                 {Array.from({ length: 7 }, (_, day) => {
@@ -1231,22 +1231,22 @@ function WeeklyGrid({ posts, onSelectPost }: {
                             <cfg.Icon size={8} />
                           </div>
                           {preview ? (
-                            <p className="text-[11px] text-[#1a1a2e] leading-snug line-clamp-3 group-hover:text-[#0C2054]">
+                            <p className="text-[11px] text-[var(--t-1a1a2e)] leading-snug line-clamp-3 group-hover:text-[var(--t-0c2054)]">
                               {preview}
                             </p>
                           ) : (
-                            <p className="text-[10px] text-[#c0c0d0] italic">Sin contenido</p>
+                            <p className="text-[10px] text-[var(--t-c0c0d0)] italic">Sin contenido</p>
                           )}
                           {(post.comments?.length ?? 0) > 0 && (
                             <div className="flex items-center gap-0.5 mt-1.5">
-                              <MessageCircle size={8} className="text-[#8888a8]" />
-                              <span className="text-[9px] text-[#8888a8]">{post.comments.length}</span>
+                              <MessageCircle size={8} className="text-[var(--t-8888a8)]" />
+                              <span className="text-[9px] text-[var(--t-8888a8)]">{post.comments.length}</span>
                             </div>
                           )}
                         </button>
                       ) : (
-                        <div className="w-full min-h-[76px] rounded-xl border border-dashed border-[#e8eaf0] flex items-center justify-center">
-                          <span className="text-[10px] text-[#d0d0e0]">—</span>
+                        <div className="w-full min-h-[76px] rounded-xl border border-dashed border-[var(--s-e8eaf0)] flex items-center justify-center">
+                          <span className="text-[10px] text-[var(--t-d0d0e0)]">—</span>
                         </div>
                       )}
                     </td>
@@ -1299,37 +1299,37 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
       {/* Header */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex items-start gap-3">
-          <button onClick={onBack} className="mt-1 text-[#8888a8] hover:text-[#0C2054] transition-colors">
+          <button onClick={onBack} className="mt-1 text-[var(--t-8888a8)] hover:text-[var(--t-0c2054)] transition-colors">
             <ChevronLeft size={20} />
           </button>
           <div>
             <div className="flex items-center gap-2.5 flex-wrap">
-              <h1 className="text-xl font-bold text-[#0C2054]">{grid.tema_display}</h1>
+              <h1 className="text-xl font-bold text-[var(--t-0c2054)]">{grid.tema_display}</h1>
               <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${statusCfg.cls}`}>
                 {statusCfg.label}
               </span>
             </div>
-            <p className="text-sm text-[#8888a8] mt-0.5">{formatWeekRange(grid.week_start)}</p>
+            <p className="text-sm text-[var(--t-8888a8)] mt-0.5">{formatWeekRange(grid.week_start)}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           {/* Progress bars */}
           {hasPosts && (
-            <div className="flex flex-col gap-1 bg-[#f7f8fc] border border-[#e8eaf0] rounded-xl px-3 py-2">
+            <div className="flex flex-col gap-1 bg-[var(--s-f7f8fc)] border border-[var(--s-e8eaf0)] rounded-xl px-3 py-2">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#8888a8] w-16">Contenido</span>
-                <div className="w-20 h-1.5 bg-[#e8eaf0] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#F79C31] rounded-full transition-all" style={{ width: `${(withContent / Math.max(total, 1)) * 100}%` }} />
+                <span className="text-[10px] text-[var(--t-8888a8)] w-16">Contenido</span>
+                <div className="w-20 h-1.5 bg-[var(--s-e8eaf0)] rounded-full overflow-hidden">
+                  <div className="h-full bg-[var(--s-f79c31)] rounded-full transition-all" style={{ width: `${(withContent / Math.max(total, 1)) * 100}%` }} />
                 </div>
-                <span className="text-[10px] font-bold text-[#4a4a6a]">{withContent}/{total}</span>
+                <span className="text-[10px] font-bold text-[var(--t-4a4a6a)]">{withContent}/{total}</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#8888a8] w-16">Aprobados</span>
-                <div className="w-20 h-1.5 bg-[#e8eaf0] rounded-full overflow-hidden">
+                <span className="text-[10px] text-[var(--t-8888a8)] w-16">Aprobados</span>
+                <div className="w-20 h-1.5 bg-[var(--s-e8eaf0)] rounded-full overflow-hidden">
                   <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${(approved / Math.max(total, 1)) * 100}%` }} />
                 </div>
-                <span className="text-[10px] font-bold text-[#4a4a6a]">{approved}/{total}</span>
+                <span className="text-[10px] font-bold text-[var(--t-4a4a6a)]">{approved}/{total}</span>
               </div>
             </div>
           )}
@@ -1349,7 +1349,7 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
           <ExportMenu grid={grid} onCalendarPush={onCalendarPush} />
 
           {!deleteConfirm ? (
-            <button onClick={() => setDeleteConfirm(true)} className="p-1.5 rounded-lg text-[#8888a8] hover:text-red-500 hover:bg-red-50 transition-colors">
+            <button onClick={() => setDeleteConfirm(true)} className="p-1.5 rounded-lg text-[var(--t-8888a8)] hover:text-red-500 hover:bg-red-50 transition-colors">
               <Trash2 size={15} />
             </button>
           ) : (
@@ -1357,22 +1357,22 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
               <span className="text-red-600 text-xs font-medium">¿Eliminar?</span>
               <button onClick={onDelete} className="text-red-600 hover:text-red-700 text-xs font-bold">Sí</button>
               <span className="text-red-300">·</span>
-              <button onClick={() => setDeleteConfirm(false)} className="text-[#8888a8] hover:text-[#4a4a6a] text-xs">No</button>
+              <button onClick={() => setDeleteConfirm(false)} className="text-[var(--t-8888a8)] hover:text-[var(--t-4a4a6a)] text-xs">No</button>
             </div>
           )}
         </div>
       </div>
 
       {!hasPosts && (
-        <div className="text-center py-20 text-[#8888a8] border border-dashed border-[#e8eaf0] rounded-2xl bg-white">
+        <div className="text-center py-20 text-[var(--t-8888a8)] border border-dashed border-[var(--s-e8eaf0)] rounded-2xl bg-[var(--surface)]">
           <Sparkles size={32} className="mx-auto mb-3 opacity-30" />
-          <p className="text-sm font-medium text-[#4a4a6a]">La grilla no tiene contenido generado.</p>
+          <p className="text-sm font-medium text-[var(--t-4a4a6a)]">La grilla no tiene contenido generado.</p>
         </div>
       )}
 
       {hasPosts && (
         <>
-          <div className="flex items-center gap-5 text-xs text-[#8888a8]">
+          <div className="flex items-center gap-5 text-xs text-[var(--t-8888a8)]">
             {SLOTS.map(slot => {
               const cfg = SLOT_CONFIG[slot];
               return (
@@ -1382,18 +1382,18 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
                 </span>
               );
             })}
-            <span className="text-[#d0d0e0]">·</span>
+            <span className="text-[var(--t-d0d0e0)]">·</span>
             <span className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-emerald-500" /> = aprobado
             </span>
-            <span className="text-[#d0d0e0]">·</span>
+            <span className="text-[var(--t-d0d0e0)]">·</span>
             <span>Clic en celda para editar</span>
           </div>
 
           <WeeklyGrid posts={grid.posts} onSelectPost={setSelectedPost} />
 
           {/* Hashtags panel */}
-          <div className="bg-white rounded-2xl border border-[#e8eaf0] overflow-hidden">
+          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] overflow-hidden">
             <button
               onClick={async () => {
                 setShowHashtags(s => !s);
@@ -1404,22 +1404,22 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
                   finally { setLoadingHashtags(false); }
                 }
               }}
-              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#f7f8fc] transition-colors"
+              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[var(--s-f7f8fc)] transition-colors"
             >
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-lg bg-[#F79C31]/10 flex items-center justify-center">
                   <span className="text-sm">#</span>
                 </div>
-                <p className="text-sm font-bold text-[#1a1a2e]">Hashtags con IA</p>
-                <span className="text-[10px] text-[#8888a8] bg-[#f0f0f0] px-2 py-0.5 rounded-full">30 tags · por reach</span>
+                <p className="text-sm font-bold text-[var(--t-1a1a2e)]">Hashtags con IA</p>
+                <span className="text-[10px] text-[var(--t-8888a8)] bg-[var(--s-f0f0f0)] px-2 py-0.5 rounded-full">30 tags · por reach</span>
               </div>
               {loadingHashtags
-                ? <Loader2 size={14} className="text-[#F79C31] animate-spin" />
-                : <ChevronDown size={14} className={cn('text-[#8888a8] transition-transform', showHashtags && 'rotate-180')} />
+                ? <Loader2 size={14} className="text-[var(--t-f79c31)] animate-spin" />
+                : <ChevronDown size={14} className={cn('text-[var(--t-8888a8)] transition-transform', showHashtags && 'rotate-180')} />
               }
             </button>
             {showHashtags && hashtags && (
-              <div className="px-5 pb-5 border-t border-[#f0f0f0] pt-4 space-y-4">
+              <div className="px-5 pb-5 border-t border-[var(--s-f0f0f0)] pt-4 space-y-4">
                 {([
                   { key: 'pequeños' as const,  label: '🎯 Nicho',    desc: '< 100K posts · alta conversión',   color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
                   { key: 'medianos' as const,  label: '⚖️ Balance',  desc: '100K–1M posts · reach + conversión', color: 'bg-blue-50 text-blue-700 border-blue-200' },
@@ -1428,12 +1428,12 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
                   <div key={key}>
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <p className="text-xs font-bold text-[#1a1a2e]">{label}</p>
-                        <p className="text-[10px] text-[#8888a8]">{desc}</p>
+                        <p className="text-xs font-bold text-[var(--t-1a1a2e)]">{label}</p>
+                        <p className="text-[10px] text-[var(--t-8888a8)]">{desc}</p>
                       </div>
                       <button
                         onClick={() => navigator.clipboard.writeText(hashtags[key].join(' '))}
-                        className="text-[10px] font-semibold text-[#8888a8] hover:text-[#0C2054] flex items-center gap-1 transition-colors"
+                        className="text-[10px] font-semibold text-[var(--t-8888a8)] hover:text-[var(--t-0c2054)] flex items-center gap-1 transition-colors"
                       >
                         <Copy size={10} /> Copiar grupo
                       </button>
@@ -1459,7 +1459,7 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
                     catch { /* silently fail */ }
                     finally { setLoadingHashtags(false); }
                   }}
-                  className="flex items-center gap-1.5 text-xs font-semibold text-[#8888a8] hover:text-[#0C2054] transition-colors"
+                  className="flex items-center gap-1.5 text-xs font-semibold text-[var(--t-8888a8)] hover:text-[var(--t-0c2054)] transition-colors"
                 >
                   <Sparkles size={11} /> Regenerar hashtags
                 </button>
@@ -1468,22 +1468,22 @@ function GridDetail({ grid, onBack, onStatusChange, onPostSave, onPostApprove, o
           </div>
 
           {/* Feed preview toggle */}
-          <div className="bg-white rounded-2xl border border-[#e8eaf0] overflow-hidden">
+          <div className="bg-[var(--surface)] rounded-2xl border border-[var(--s-e8eaf0)] overflow-hidden">
             <button
               onClick={() => setShowFeed(f => !f)}
-              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[#f7f8fc] transition-colors"
+              className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-[var(--s-f7f8fc)] transition-colors"
             >
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-[#f0f2f8] flex items-center justify-center">
-                  <Eye size={13} className="text-[#0C2054]" />
+                <div className="w-7 h-7 rounded-lg bg-[var(--s-f0f2f8)] flex items-center justify-center">
+                  <Eye size={13} className="text-[var(--t-0c2054)]" />
                 </div>
-                <p className="text-sm font-bold text-[#1a1a2e]">Vista previa del feed</p>
-                <span className="text-[10px] text-[#8888a8] bg-[#f0f0f0] px-2 py-0.5 rounded-full">21 posts en orden</span>
+                <p className="text-sm font-bold text-[var(--t-1a1a2e)]">Vista previa del feed</p>
+                <span className="text-[10px] text-[var(--t-8888a8)] bg-[var(--s-f0f0f0)] px-2 py-0.5 rounded-full">21 posts en orden</span>
               </div>
-              <ChevronDown size={14} className={cn('text-[#8888a8] transition-transform', showFeed && 'rotate-180')} />
+              <ChevronDown size={14} className={cn('text-[var(--t-8888a8)] transition-transform', showFeed && 'rotate-180')} />
             </button>
             {showFeed && (
-              <div className="px-5 pb-5 border-t border-[#f0f0f0]">
+              <div className="px-5 pb-5 border-t border-[var(--s-f0f0f0)]">
                 <div className="pt-4">
                   <FeedPreview posts={grid.posts} />
                 </div>
@@ -1515,16 +1515,16 @@ function GrillaCard({ grilla, onClick }: { grilla: ContentGridList; onClick: () 
   return (
     <button
       onClick={onClick}
-      className="w-full text-left bg-white border border-[#e8eaf0] hover:border-[#0C2054]/30 rounded-2xl p-5 transition-all hover:shadow-md group"
+      className="w-full text-left bg-[var(--surface)] border border-[var(--s-e8eaf0)] hover:border-[#0C2054]/30 rounded-2xl p-5 transition-all hover:shadow-md group"
     >
       <div className="flex items-start justify-between gap-2 mb-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#f0f2f8] flex items-center justify-center text-xl flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[var(--s-f0f2f8)] flex items-center justify-center text-xl flex-shrink-0">
             {tema?.emoji ?? '📅'}
           </div>
           <div>
-            <p className="font-bold text-[#0C2054] text-sm group-hover:text-[#1a3a7a] transition-colors">{grilla.tema_display}</p>
-            <p className="text-xs text-[#8888a8] mt-0.5">{formatWeekRange(grilla.week_start)}</p>
+            <p className="font-bold text-[var(--t-0c2054)] text-sm group-hover:text-[#1a3a7a] transition-colors">{grilla.tema_display}</p>
+            <p className="text-xs text-[var(--t-8888a8)] mt-0.5">{formatWeekRange(grilla.week_start)}</p>
           </div>
         </div>
         <span className={`text-[10px] font-semibold px-2 py-1 rounded-full shrink-0 ${s.cls}`}>{s.label}</span>
@@ -1533,23 +1533,23 @@ function GrillaCard({ grilla, onClick }: { grilla: ContentGridList; onClick: () 
       {/* Approval progress */}
       {grilla.post_count > 0 && (
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1 h-1.5 bg-[#f0f0f0] rounded-full overflow-hidden">
+          <div className="flex-1 h-1.5 bg-[var(--s-f0f0f0)] rounded-full overflow-hidden">
             <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
           </div>
-          <span className="text-[10px] text-[#8888a8] font-medium">{grilla.approved_count}/{grilla.post_count}</span>
+          <span className="text-[10px] text-[var(--t-8888a8)] font-medium">{grilla.approved_count}/{grilla.post_count}</span>
         </div>
       )}
 
-      <div className="flex items-center gap-3 pt-3 border-t border-[#f4f4f8]">
+      <div className="flex items-center gap-3 pt-3 border-t border-[var(--s-f4f4f8)]">
         <div className="flex gap-1.5">
           {SLOTS.map(slot => <div key={slot} className={`w-1.5 h-1.5 rounded-full ${SLOT_CONFIG[slot].dot}`} />)}
         </div>
-        <span className="text-xs text-[#8888a8]">{grilla.post_count} posts</span>
-        <span className="text-[#d0d0e0]">·</span>
-        <span className="text-xs text-[#8888a8]">
+        <span className="text-xs text-[var(--t-8888a8)]">{grilla.post_count} posts</span>
+        <span className="text-[var(--t-d0d0e0)]">·</span>
+        <span className="text-xs text-[var(--t-8888a8)]">
           {new Date(grilla.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
         </span>
-        <ChevronRight size={12} className="ml-auto text-[#d0d0e0] group-hover:text-[#0C2054] transition-colors" />
+        <ChevronRight size={12} className="ml-auto text-[var(--t-d0d0e0)] group-hover:text-[var(--t-0c2054)] transition-colors" />
       </div>
     </button>
   );
@@ -1602,7 +1602,7 @@ function CreateWizard({ onBack, onCreate }: {
 
   return (
     <div className="max-w-2xl mx-auto p-8">
-      <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-[#8888a8] hover:text-[#0C2054] transition-colors mb-8">
+      <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-[var(--t-8888a8)] hover:text-[var(--t-0c2054)] transition-colors mb-8">
         <ChevronLeft size={16} /> Volver a grillas
       </button>
 
@@ -1611,13 +1611,13 @@ function CreateWizard({ onBack, onCreate }: {
           <div key={s.n} className="flex items-center">
             <div className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all',
-              step === s.n ? 'bg-[#0C2054] text-white shadow-md' :
-              step > s.n  ? 'bg-emerald-100 text-emerald-700'   : 'bg-[#f0f2f8] text-[#8888a8]'
+              step === s.n ? 'bg-[var(--s-0c2054)] text-white shadow-md' :
+              step > s.n  ? 'bg-emerald-100 text-emerald-700'   : 'bg-[var(--s-f0f2f8)] text-[var(--t-8888a8)]'
             )}>
               {step > s.n ? <Check size={14} /> : <s.Icon size={14} />}
               <span className="hidden sm:inline">{s.label}</span>
             </div>
-            {i < STEPS.length - 1 && <ArrowRight size={14} className="mx-2 text-[#d0d0e0] flex-shrink-0" />}
+            {i < STEPS.length - 1 && <ArrowRight size={14} className="mx-2 text-[var(--t-d0d0e0)] flex-shrink-0" />}
           </div>
         ))}
       </div>
@@ -1625,22 +1625,22 @@ function CreateWizard({ onBack, onCreate }: {
       {step === 1 && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-bold text-[#0C2054] mb-1">¿Para qué semana?</h2>
-            <p className="text-sm text-[#8888a8]">Selecciona la semana de publicación</p>
+            <h2 className="text-xl font-bold text-[var(--t-0c2054)] mb-1">¿Para qué semana?</h2>
+            <p className="text-sm text-[var(--t-8888a8)]">Selecciona la semana de publicación</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
             {mondays.map((m, i) => (
               <button key={m.value} onClick={() => setWeek(m.value)}
                 className={cn('flex flex-col items-start p-3.5 rounded-xl border text-left transition-all',
-                  week === m.value ? 'bg-[#0C2054] border-[#0C2054] text-white shadow-md' :
-                  'bg-white border-[#e8eaf0] hover:border-[#0C2054]/30 hover:shadow-sm')}>
-                {i === 0 && <span className="text-[9px] font-bold uppercase tracking-widest mb-1 text-[#F79C31]">Esta semana</span>}
-                <p className={cn('text-xs font-bold', week === m.value ? 'text-white' : 'text-[#0C2054]')}>{m.label}</p>
+                  week === m.value ? 'bg-[var(--s-0c2054)] border-[var(--s-0c2054)] text-white shadow-md' :
+                  'bg-[var(--surface)] border-[var(--s-e8eaf0)] hover:border-[#0C2054]/30 hover:shadow-sm')}>
+                {i === 0 && <span className="text-[9px] font-bold uppercase tracking-widest mb-1 text-[var(--t-f79c31)]">Esta semana</span>}
+                <p className={cn('text-xs font-bold', week === m.value ? 'text-white' : 'text-[var(--t-0c2054)]')}>{m.label}</p>
               </button>
             ))}
           </div>
           <button onClick={() => setStep(2)} disabled={!week}
-            className="flex items-center gap-2 bg-[#0C2054] text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-[#1a3a7a] transition-colors disabled:opacity-50 shadow-sm">
+            className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-[var(--s-1a3a7a)] transition-colors disabled:opacity-50 shadow-sm">
             Siguiente <ArrowRight size={15} />
           </button>
         </div>
@@ -1649,28 +1649,28 @@ function CreateWizard({ onBack, onCreate }: {
       {step === 2 && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-bold text-[#0C2054] mb-1">¿Cuál es el tema?</h2>
-            <p className="text-sm text-[#8888a8]">El tema define el ángulo legal de los 21 posts</p>
+            <h2 className="text-xl font-bold text-[var(--t-0c2054)] mb-1">¿Cuál es el tema?</h2>
+            <p className="text-sm text-[var(--t-8888a8)]">El tema define el ángulo legal de los 21 posts</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {TEMAS.map(t => (
               <button key={t.value} onClick={() => setTema(t.value)}
                 className={cn('flex items-center gap-3 p-4 rounded-xl border text-left transition-all',
-                  tema === t.value ? 'bg-[#0C2054] border-[#0C2054] shadow-md' :
-                  'bg-white border-[#e8eaf0] hover:border-[#0C2054]/30 hover:shadow-sm')}>
+                  tema === t.value ? 'bg-[var(--s-0c2054)] border-[var(--s-0c2054)] shadow-md' :
+                  'bg-[var(--surface)] border-[var(--s-e8eaf0)] hover:border-[#0C2054]/30 hover:shadow-sm')}>
                 <span className="text-2xl flex-shrink-0">{t.emoji}</span>
                 <div>
-                  <p className={cn('text-sm font-bold', tema === t.value ? 'text-white' : 'text-[#0C2054]')}>{t.label}</p>
-                  <p className={cn('text-xs mt-0.5', tema === t.value ? 'text-white/60' : 'text-[#8888a8]')}>{t.desc}</p>
+                  <p className={cn('text-sm font-bold', tema === t.value ? 'text-white' : 'text-[var(--t-0c2054)]')}>{t.label}</p>
+                  <p className={cn('text-xs mt-0.5', tema === t.value ? 'text-white/60' : 'text-[var(--t-8888a8)]')}>{t.desc}</p>
                 </div>
-                {tema === t.value && <Check size={14} className="ml-auto text-[#F79C31] flex-shrink-0" />}
+                {tema === t.value && <Check size={14} className="ml-auto text-[var(--t-f79c31)] flex-shrink-0" />}
               </button>
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => setStep(1)} className="px-5 py-2.5 text-sm font-semibold border border-[#e8eaf0] text-[#4a4a6a] rounded-xl hover:bg-[#f7f8fc] transition-colors">Atrás</button>
+            <button onClick={() => setStep(1)} className="px-5 py-2.5 text-sm font-semibold border border-[var(--s-e8eaf0)] text-[var(--t-4a4a6a)] rounded-xl hover:bg-[var(--s-f7f8fc)] transition-colors">Atrás</button>
             <button onClick={() => setStep(3)} disabled={!tema}
-              className="flex items-center gap-2 bg-[#0C2054] text-white font-semibold text-sm px-6 py-2.5 rounded-xl hover:bg-[#1a3a7a] transition-colors disabled:opacity-50 shadow-sm">
+              className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white font-semibold text-sm px-6 py-2.5 rounded-xl hover:bg-[var(--s-1a3a7a)] transition-colors disabled:opacity-50 shadow-sm">
               Siguiente <ArrowRight size={15} />
             </button>
           </div>
@@ -1680,45 +1680,45 @@ function CreateWizard({ onBack, onCreate }: {
       {step === 3 && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-xl font-bold text-[#0C2054] mb-1">Configuración final</h2>
-            <p className="text-sm text-[#8888a8]">Ajusta el tono y agrega contexto adicional</p>
+            <h2 className="text-xl font-bold text-[var(--t-0c2054)] mb-1">Configuración final</h2>
+            <p className="text-sm text-[var(--t-8888a8)]">Ajusta el tono y agrega contexto adicional</p>
           </div>
-          <div className="bg-[#f7f8fc] border border-[#e8eaf0] rounded-xl p-4 flex items-center gap-4">
+          <div className="bg-[var(--s-f7f8fc)] border border-[var(--s-e8eaf0)] rounded-xl p-4 flex items-center gap-4">
             <span className="text-2xl">{selectedTema?.emoji}</span>
             <div>
-              <p className="text-sm font-bold text-[#0C2054]">{selectedTema?.label}</p>
-              <p className="text-xs text-[#8888a8]">{selectedWeek?.full}</p>
+              <p className="text-sm font-bold text-[var(--t-0c2054)]">{selectedTema?.label}</p>
+              <p className="text-xs text-[var(--t-8888a8)]">{selectedWeek?.full}</p>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#1a1a2e] mb-2.5">Tono de los posts</label>
+            <label className="block text-sm font-semibold text-[var(--t-1a1a2e)] mb-2.5">Tono de los posts</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {TONOS.map(t => (
                 <button key={t.value} onClick={() => setTono(t.value)}
                   className={cn('flex flex-col items-center p-3 rounded-xl border text-center transition-all',
-                    tono === t.value ? 'bg-[#F79C31]/10 border-[#F79C31] shadow-sm' :
-                    'bg-white border-[#e8eaf0] hover:border-[#F79C31]/40')}>
-                  <p className={cn('text-xs font-bold', tono === t.value ? 'text-[#0C2054]' : 'text-[#4a4a6a]')}>{t.label}</p>
-                  <p className="text-[10px] text-[#8888a8] mt-0.5">{t.desc}</p>
+                    tono === t.value ? 'bg-[#F79C31]/10 border-[var(--s-f79c31)] shadow-sm' :
+                    'bg-[var(--surface)] border-[var(--s-e8eaf0)] hover:border-[#F79C31]/40')}>
+                  <p className={cn('text-xs font-bold', tono === t.value ? 'text-[var(--t-0c2054)]' : 'text-[var(--t-4a4a6a)]')}>{t.label}</p>
+                  <p className="text-[10px] text-[var(--t-8888a8)] mt-0.5">{t.desc}</p>
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#1a1a2e] mb-1.5">
-              Contexto adicional <span className="text-[#8888a8] font-normal">(opcional)</span>
+            <label className="block text-sm font-semibold text-[var(--t-1a1a2e)] mb-1.5">
+              Contexto adicional <span className="text-[var(--t-8888a8)] font-normal">(opcional)</span>
             </label>
             <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)}
               placeholder="Ej: Esta semana hay Consultation Day el jueves. Incluir llamado a ese evento en al menos 3 posts…"
-              className="w-full bg-[#f7f8fc] border border-[#e8e8f0] rounded-xl px-4 py-3 text-sm text-[#1a1a2e] focus:outline-none focus:border-[#F79C31] focus:bg-white resize-none transition-colors" />
-            <p className="text-[10px] text-[#8888a8] mt-1">Este texto se envía directamente al prompt de la IA.</p>
+              className="w-full bg-[var(--s-f7f8fc)] border border-[var(--s-e8e8f0)] rounded-xl px-4 py-3 text-sm text-[var(--t-1a1a2e)] focus:outline-none focus:border-[var(--s-f79c31)] focus:bg-[var(--surface)] resize-none transition-colors" />
+            <p className="text-[10px] text-[var(--t-8888a8)] mt-1">Este texto se envía directamente al prompt de la IA.</p>
           </div>
           {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-600">{error}</div>}
           {generating && (
             <div className="bg-gradient-to-br from-[#0C2054] to-[#1a3a7a] rounded-2xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-xl bg-[#F79C31]/20 flex items-center justify-center flex-shrink-0">
-                  <Sparkles size={20} className="text-[#F79C31] animate-pulse" />
+                  <Sparkles size={20} className="text-[var(--t-f79c31)] animate-pulse" />
                 </div>
                 <div>
                   <p className="text-sm font-bold text-white">Generando tu grilla…</p>
@@ -1733,7 +1733,7 @@ function CreateWizard({ onBack, onCreate }: {
                     <div className={cn(
                       'w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
                       i < genStep  ? 'bg-emerald-500'      :
-                      i === genStep ? 'bg-[#F79C31] animate-pulse' : 'bg-white/10'
+                      i === genStep ? 'bg-[var(--s-f79c31)] animate-pulse' : 'bg-white/10'
                     )}>
                       {i < genStep
                         ? <Check size={9} className="text-white" strokeWidth={3} />
@@ -1754,7 +1754,7 @@ function CreateWizard({ onBack, onCreate }: {
               {/* Progress bar */}
               <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#F79C31] rounded-full transition-all duration-1000"
+                  className="h-full bg-[var(--s-f79c31)] rounded-full transition-all duration-1000"
                   style={{ width: `${Math.min(((genStep + 1) / GEN_STEPS.length) * 90, 90)}%` }}
                 />
               </div>
@@ -1762,9 +1762,9 @@ function CreateWizard({ onBack, onCreate }: {
           )}
           {!generating && (
             <div className="flex items-center gap-3">
-              <button onClick={() => setStep(2)} className="px-5 py-2.5 text-sm font-semibold border border-[#e8eaf0] text-[#4a4a6a] rounded-xl hover:bg-[#f7f8fc] transition-colors">Atrás</button>
+              <button onClick={() => setStep(2)} className="px-5 py-2.5 text-sm font-semibold border border-[var(--s-e8eaf0)] text-[var(--t-4a4a6a)] rounded-xl hover:bg-[var(--s-f7f8fc)] transition-colors">Atrás</button>
               <button onClick={handleGenerate}
-                className="flex items-center gap-2 bg-[#F79C31] text-[#0C2054] font-bold text-sm px-7 py-2.5 rounded-xl hover:bg-[#e08a20] transition-colors shadow-sm">
+                className="flex items-center gap-2 bg-[var(--s-f79c31)] text-[var(--t-0c2054)] font-bold text-sm px-7 py-2.5 rounded-xl hover:bg-[var(--s-e08a20)] transition-colors shadow-sm">
                 <Sparkles size={15} /> Generar con IA
               </button>
             </div>
@@ -1870,23 +1870,23 @@ export default function GrillasPage() {
     <div className="max-w-4xl mx-auto px-8 py-8 space-y-8">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0C2054]">Generador de Grillas</h1>
-          <p className="text-sm text-[#8888a8] mt-1">Planning semanal para Instagram, Facebook, TikTok y más</p>
+          <h1 className="text-2xl font-bold text-[var(--t-0c2054)]">Generador de Grillas</h1>
+          <p className="text-sm text-[var(--t-8888a8)] mt-1">Planning semanal para Instagram, Facebook, TikTok y más</p>
         </div>
         <button
           onClick={() => { setError(''); setView('create'); }}
-          className="flex items-center gap-2 bg-[#0C2054] text-white font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-[#1a3a7a] transition-colors shadow-sm flex-shrink-0"
+          className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white font-semibold text-sm px-5 py-2.5 rounded-xl hover:bg-[var(--s-1a3a7a)] transition-colors shadow-sm flex-shrink-0"
         >
           <Plus size={15} /> Nueva Grilla
         </button>
       </div>
 
-      <div className="flex items-center gap-5 text-xs text-[#8888a8]">
+      <div className="flex items-center gap-5 text-xs text-[var(--t-8888a8)]">
         {SLOTS.map(slot => {
           const cfg = SLOT_CONFIG[slot];
           return <span key={slot} className="flex items-center gap-1.5"><div className={`w-2 h-2 rounded-full ${cfg.dot}`} />{cfg.label}</span>;
         })}
-        <span className="text-[#d0d0e0]">·</span>
+        <span className="text-[var(--t-d0d0e0)]">·</span>
         <span>3 posts por día · 21 posts por semana</span>
       </div>
 
@@ -1894,18 +1894,18 @@ export default function GrillasPage() {
 
       {loadingList ? (
         <div className="flex items-center justify-center py-28">
-          <Loader2 size={28} className="animate-spin text-[#F79C31]" />
+          <Loader2 size={28} className="animate-spin text-[var(--t-f79c31)]" />
         </div>
       ) : grillas.length === 0 ? (
-        <div className="text-center py-28 border border-dashed border-[#e8eaf0] rounded-2xl bg-white">
-          <div className="w-16 h-16 rounded-2xl bg-[#f0f2f8] flex items-center justify-center mx-auto mb-4">
-            <Sparkles size={28} className="text-[#0C2054] opacity-40" />
+        <div className="text-center py-28 border border-dashed border-[var(--s-e8eaf0)] rounded-2xl bg-[var(--surface)]">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--s-f0f2f8)] flex items-center justify-center mx-auto mb-4">
+            <Sparkles size={28} className="text-[var(--t-0c2054)] opacity-40" />
           </div>
-          <p className="text-base font-bold text-[#0C2054]">Aún no hay grillas</p>
-          <p className="text-sm text-[#8888a8] mt-1 mb-6">Crea la primera y deja que la IA planifique tu semana</p>
+          <p className="text-base font-bold text-[var(--t-0c2054)]">Aún no hay grillas</p>
+          <p className="text-sm text-[var(--t-8888a8)] mt-1 mb-6">Crea la primera y deja que la IA planifique tu semana</p>
           <button
             onClick={() => setView('create')}
-            className="inline-flex items-center gap-2 bg-[#0C2054] text-white font-semibold text-sm px-6 py-2.5 rounded-xl hover:bg-[#1a3a7a] transition-colors shadow-sm"
+            className="inline-flex items-center gap-2 bg-[var(--s-0c2054)] text-white font-semibold text-sm px-6 py-2.5 rounded-xl hover:bg-[var(--s-1a3a7a)] transition-colors shadow-sm"
           >
             <Plus size={15} /> Nueva Grilla
           </button>

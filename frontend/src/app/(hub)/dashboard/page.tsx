@@ -77,7 +77,7 @@ function KpiCard({ kpi }: { kpi: (typeof MOCK_KPIS)[0] }) {
 
         {/* Fila superior: icono + badge de cambio */}
         <div className="flex items-start justify-between">
-          <div className="w-12 h-12 rounded-2xl bg-[#F79C31]/10 flex items-center justify-center text-[#F79C31] flex-shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-[#F79C31]/10 flex items-center justify-center text-[var(--t-f79c31)] flex-shrink-0">
             {KPI_ICON[kpi.id] ?? <Activity className="w-5 h-5" />}
           </div>
           <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${
@@ -92,26 +92,26 @@ function KpiCard({ kpi }: { kpi: (typeof MOCK_KPIS)[0] }) {
 
         {/* Bloque central: etiqueta + valor */}
         <div>
-          <p className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-[0.1em] mb-2.5">
+          <p className="text-[11px] font-bold text-[var(--t-9ca3af)] uppercase tracking-[0.1em] mb-2.5">
             {kpi.name}
           </p>
-          <p className="text-[34px] font-extrabold text-[#111827] leading-none tracking-tight">
+          <p className="text-[34px] font-extrabold text-[var(--t-111827)] leading-none tracking-tight">
             {fmt(kpi.value)}
           </p>
-          <p className="text-xs text-[#9ca3af] mt-2">vs mes anterior</p>
+          <p className="text-xs text-[var(--t-9ca3af)] mt-2">vs mes anterior</p>
         </div>
 
         {/* Barra de progreso */}
         <div className="mt-auto pt-1">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-[#6b7280]">
-              Objetivo: <span className="font-semibold text-[#374151]">{fmt(kpi.target)}</span>
+            <span className="text-xs text-[var(--t-6b7280)]">
+              Objetivo: <span className="font-semibold text-[var(--t-374151)]">{fmt(kpi.target)}</span>
             </span>
             <span className="text-xs font-bold" style={{ color: barColor }}>
               {progress.toFixed(0)}%
             </span>
           </div>
-          <div className="w-full h-2 bg-[#f3f4f6] rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-[var(--s-f3f4f6)] rounded-full overflow-hidden">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{ width: `${progress}%`, background: barColor }}
@@ -169,7 +169,7 @@ export default function DashboardPage() {
 
           {/* Texto izquierda */}
           <div className="relative z-10">
-            <p className="text-[#F79C31] text-[11px] font-bold uppercase tracking-[0.2em] mb-3">
+            <p className="text-[var(--t-f79c31)] text-[11px] font-bold uppercase tracking-[0.2em] mb-3">
               Mayo 2026
             </p>
             <h2 className="text-white text-3xl font-bold tracking-tight mb-3">
@@ -191,7 +191,7 @@ export default function DashboardPage() {
             ].map(({ val, sub, icon }) => (
               <div key={sub} className="text-center px-10">
                 <p className="text-2xl mb-2">{icon}</p>
-                <p className="text-[#F79C31] font-display text-3xl leading-none">{val}</p>
+                <p className="text-[var(--t-f79c31)] font-display text-3xl leading-none">{val}</p>
                 <p className="text-white/45 text-xs mt-2 font-medium">{sub}</p>
               </div>
             ))}
@@ -202,12 +202,12 @@ export default function DashboardPage() {
         <section>
           <div className="flex items-end justify-between mb-6">
             <div>
-              <h2 className="text-lg font-bold text-[#111827] leading-tight">KPIs Principales</h2>
-              <p className="text-sm text-[#9ca3af] mt-1">Indicadores clave del mes actual</p>
+              <h2 className="text-lg font-bold text-[var(--t-111827)] leading-tight">KPIs Principales</h2>
+              <p className="text-sm text-[var(--t-9ca3af)] mt-1">Indicadores clave del mes actual</p>
             </div>
             <Link
               href="/metricas"
-              className="text-sm text-[#F79C31] font-semibold hover:underline underline-offset-2"
+              className="text-sm text-[var(--t-f79c31)] font-semibold hover:underline underline-offset-2"
             >
               Ver métricas completas →
             </Link>
@@ -225,8 +225,8 @@ export default function DashboardPage() {
             <div className="p-7 pb-4">
               <div className="flex items-start justify-between mb-1">
                 <div>
-                  <h3 className="text-[15px] font-bold text-[#111827]">Leads Generados</h3>
-                  <p className="text-xs text-[#9ca3af] mt-1">Evolución últimos 5 meses</p>
+                  <h3 className="text-[15px] font-bold text-[var(--t-111827)]">Leads Generados</h3>
+                  <p className="text-xs text-[var(--t-9ca3af)] mt-1">Evolución últimos 5 meses</p>
                 </div>
                 <Badge variant="success">+17.8% vs anterior</Badge>
               </div>
@@ -243,13 +243,13 @@ export default function DashboardPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 11, fill: '#9ca3af' }}
+                    tick={{ fontSize: 11, fill: 'var(--s-9ca3af)' }}
                     axisLine={false}
                     tickLine={false}
                     dy={6}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: '#9ca3af' }}
+                    tick={{ fontSize: 11, fill: 'var(--s-9ca3af)' }}
                     axisLine={false}
                     tickLine={false}
                   />
@@ -259,7 +259,7 @@ export default function DashboardPage() {
                       boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
                       fontSize: '12px', padding: '10px 14px',
                     }}
-                    cursor={{ stroke: '#F79C31', strokeWidth: 1, strokeDasharray: '4 4' }}
+                    cursor={{ stroke: 'var(--s-f79c31)', strokeWidth: 1, strokeDasharray: '4 4' }}
                   />
                   <Area
                     type="monotone"
@@ -269,7 +269,7 @@ export default function DashboardPage() {
                     strokeWidth={2.5}
                     fill="url(#leadsGrad)"
                     dot={false}
-                    activeDot={{ r: 5, fill: '#F79C31', strokeWidth: 2, stroke: '#fff' }}
+                    activeDot={{ r: 5, fill: 'var(--s-f79c31)', strokeWidth: 2, stroke: '#fff' }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -279,8 +279,8 @@ export default function DashboardPage() {
           {/* ── Donut: Leads por canal ── */}
           <Card>
             <div className="p-7 pb-4">
-              <h3 className="text-[15px] font-bold text-[#111827]">Leads por Canal</h3>
-              <p className="text-xs text-[#9ca3af] mt-1">Distribución Mayo 2026</p>
+              <h3 className="text-[15px] font-bold text-[var(--t-111827)]">Leads por Canal</h3>
+              <p className="text-xs text-[var(--t-9ca3af)] mt-1">Distribución Mayo 2026</p>
             </div>
 
             <div className="px-4">
@@ -320,9 +320,9 @@ export default function DashboardPage() {
                       className="w-3 h-3 rounded-sm flex-shrink-0"
                       style={{ background: CHANNEL_COLORS[i] }}
                     />
-                    <span className="text-sm text-[#374151] flex-1 leading-none">{d.channel}</span>
-                    <span className="text-xs text-[#9ca3af] w-8 text-right">{pct}%</span>
-                    <span className="text-sm font-bold text-[#111827] w-8 text-right">{d.leads}</span>
+                    <span className="text-sm text-[var(--t-374151)] flex-1 leading-none">{d.channel}</span>
+                    <span className="text-xs text-[var(--t-9ca3af)] w-8 text-right">{pct}%</span>
+                    <span className="text-sm font-bold text-[var(--t-111827)] w-8 text-right">{d.leads}</span>
                   </div>
                 );
               })}
@@ -334,8 +334,8 @@ export default function DashboardPage() {
         <section>
           <div className="flex items-end justify-between mb-6">
             <div>
-              <h2 className="text-lg font-bold text-[#111827] leading-tight">Métricas Secundarias</h2>
-              <p className="text-sm text-[#9ca3af] mt-1">Alcance, engagement y SEO</p>
+              <h2 className="text-lg font-bold text-[var(--t-111827)] leading-tight">Métricas Secundarias</h2>
+              <p className="text-sm text-[var(--t-9ca3af)] mt-1">Alcance, engagement y SEO</p>
             </div>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
@@ -351,8 +351,8 @@ export default function DashboardPage() {
                 <PlaySquare className="w-4 h-4 text-red-600" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-[#111827] leading-tight">YouTube Analytics</h2>
-                <p className="text-sm text-[#9ca3af] mt-0.5">Últimos 28 días</p>
+                <h2 className="text-lg font-bold text-[var(--t-111827)] leading-tight">YouTube Analytics</h2>
+                <p className="text-sm text-[var(--t-9ca3af)] mt-0.5">Últimos 28 días</p>
               </div>
             </div>
           </div>
@@ -410,13 +410,13 @@ export default function DashboardPage() {
                   </div>
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600">YouTube</span>
                 </div>
-                <p className="text-[11px] font-bold text-[#9ca3af] uppercase tracking-[0.1em] mb-2">{label}</p>
+                <p className="text-[11px] font-bold text-[var(--t-9ca3af)] uppercase tracking-[0.1em] mb-2">{label}</p>
                 {value !== null && value !== undefined ? (
-                  <p className="text-[28px] font-extrabold text-[#111827] leading-none tracking-tight">
+                  <p className="text-[28px] font-extrabold text-[var(--t-111827)] leading-none tracking-tight">
                     {fmt(value)}
                   </p>
                 ) : (
-                  <p className="text-[18px] font-semibold text-[#d1d5db] leading-none">Sin datos</p>
+                  <p className="text-[18px] font-semibold text-[var(--t-d1d5db)] leading-none">Sin datos</p>
                 )}
               </Card>
             ))}
@@ -429,8 +429,8 @@ export default function DashboardPage() {
           {/* ── Bar chart: Inversión publicitaria ── */}
           <Card>
             <div className="p-7 pb-4">
-              <h3 className="text-[15px] font-bold text-[#111827]">Inversión Publicitaria</h3>
-              <p className="text-xs text-[#9ca3af] mt-1">Gasto mensual en ads — USD</p>
+              <h3 className="text-[15px] font-bold text-[var(--t-111827)]">Inversión Publicitaria</h3>
+              <p className="text-xs text-[var(--t-9ca3af)] mt-1">Gasto mensual en ads — USD</p>
             </div>
             <div className="px-4 pb-6">
               <ResponsiveContainer width="100%" height={190}>
@@ -442,13 +442,13 @@ export default function DashboardPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 11, fill: '#9ca3af' }}
+                    tick={{ fontSize: 11, fill: 'var(--s-9ca3af)' }}
                     axisLine={false}
                     tickLine={false}
                     dy={6}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: '#9ca3af' }}
+                    tick={{ fontSize: 11, fill: 'var(--s-9ca3af)' }}
                     axisLine={false}
                     tickLine={false}
                     tickFormatter={v => `$${v / 1000}K`}
@@ -472,29 +472,29 @@ export default function DashboardPage() {
             <div className="p-7 pb-5">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-[15px] font-bold text-[#111827]">Tareas Activas</h3>
-                  <p className="text-xs text-[#9ca3af] mt-1">{upcomingTasks.length} tareas en curso</p>
+                  <h3 className="text-[15px] font-bold text-[var(--t-111827)]">Tareas Activas</h3>
+                  <p className="text-xs text-[var(--t-9ca3af)] mt-1">{upcomingTasks.length} tareas en curso</p>
                 </div>
                 <Link
                   href="/tareas"
-                  className="text-sm text-[#F79C31] font-semibold hover:underline underline-offset-2 flex-shrink-0"
+                  className="text-sm text-[var(--t-f79c31)] font-semibold hover:underline underline-offset-2 flex-shrink-0"
                 >
                   Ver todas
                 </Link>
               </div>
             </div>
 
-            <div className="px-7 pb-7 divide-y divide-[#f3f4f6]">
+            <div className="px-7 pb-7 divide-y divide-[var(--s-f3f4f6)]">
               {upcomingTasks.map(task => (
                 <div key={task.id} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
                   {/* Punto de prioridad */}
                   <span className={`w-2.5 h-2.5 rounded-full mt-1.5 flex-shrink-0 ${PRIORITY_DOT[task.priority]}`} />
                   {/* Texto */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#111827] truncate leading-snug">
+                    <p className="text-sm font-semibold text-[var(--t-111827)] truncate leading-snug">
                       {task.title}
                     </p>
-                    <p className="text-xs text-[#9ca3af] mt-1 truncate">{task.assignee}</p>
+                    <p className="text-xs text-[var(--t-9ca3af)] mt-1 truncate">{task.assignee}</p>
                   </div>
                   {/* Estado */}
                   <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 leading-none ${STATUS_CFG[task.status].cls}`}>
@@ -510,19 +510,19 @@ export default function DashboardPage() {
             <div className="p-7 pb-5">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-[15px] font-bold text-[#111827]">Próximos Eventos</h3>
-                  <p className="text-xs text-[#9ca3af] mt-1">Agenda del equipo</p>
+                  <h3 className="text-[15px] font-bold text-[var(--t-111827)]">Próximos Eventos</h3>
+                  <p className="text-xs text-[var(--t-9ca3af)] mt-1">Agenda del equipo</p>
                 </div>
                 <Link
                   href="/calendario"
-                  className="text-sm text-[#F79C31] font-semibold hover:underline underline-offset-2 flex-shrink-0"
+                  className="text-sm text-[var(--t-f79c31)] font-semibold hover:underline underline-offset-2 flex-shrink-0"
                 >
                   Ver todos
                 </Link>
               </div>
             </div>
 
-            <div className="px-7 pb-7 divide-y divide-[#f3f4f6]">
+            <div className="px-7 pb-7 divide-y divide-[var(--s-f3f4f6)]">
               {upcomingEvents.map(ev => {
                 const d   = new Date(ev.date);
                 const cfg = EVENT_CFG[ev.type];
@@ -530,16 +530,16 @@ export default function DashboardPage() {
                   <div key={ev.id} className="flex items-start gap-4 py-4 first:pt-0 last:pb-0">
                     {/* Badge de fecha */}
                     <div className="w-11 h-11 rounded-xl bg-[#F79C31]/10 flex flex-col items-center justify-center flex-shrink-0">
-                      <span className="text-[#b97a00] font-extrabold text-sm leading-none">
+                      <span className="text-[var(--t-b97a00)] font-extrabold text-sm leading-none">
                         {d.getDate()}
                       </span>
-                      <span className="text-[#F79C31] text-[9px] font-bold uppercase mt-0.5">
+                      <span className="text-[var(--t-f79c31)] text-[9px] font-bold uppercase mt-0.5">
                         {d.toLocaleString('es', { month: 'short' })}
                       </span>
                     </div>
                     {/* Texto */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[#111827] truncate leading-snug">
+                      <p className="text-sm font-semibold text-[var(--t-111827)] truncate leading-snug">
                         {ev.title}
                       </p>
                       <span className={`inline-flex mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full ${cfg.cls}`}>
