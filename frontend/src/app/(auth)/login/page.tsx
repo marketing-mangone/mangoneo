@@ -13,6 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   const parallaxRef = useRef<HTMLDivElement>(null);
 
@@ -22,9 +23,10 @@ export default function LoginPage() {
     const handleMouseMove = (e: MouseEvent) => {
       if (!parallaxRef.current) return;
       const { innerWidth, innerHeight } = window;
-      const x = (e.clientX / innerWidth - 0.5) * 2;
-      const y = (e.clientY / innerHeight - 0.5) * 2;
-      parallaxRef.current.style.transform = `scale(1.12) translate(${x * -18}px, ${y * -18}px)`;
+      // -0.5..0.5 range, max desplazamiento ±20px
+      const x = (e.clientX / innerWidth - 0.5) * -40;
+      const y = (e.clientY / innerHeight - 0.5) * -40;
+      parallaxRef.current.style.transform = `translate(${x}px, ${y}px)`;
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -50,13 +52,13 @@ export default function LoginPage() {
       {/* ── LEFT PANEL: equipo con parallax ── */}
       <div className="hidden lg:block relative w-[58%] overflow-hidden">
 
-        {/* Imagen con parallax */}
+        {/* Imagen con parallax — sobredimensionada para absorber el desplazamiento */}
         <div
           ref={parallaxRef}
-          className="absolute inset-[-6%] w-[112%] h-[112%]"
+          className="absolute"
           style={{
-            transform: 'scale(1.12)',
-            transition: 'transform 0.08s linear',
+            inset: '-30px',
+            transition: 'transform 0.12s ease-out',
             willChange: 'transform',
           }}
         >
@@ -96,7 +98,7 @@ export default function LoginPage() {
           <div>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F79C31]/15 border border-[#F79C31]/25 text-[#F79C31] text-[11px] font-semibold tracking-wider uppercase mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F79C31] animate-pulse" />
-              Equipo de Marketing · Morris Plains, NJ
+              Equipo de Marketing
             </span>
 
             <h2
@@ -227,6 +229,7 @@ export default function LoginPage() {
                   </label>
                   <button
                     type="button"
+                    onClick={() => setForgotOpen(true)}
                     className="text-xs text-[#F79C31] hover:text-[#e08a20] font-medium transition-colors"
                   >
                     ¿Olvidaste tu contraseña?
@@ -318,6 +321,43 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+      {/* ── MODAL: olvidé contraseña ── */}
+      {forgotOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: 'rgba(12,32,84,0.5)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setForgotOpen(false)}
+        >
+          <div
+            className="bg-white rounded-2xl p-8 w-full max-w-sm shadow-2xl"
+            style={{ boxShadow: '0 32px 80px rgba(12,32,84,0.2)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="w-12 h-12 rounded-xl bg-[#fef6e7] flex items-center justify-center mb-5">
+              <Lock className="w-5 h-5 text-[#F79C31]" />
+            </div>
+            <h3 className="text-lg font-bold text-[#0C2054] mb-1.5">¿Olvidaste tu contraseña?</h3>
+            <p className="text-sm text-[#6b7280] leading-relaxed mb-6">
+              Contacta con el administrador del sistema para restablecer tu acceso.
+            </p>
+            <div className="flex items-center gap-3 p-4 bg-[#f0f2f8] rounded-xl mb-6">
+              <div className="w-10 h-10 rounded-full bg-[#0C2054] flex items-center justify-center text-white font-bold text-sm shrink-0">
+                SQ
+              </div>
+              <div>
+                <p className="font-semibold text-[#0C2054] text-sm">Sebastian Quijada</p>
+                <p className="text-xs text-[#9ca3af]">Director de Marketing</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setForgotOpen(false)}
+              className="w-full py-3 rounded-xl bg-[#0C2054] text-white text-sm font-semibold hover:bg-[#0f2960] transition-colors"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
