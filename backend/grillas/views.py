@@ -4,13 +4,17 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from groq import Groq
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import viewsets, generics
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import ContentGrid, GridPost
-from .serializers import ContentGridSerializer, ContentGridListSerializer, GridPostSerializer
+from .models import ContentGrid, GridPost, GridPostComment, GridPostVersion
+from .serializers import (
+    ContentGridSerializer, ContentGridListSerializer, GridPostSerializer,
+    GridPostCommentSerializer, GridPostVersionSerializer,
+)
 from .prompts import build_generation_prompt, build_uscis_angles
 
 logger = logging.getLogger(__name__)
@@ -57,6 +61,65 @@ class GridPostUpdateView(generics.UpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = GridPostSerializer
     queryset = GridPost.objects.all()
+
+    def perform_update(self, serializer):
+        instance = self.get_object()
+        old_caption = instance.caption
+        serializer.save()
+        new_caption = serializer.instance.caption
+        # Save version snapshot if caption actually changed
+        if new_caption and new_caption.strip() != old_caption.strip():
+            user = self.request.user
+            name = user.get_full_name() or user.username
+            GridPostVersion.objects.create(
+                post=serializer.instance,
+                caption=old_caption,
+                changed_by_name=name,
+            )
+
+
+class PostApproveView(generics.GenericAPIView):
+    """Toggle approval on a GridPost. POST toggles the current state."""
+    permission_classes = [IsAuthenticated]
+    queryset = GridPost.objects.all()
+
+    def post(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        if post.approved:
+            post.approved = False
+            post.approved_by = None
+            post.approved_at = None
+        else:
+            post.approved = True
+            post.approved_by = user
+            post.approved_at = timezone.now()
+        post.save(update_fields=['approved', 'approved_by', 'approved_at'])
+        serializer = GridPostSerializer(post)
+        return Response(serializer.data)
+
+
+class PostCommentsView(generics.ListCreateAPIView):
+    """List or add comments on a GridPost."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = GridPostCommentSerializer
+
+    def get_queryset(self):
+        return GridPostComment.objects.filter(post_id=self.kwargs['pk'])
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        name = user.get_full_name() or user.username
+        serializer.save(post_id=self.kwargs['pk'], author_name=name)
+
+
+class PostHistoryView(generics.ListAPIView):
+    """List caption version history for a GridPost."""
+    permission_classes = [IsAuthenticated]
+    serializer_class = GridPostVersionSerializer
+
+    def get_queryset(self):
+        return GridPostVersion.objects.filter(post_id=self.kwargs['pk'])
 
 
 def _fetch_uscis_news(max_items: int = 7) -> list[dict]:

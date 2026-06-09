@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 TEMA_CHOICES = [
@@ -71,6 +72,14 @@ class GridPost(models.Model):
     video_title = models.TextField(blank=True, help_text="Texto corto que aparece en pantalla al inicio")
     script_points = models.JSONField(default=list, blank=True, help_text="Puntos clave del guión para Gloriana")
 
+    # Approval
+    approved = models.BooleanField(default=False)
+    approved_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='approved_posts',
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -81,3 +90,30 @@ class GridPost(models.Model):
     def __str__(self):
         days = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
         return f"{days[self.day_of_week]} – {self.get_slot_display()}"
+
+
+class GridPostComment(models.Model):
+    post = models.ForeignKey(GridPost, on_delete=models.CASCADE, related_name='comments')
+    author_name = models.CharField(max_length=100, blank=True)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return f"Comentario en {self.post} por {self.author_name}"
+
+
+class GridPostVersion(models.Model):
+    """Snapshot of a post's caption before it was edited."""
+    post = models.ForeignKey(GridPost, on_delete=models.CASCADE, related_name='versions')
+    caption = models.TextField()
+    changed_by_name = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Versión de {self.post} – {self.created_at:%Y-%m-%d %H:%M}"

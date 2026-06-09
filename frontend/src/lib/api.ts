@@ -856,6 +856,20 @@ export const competitorsApi = {
 
 // ── Grillas ───────────────────────────────────────────────────────────────────
 
+export type GridPostComment = {
+  id: number;
+  author_name: string;
+  text: string;
+  created_at: string;
+};
+
+export type GridPostVersion = {
+  id: number;
+  caption: string;
+  changed_by_name: string;
+  created_at: string;
+};
+
 export type GridPost = {
   id: number;
   grid: number;
@@ -871,6 +885,11 @@ export type GridPost = {
   photo_suggestion: string;
   video_title: string;
   script_points: string[];
+  approved: boolean;
+  approved_by_name: string | null;
+  approved_at: string | null;
+  comments: GridPostComment[];
+  versions: GridPostVersion[];
   created_at: string;
   updated_at: string;
 };
@@ -889,7 +908,10 @@ export type ContentGrid = {
   posts: GridPost[];
 };
 
-export type ContentGridList = Omit<ContentGrid, 'posts'> & { post_count: number };
+export type ContentGridList = Omit<ContentGrid, 'posts'> & {
+  post_count: number;
+  approved_count: number;
+};
 
 export const grillasApi = {
   list: () => apiJSON<{ results: ContentGridList[]; count: number }>('/api/grillas/'),
@@ -903,4 +925,12 @@ export const grillasApi = {
   updatePost: (postId: number, data: Partial<GridPost>) =>
     apiJSON<GridPost>(`/api/grillas/posts/${postId}/`, { method: 'PATCH', body: JSON.stringify(data) }),
   delete: (id: number) => apiFetch(`/api/grillas/${id}/`, { method: 'DELETE' }),
+  approvePost: (postId: number) =>
+    apiJSON<GridPost>(`/api/grillas/posts/${postId}/approve/`, { method: 'POST' }),
+  addComment: (postId: number, text: string) =>
+    apiJSON<GridPostComment>(`/api/grillas/posts/${postId}/comments/`, {
+      method: 'POST', body: JSON.stringify({ text }),
+    }),
+  getHistory: (postId: number) =>
+    apiJSON<GridPostVersion[]>(`/api/grillas/posts/${postId}/history/`),
 };
