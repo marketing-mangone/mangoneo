@@ -57,3 +57,6 @@ yarn-error.log*
 # Logs
 *.log
 logs/
+
+# Runbook interno con credenciales — NUNCA versionar
+docs/INFRAESTRUCTURA.md
