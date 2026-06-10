@@ -1073,3 +1073,114 @@ export const blogApi = {
     return apiJSON<BlogPost>(`/api/blog/posts/${id}/back/`, { method: 'POST' });
   },
 };
+
+// ── Ventas (CRM de leads) ─────────────────────────────────────────────────────
+
+export type LeadStage = 'nuevo' | 'contactado' | 'calificado' | 'consulta' | 'contrato' | 'ganado' | 'perdido';
+export type LeadPriority = 'alta' | 'media' | 'baja';
+export type LeadSource =
+  | 'website' | 'meta_ads' | 'google_ads' | 'organico' | 'redes_sociales'
+  | 'golden_tickets' | 'consultation_day' | 'podcast' | 'evento' | 'otro';
+export type LeadActivityType = 'nota' | 'llamada' | 'email' | 'whatsapp' | 'reunion' | 'etapa';
+
+export interface LeadActivity {
+  id: number;
+  lead: number;
+  activity_type: LeadActivityType;
+  activity_type_display: string;
+  description: string;
+  created_by: number | null;
+  created_by_name: string | null;
+  created_at: string;
+}
+
+export interface ApiLeadList {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  location: string;
+  source: LeadSource;
+  source_display: string;
+  practice_area: string;
+  practice_area_display: string;
+  stage: LeadStage;
+  stage_display: string;
+  priority: LeadPriority;
+  priority_display: string;
+  estimated_value: string | null;
+  assigned_to: number | null;
+  assigned_to_name: string | null;
+  next_followup: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiLead extends ApiLeadList {
+  language: 'es' | 'en';
+  language_display: string;
+  campaign: string;
+  lost_reason: string;
+  created_by: number | null;
+  created_by_name: string | null;
+  last_contact_at: string | null;
+  won_at: string | null;
+  notes: string;
+  activities: LeadActivity[];
+}
+
+export type LeadInput = Partial<Pick<ApiLead,
+  'name' | 'email' | 'phone' | 'language' | 'location' | 'source' | 'campaign' |
+  'practice_area' | 'stage' | 'priority' | 'estimated_value' | 'lost_reason' |
+  'assigned_to' | 'next_followup' | 'notes'
+>>;
+
+export interface VentasStats {
+  total: number;
+  open: number;
+  won: number;
+  lost: number;
+  new_this_month: number;
+  won_this_month: number;
+  conversion_rate: number;
+  pipeline_value: number;
+  won_value: number;
+  overdue_followups: number;
+  funnel: { stage: LeadStage; label: string; count: number; value: number }[];
+}
+
+export const ventasApi = {
+  list(params?: { stage?: LeadStage; source?: LeadSource; priority?: LeadPriority; practice_area?: string; search?: string; page_size?: number }) {
+    const qs = params ? '?' + new URLSearchParams(params as Record<string, string>).toString() : '';
+    return apiJSON<{ results: ApiLeadList[]; count: number }>(`/api/ventas/leads/${qs}`);
+  },
+  get(id: number) {
+    return apiJSON<ApiLead>(`/api/ventas/leads/${id}/`);
+  },
+  create(data: LeadInput) {
+    return apiJSON<ApiLead>('/api/ventas/leads/', { method: 'POST', body: JSON.stringify(data) });
+  },
+  update(id: number, data: LeadInput) {
+    return apiJSON<ApiLead>(`/api/ventas/leads/${id}/`, { method: 'PATCH', body: JSON.stringify(data) });
+  },
+  remove(id: number) {
+    return apiFetch(`/api/ventas/leads/${id}/`, { method: 'DELETE' });
+  },
+  move(id: number, stage?: LeadStage, lostReason?: string) {
+    return apiJSON<ApiLead>(`/api/ventas/leads/${id}/move/`, {
+      method: 'POST',
+      body: JSON.stringify({ ...(stage ? { stage } : {}), ...(lostReason ? { lost_reason: lostReason } : {}) }),
+    });
+  },
+  addActivity(leadId: number, data: { activity_type: LeadActivityType; description: string }) {
+    return apiJSON<LeadActivity>(`/api/ventas/leads/${leadId}/activities/`, {
+      method: 'POST', body: JSON.stringify(data),
+    });
+  },
+  deleteActivity(activityId: number) {
+    return apiFetch(`/api/ventas/actividades/${activityId}/`, { method: 'DELETE' });
+  },
+  stats() {
+    return apiJSON<VentasStats>('/api/ventas/leads/stats/');
+  },
+};

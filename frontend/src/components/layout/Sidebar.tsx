@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, ChevronLeft, ChevronRight,
-  LogOut, Target, Wrench, Link2, Sun, Moon,
+  LogOut, Target, Wrench, Link2, Sun, Moon, Handshake,
 } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { auth } from '@/lib/api';
@@ -35,6 +35,21 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
           { href: '/metricas', label: 'Departamentales', exact: true },
           { href: '/metricas/individuales', label: 'Individuales' },
           { href: '/metricas/integraciones', label: 'Integraciones' },
+        ],
+      },
+    ],
+  },
+  {
+    label: 'Ventas',
+    items: [
+      {
+        href: '/ventas',
+        icon: Handshake,
+        label: 'Ventas',
+        desc: 'Leads y pipeline',
+        subItems: [
+          { href: '/ventas', label: 'Pipeline', exact: true },
+          { href: '/ventas/leads', label: 'Leads' },
         ],
       },
     ],

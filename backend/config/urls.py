@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/avatars/', include('customer_avatars.urls')),
     path('api/grillas/', include('grillas.urls')),
     path('api/blog/', include('blog.urls')),
+    path('api/ventas/', include('ventas.urls')),
 ]
 
 if settings.DEBUG:
