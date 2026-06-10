@@ -36,7 +36,7 @@ async function _doRefresh(): Promise<boolean> {
   try {
     const res = await fetch(`${API_BASE}/api/auth/refresh/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
       credentials: 'include',
     });
     if (!res.ok) return false;
@@ -50,6 +50,9 @@ async function _doRefresh(): Promise<boolean> {
 
 async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
+    // CSRF: header custom que el navegador no permite enviar cross-site sin
+    // preflight (bloqueado por la allowlist CORS). Pareja del backend ENFORCE_COOKIE_CSRF.
+    'X-Requested-With': 'XMLHttpRequest',
     ...(options.headers as Record<string, string> ?? {}),
   };
 
@@ -140,7 +143,7 @@ export const auth = {
   async login(username: string, password: string) {
     const res = await fetch(`${API_BASE}/api/auth/login/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
       credentials: 'include',
       body: JSON.stringify({ username, password }),
     });

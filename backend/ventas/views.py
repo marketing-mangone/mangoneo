@@ -2,11 +2,11 @@ from django.db.models import Count, Sum, Q
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
+from core.permissions import SalesAccess
 from .models import Lead, LeadActivity, STAGE_CHOICES
 from .serializers import (
     LeadSerializer, LeadListSerializer, LeadActivitySerializer, LeadStageSerializer,
@@ -16,7 +16,7 @@ from .serializers import (
 class LeadViewSet(viewsets.ModelViewSet):
     queryset = Lead.objects.select_related('assigned_to', 'created_by').order_by('-created_at')
     serializer_class = LeadSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [SalesAccess]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['stage', 'source', 'priority', 'practice_area', 'assigned_to']
     search_fields = ['name', 'email', 'phone', 'campaign', 'location']
@@ -108,7 +108,7 @@ class LeadActivityViewSet(viewsets.ModelViewSet):
     """CRUD directo de actividades (editar/eliminar una nota concreta)."""
     queryset = LeadActivity.objects.select_related('created_by', 'lead').order_by('-created_at')
     serializer_class = LeadActivitySerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [SalesAccess]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['lead', 'activity_type']
     http_method_names = ['get', 'patch', 'delete', 'head', 'options']

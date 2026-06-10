@@ -150,6 +150,15 @@ JWT_REFRESH_COOKIE = 'mh_refresh'
 JWT_COOKIE_SECURE   = not DEBUG
 JWT_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
 
+# Defensa CSRF para auth por cookie (SameSite=None es necesario en el setup
+# cross-origin vercel.app ↔ railway.app). Cuando está activo, las peticiones
+# mutantes autenticadas por cookie deben incluir el header X-Requested-With,
+# que un atacante cross-site no puede enviar sin disparar un preflight CORS
+# bloqueado por la allowlist de orígenes. Se activa por env var en producción
+# UNA VEZ que el frontend que envía el header ya esté desplegado (rollout sin
+# downtime: front primero, luego ENFORCE_COOKIE_CSRF=True en Railway).
+ENFORCE_COOKIE_CSRF = config('ENFORCE_COOKIE_CSRF', default=False, cast=bool)
+
 # ── CORS ──────────────────────────────────────────────────────────────────────
 # En producción agrega el dominio de Vercel en CORS_ALLOWED_ORIGINS (env var).
 _cors_extra = config('CORS_ALLOWED_ORIGINS', default='')
