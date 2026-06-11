@@ -69,6 +69,11 @@ class UploadURLSerializer(serializers.Serializer):
         return value
 
     def validate_file_name(self, value):
-        import re
-        sanitized = re.sub(r'["\r\n\x00-\x1f]', '', value)
+        import os
+        # basename neutraliza componentes de ruta (../, /etc/…) antes de usar el
+        # nombre en el header Content-Disposition de la descarga.
+        sanitized = os.path.basename(value.replace('\\', '/'))
+        sanitized = re.sub(r'["\r\n\x00-\x1f]', '', sanitized)
+        if not sanitized:
+            raise serializers.ValidationError('Nombre de archivo inválido.')
         return sanitized

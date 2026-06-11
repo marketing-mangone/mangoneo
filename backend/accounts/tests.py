@@ -29,5 +29,23 @@ class AuthHardeningTests(APITestCase):
     def test_set_password_acepta_password_fuerte(self):
         self.client.force_authenticate(self.user)
         r = self.client.post(f'/api/accounts/users/{self.user.id}/set-password/',
-                             {'password': 'Una-Clave-Muy-Larga-Y-Segura-2026'}, format='json')
+                             {'password': 'Verde-Montana-Lluvia-Camino-91'}, format='json')
         self.assertEqual(r.status_code, 200)
+
+    def test_validador_de_similitud_configurado(self):
+        # B-3: UserAttributeSimilarityValidator presente en la política de passwords.
+        from django.conf import settings
+        names = [v['NAME'] for v in settings.AUTH_PASSWORD_VALIDATORS]
+        self.assertIn(
+            'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', names)
+
+
+class IsAdminRoleConsolidationTests(APITestCase):
+    """B-6: IsAdminRole es una única definición canónica reutilizada en todos los módulos."""
+
+    def test_misma_clase_en_todos_los_modulos(self):
+        from core.permissions import IsAdminRole as Canonical
+        from accounts.views import IsAdminRole as FromAccounts
+        from team.views import IsAdminRole as FromTeam
+        self.assertIs(FromAccounts, Canonical)
+        self.assertIs(FromTeam, Canonical)

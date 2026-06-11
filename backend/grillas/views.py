@@ -17,8 +17,22 @@ from .serializers import (
     GridPostCommentSerializer, GridPostVersionSerializer,
 )
 from .prompts import build_generation_prompt, build_uscis_angles
+from .ayrshare import PLATFORM_LABELS
 
 logger = logging.getLogger(__name__)
+
+VALID_PLATFORMS = set(PLATFORM_LABELS)
+
+
+def _clean_platforms(platforms):
+    """Valida que platforms sea una lista no vacía dentro de la allowlist.
+    Devuelve (lista_limpia, None) o (None, mensaje_de_error)."""
+    if not isinstance(platforms, list) or not platforms:
+        return None, 'Selecciona al menos una plataforma.'
+    invalid = [p for p in platforms if p not in VALID_PLATFORMS]
+    if invalid:
+        return None, f'Plataforma(s) no válida(s): {", ".join(map(str, invalid))}.'
+    return platforms, None
 
 
 class ContentGridViewSet(viewsets.ModelViewSet):
@@ -211,8 +225,9 @@ class PostScheduleView(generics.GenericAPIView):
 
         if not scheduled_at_raw:
             return Response({'error': 'Se requiere una fecha de publicación.'}, status=400)
-        if not platforms:
-            return Response({'error': 'Selecciona al menos una plataforma.'}, status=400)
+        platforms, err = _clean_platforms(platforms)
+        if err:
+            return Response({'error': err}, status=400)
 
         scheduled_dt = parse_datetime(scheduled_at_raw)
         if not scheduled_dt:
@@ -243,6 +258,9 @@ class PostPublishNowView(generics.GenericAPIView):
             return Response({'error': 'El post no tiene caption para publicar.'}, status=400)
 
         platforms = request.data.get('platforms') or post.platforms or ['instagram', 'facebook']
+        platforms, err = _clean_platforms(platforms)
+        if err:
+            return Response({'error': err}, status=400)
 
         try:
             result = post_to_social(caption=post.caption, platforms=platforms)

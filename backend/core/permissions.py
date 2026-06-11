@@ -22,6 +22,12 @@ def get_role(user):
     return 'admin' if user.is_superuser else None
 
 
+class IsAdminRole(BasePermission):
+    """Solo rol 'admin' (o superusuario sin perfil). Definición canónica del proyecto."""
+    def has_permission(self, request, view):
+        return get_role(request.user) == 'admin'
+
+
 class RoleBasedAccess(BasePermission):
     """
     Base RBAC: define `read_roles` (métodos seguros) y `write_roles` (mutaciones).

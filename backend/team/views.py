@@ -1,18 +1,9 @@
 from rest_framework import viewsets, serializers
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, BasePermission
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from accounts.models import UserProfile
-
-
-class IsAdminRole(BasePermission):
-    def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        try:
-            return request.user.profile.role == 'admin'
-        except UserProfile.DoesNotExist:
-            return request.user.is_superuser
+from core.permissions import IsAdminRole
 
 
 class TeamMemberSerializer(serializers.ModelSerializer):

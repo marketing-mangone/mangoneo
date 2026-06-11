@@ -23,15 +23,9 @@ from .serializers import (
 
 
 # ── Permissions ───────────────────────────────────────────────────────────────
-
-class IsAdminRole(BasePermission):
-    def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        try:
-            return request.user.profile.role == 'admin'
-        except UserProfile.DoesNotExist:
-            return request.user.is_superuser
+# Definición canónica consolidada en core.permissions; se re-exporta aquí para
+# no romper los imports existentes (`from accounts.views import IsAdminRole`).
+from core.permissions import IsAdminRole  # noqa: E402,F401
 
 
 # ── Throttle ──────────────────────────────────────────────────────────────────
@@ -88,8 +82,7 @@ class CookieTokenObtainPairView(TokenObtainPairView):
 
 
 class RefreshThrottle(AnonRateThrottle):
-    rate = '20/minute'
-    scope = 'refresh'
+    scope = 'refresh'  # rate definido en DEFAULT_THROTTLE_RATES
 
 
 class CookieTokenRefreshView(TokenRefreshView):
@@ -111,8 +104,13 @@ class CookieTokenRefreshView(TokenRefreshView):
         return response
 
 
+class LogoutThrottle(AnonRateThrottle):
+    scope = 'logout'  # rate definido en DEFAULT_THROTTLE_RATES
+
+
 class LogoutView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [LogoutThrottle]
 
     def post(self, request):
         response = Response({'detail': 'Sesión cerrada.'})
