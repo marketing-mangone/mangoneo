@@ -38,12 +38,17 @@ class RoleBasedAccess(BasePermission):
         return role in allowed
 
 
-class SalesAccess(RoleBasedAccess):
+class TeamModuleAccess(RoleBasedAccess):
     """
-    CRM de Ventas — modelo colaborativo.
-      admin, team        → lectura y escritura (operan los leads en equipo)
-      leadership         → solo lectura (vista ejecutiva del pipeline)
-      viewer             → sin acceso (los leads contienen PII de clientes)
+    Módulos internos del equipo (tareas, calendario, ventas).
+      admin, team        → lectura y escritura (operación colaborativa)
+      leadership         → solo lectura (vista ejecutiva)
+      viewer             → sin acceso (otros departamentos no ven operación interna)
     """
     read_roles = {'admin', 'team', 'leadership'}
     write_roles = {'admin', 'team'}
+
+
+class SalesAccess(TeamModuleAccess):
+    """CRM de Ventas — mismo modelo colaborativo; los leads contienen PII de clientes."""
+    pass

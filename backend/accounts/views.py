@@ -2,6 +2,8 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, api_view, permission_classes
@@ -80,6 +82,8 @@ class CookieTokenObtainPairView(TokenObtainPairView):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
             _set_auth_cookies(response, response.data['access'], response.data['refresh'])
+            # El refresh vive solo en cookie httpOnly; no exponerlo en el body.
+            response.data.pop('refresh', None)
         return response
 
 
@@ -102,6 +106,8 @@ class CookieTokenRefreshView(TokenRefreshView):
         response = super().post(request, *args, **kwargs)
         if response.status_code == 200:
             _set_auth_cookies(response, response.data['access'], response.data.get('refresh'))
+            # El refresh rotado vive solo en cookie httpOnly; no exponerlo en el body.
+            response.data.pop('refresh', None)
         return response
 
 
@@ -163,11 +169,10 @@ class UserManagementViewSet(viewsets.ModelViewSet):
     def set_password(self, request, pk=None):
         user = self.get_object()
         password = request.data.get('password', '')
-        if len(password) < 8:
-            return Response(
-                {'error': 'La contraseña debe tener al menos 8 caracteres.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        try:
+            validate_password(password, user)
+        except DjangoValidationError as e:
+            return Response({'error': ' '.join(e.messages)}, status=status.HTTP_400_BAD_REQUEST)
         user.set_password(password)
         user.save()
         return Response({'status': 'ok'})

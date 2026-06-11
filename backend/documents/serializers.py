@@ -1,5 +1,10 @@
+import re
 from rest_framework import serializers
 from .models import Document
+
+# Debe coincidir con el formato generado en views.upload_url:
+#   documents/YYYY/MM/<uuid4-hex><ext>
+OBJECT_KEY_RE = re.compile(r'^documents/\d{4}/\d{2}/[0-9a-f]{32}(\.[A-Za-z0-9]+)?$')
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -21,6 +26,14 @@ class DocumentSerializer(serializers.ModelSerializer):
         if obj.uploaded_by:
             return obj.uploaded_by.get_full_name() or obj.uploaded_by.username
         return None
+
+    def validate_object_key(self, value):
+        # El cliente reenvía la clave emitida por el servidor tras subir a R2.
+        # Solo aceptar el formato exacto que emitimos: evita apuntar a claves
+        # arbitrarias del bucket o secuencias de path traversal.
+        if value and not OBJECT_KEY_RE.match(value):
+            raise serializers.ValidationError('object_key inválido.')
+        return value
 
     def create(self, validated_data):
         request = self.context.get('request')

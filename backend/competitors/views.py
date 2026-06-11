@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from accounts.views import IsAdminRole
+from core.permissions import get_role
 
 from .models import Competitor, CompetitorScore, AdObservation, CompetitorInsight
 from .serializers import (
@@ -28,8 +29,9 @@ class CompetitorViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = Competitor.objects.all()
-        # Permitir ver inactivos si se pasa ?all=true
-        if self.request.query_params.get('all') != 'true':
+        # Solo admin puede ver inactivos vía ?all=true; el resto siempre filtrado.
+        show_all = self.request.query_params.get('all') == 'true' and get_role(self.request.user) == 'admin'
+        if not show_all:
             qs = qs.filter(is_active=True)
         return qs
 

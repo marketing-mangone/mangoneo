@@ -1,5 +1,5 @@
 from rest_framework import viewsets, filters
-from rest_framework.permissions import IsAuthenticated
+from core.permissions import TeamModuleAccess
 from .models import Task, CalendarEvent
 from .serializers import TaskSerializer, CalendarEventSerializer
 
@@ -7,7 +7,7 @@ from .serializers import TaskSerializer, CalendarEventSerializer
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [TeamModuleAccess]
     filterset_fields = ['status', 'priority', 'assignee']
     search_fields = ['title', 'description', 'project']
 
@@ -15,7 +15,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 class CalendarEventViewSet(viewsets.ModelViewSet):
     queryset = CalendarEvent.objects.all()
     serializer_class = CalendarEventSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [TeamModuleAccess]
     filter_backends = [filters.SearchFilter]
     search_fields = ['title', 'description']
 

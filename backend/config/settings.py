@@ -2,11 +2,19 @@ from pathlib import Path
 from datetime import timedelta
 import dj_database_url
 from decouple import config
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = config('SECRET_KEY', default='dev-secret-key-change-in-production-immediately')  # noqa: S105
 DEBUG = config('DEBUG', default=False, cast=bool)
+
+# En dev se permite un default inseguro; en producción DEBE venir por env var.
+# Si esto revienta el arranque en Railway, define SECRET_KEY en las variables
+# del servicio (genera una con `python -c "import secrets;print(secrets.token_urlsafe(64))"`).
+_DEV_SECRET = 'dev-secret-key-change-in-production-immediately'
+SECRET_KEY = config('SECRET_KEY', default=_DEV_SECRET)  # noqa: S105
+if not DEBUG and SECRET_KEY == _DEV_SECRET:
+    raise ImproperlyConfigured('SECRET_KEY debe definirse por variable de entorno en producción.')
 _allowed = config('ALLOWED_HOSTS', default='')
 ALLOWED_HOSTS = [h.strip() for h in _allowed.split(',') if h.strip()] or (['localhost', '127.0.0.1'] if DEBUG else [])
 
