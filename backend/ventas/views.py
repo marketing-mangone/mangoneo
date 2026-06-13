@@ -2,12 +2,14 @@ from django.db.models import Count, Sum, Q
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
 from core.permissions import SalesAccess
 from .models import Lead, LeadActivity, STAGE_CHOICES
+from .importer import parse_and_import
 from .serializers import (
     LeadSerializer, LeadListSerializer, LeadActivitySerializer, LeadStageSerializer,
 )
@@ -55,6 +57,31 @@ class LeadViewSet(viewsets.ModelViewSet):
             lead.last_contact_at = timezone.now()
             lead.save(update_fields=['last_contact_at', 'updated_at'])
         return Response(LeadActivitySerializer(activity).data, status=status.HTTP_201_CREATED)
+
+    @action(
+        detail=False, methods=['post'], url_path='import',
+        parser_classes=[MultiPartParser, FormParser, JSONParser],
+    )
+    def import_csv(self, request):
+        """
+        Importa leads desde un CSV.
+        Acepta un archivo en 'file' (multipart) o texto crudo en 'csv_text' (JSON).
+        Devuelve resumen: {created, skipped, errors[], total_rows}.
+        """
+        upload = request.FILES.get('file')
+        if upload is not None:
+            raw = upload.read()
+        else:
+            raw = request.data.get('csv_text')
+            if not raw:
+                return Response(
+                    {'detail': "Envía un archivo en 'file' o el contenido en 'csv_text'."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        skip_dupes = str(request.data.get('skip_duplicates', 'true')).lower() != 'false'
+        result = parse_and_import(raw, request.user, skip_duplicates=skip_dupes)
+        return Response(result, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], url_path='stats')
     def stats(self, request):

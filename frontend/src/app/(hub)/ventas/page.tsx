@@ -3,11 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Plus, RefreshCw, Handshake, TrendingUp, DollarSign,
-  Trophy, AlertTriangle, List,
+  Trophy, AlertTriangle, List, Upload,
 } from 'lucide-react';
 import { ventasApi, type ApiLeadList, type VentasStats, type LeadStage } from '@/lib/api';
 import { LeadCard } from '@/components/modules/ventas/LeadCard';
 import { LeadModal } from '@/components/modules/ventas/LeadModal';
+import { ImportLeadsModal } from '@/components/modules/ventas/ImportLeadsModal';
 import { PIPELINE_STAGES, STAGE_COLORS, formatMoney } from '@/components/modules/ventas/constants';
 
 export default function VentasPage() {
@@ -15,6 +16,7 @@ export default function VentasPage() {
   const [stats, setStats] = useState<VentasStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAddLead, setShowAddLead] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [advancingId, setAdvancingId] = useState<number | null>(null);
 
   const load = useCallback(async () => {
@@ -86,6 +88,13 @@ export default function VentasPage() {
             <List className="w-4 h-4 text-[var(--t-f79c31)]" />
             Ver todos los leads
           </Link>
+          <button
+            onClick={() => setShowImport(true)}
+            className="flex items-center gap-2 border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-[var(--t-374151)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--s-f9fafb)] transition-all"
+          >
+            <Upload className="w-4 h-4 text-[var(--t-f79c31)]" />
+            Importar
+          </button>
           <button
             onClick={() => setShowAddLead(true)}
             className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"
@@ -199,6 +208,7 @@ export default function VentasPage() {
       )}
 
       <LeadModal open={showAddLead} onClose={() => setShowAddLead(false)} onSaved={load} />
+      <ImportLeadsModal open={showImport} onClose={() => setShowImport(false)} onImported={load} />
     </div>
   );
 }

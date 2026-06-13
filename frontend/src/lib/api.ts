@@ -1223,4 +1223,21 @@ export const ventasApi = {
   stats() {
     return apiJSON<VentasStats>('/api/ventas/leads/stats/');
   },
+  async importCsv(file: File, skipDuplicates = true): Promise<LeadImportResult> {
+    const form = new FormData();
+    form.append('file', file);
+    form.append('skip_duplicates', skipDuplicates ? 'true' : 'false');
+    // No fijar Content-Type: el navegador agrega el boundary del multipart.
+    const res = await apiFetch('/api/ventas/leads/import/', { method: 'POST', body: form });
+    if (!res.ok) throw new Error((await res.text()) || 'Error al importar');
+    return res.json();
+  },
+};
+
+export type LeadImportResult = {
+  created: number;
+  skipped: number;
+  total_rows: number;
+  errors: { row: number; message: string }[];
+  message?: string;
 };
