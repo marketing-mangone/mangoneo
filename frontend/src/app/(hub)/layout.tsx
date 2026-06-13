@@ -1,4 +1,5 @@
 import { SidebarWithBadge } from '@/components/layout/SidebarWithBadge';
+import { ChatBubble } from '@/components/layout/ChatBubble';
 
 export default function HubLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export default function HubLayout({ children }: { children: React.ReactNode }) {
       >
         {children}
       </main>
+      <ChatBubble />
     </div>
   );
 }
