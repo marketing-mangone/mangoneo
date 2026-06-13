@@ -604,6 +604,43 @@ export const ga4Api = {
   },
 };
 
+// ── Meta (Facebook + Instagram + Ads) ─────────────────────────────────────────
+
+export type MetaMetric = {
+  value: number | null;
+  prev_value: number | null;
+  change_pct: number | null;
+};
+
+export type MetaSlug =
+  | 'meta-fb-impressions'
+  | 'meta-fb-reach'
+  | 'meta-fb-engagement'
+  | 'meta-ig-impressions'
+  | 'meta-ig-reach'
+  | 'meta-ig-profile-views'
+  | 'meta-ads-spend'
+  | 'meta-ads-impressions'
+  | 'meta-ads-reach'
+  | 'meta-ads-clicks';
+
+export type MetaTotalSlug = 'meta-fb-fans' | 'meta-ig-followers';
+
+export type MetaSummary = {
+  week: string;
+  period_start: string;
+  period_end: string;
+  metrics: Record<MetaSlug, MetaMetric>;
+  totals: Record<MetaTotalSlug, { value: number | null; as_of: string | null }>;
+};
+
+export const metaApi = {
+  weekly(week?: string) {
+    const params = week ? `?week=${week}` : '';
+    return apiJSON<MetaSummary>(`/api/metrics/meta-summary/${params}`);
+  },
+};
+
 export const usersApi = {
   list() {
     return apiJSON<{ results: ApiUserManagement[]; count: number }>('/api/accounts/users/');
