@@ -26,11 +26,25 @@ from django.conf import settings
 BASE = 'https://graph.facebook.com/v20.0'
 
 
-def _get(path: str, params: dict | None = None) -> dict:
-    p = {**(params or {}), 'access_token': settings.META_ACCESS_TOKEN}
+def _get(path: str, params: dict | None = None, token: str | None = None) -> dict:
+    p = {**(params or {}), 'access_token': token or settings.META_ACCESS_TOKEN}
     resp = requests.get(f'{BASE}{path}', params=p, timeout=30)
     resp.raise_for_status()
     return resp.json()
+
+
+def _get_page_token() -> str:
+    """Las métricas de página de Facebook requieren un Page Access Token."""
+    data = _get(f'/{settings.META_PAGE_ID}', {'fields': 'access_token'})
+    return data.get('access_token', '')
+
+
+def _sum_total_value(response_data: dict, name: str) -> float:
+    """Suma para métricas con metric_type=total_value (Instagram v20+)."""
+    for item in response_data.get('data', []):
+        if item.get('name') == name:
+            return float((item.get('total_value') or {}).get('value') or 0)
+    return 0.0
 
 
 def _ts(d: date) -> int:
@@ -66,16 +80,19 @@ def fetch_page_insights(start_date: date, end_date: date) -> dict:
     """Métricas orgánicas semanales de la página de Facebook."""
     if not getattr(settings, 'META_PAGE_ID', ''):
         return {}
+    # Las métricas de página requieren Page Access Token + permiso read_insights.
+    # Nombres válidos en Graph API v20 (page_impressions / page_reach quedaron deprecados).
+    page_token = _get_page_token() or None
     data = _get(f'/{settings.META_PAGE_ID}/insights', {
-        'metric': 'page_impressions,page_reach,page_engaged_users',
+        'metric': 'page_posts_impressions,page_impressions_unique,page_post_engagements',
         'period': 'day',
         'since': _ts(start_date),
         'until': _ts(end_date + timedelta(days=1)),
-    })
+    }, token=page_token)
     return {
-        'fb_impressions': int(_sum_metric(data, 'page_impressions')),
-        'fb_reach':       int(_sum_metric(data, 'page_reach')),
-        'fb_engagement':  int(_sum_metric(data, 'page_engaged_users')),
+        'fb_impressions': int(_sum_metric(data, 'page_posts_impressions')),
+        'fb_reach':       int(_sum_metric(data, 'page_impressions_unique')),
+        'fb_engagement':  int(_sum_metric(data, 'page_post_engagements')),
         'start_date': start_date.isoformat(),
         'end_date':   end_date.isoformat(),
     }
@@ -100,16 +117,19 @@ def fetch_instagram_insights(start_date: date, end_date: date) -> dict:
     """Métricas orgánicas semanales de Instagram."""
     if not getattr(settings, 'META_INSTAGRAM_ACCOUNT_ID', ''):
         return {}
+    # Graph API v20+: 'impressions' fue reemplazado por 'views'; reach/profile_views
+    # requieren metric_type=total_value.
     data = _get(f'/{settings.META_INSTAGRAM_ACCOUNT_ID}/insights', {
-        'metric': 'impressions,reach,profile_views',
+        'metric': 'reach,views,profile_views',
         'period': 'day',
+        'metric_type': 'total_value',
         'since': _ts(start_date),
         'until': _ts(end_date + timedelta(days=1)),
     })
     return {
-        'ig_impressions':    int(_sum_metric(data, 'impressions')),
-        'ig_reach':          int(_sum_metric(data, 'reach')),
-        'ig_profile_views':  int(_sum_metric(data, 'profile_views')),
+        'ig_impressions':    int(_sum_total_value(data, 'views')),
+        'ig_reach':          int(_sum_total_value(data, 'reach')),
+        'ig_profile_views':  int(_sum_total_value(data, 'profile_views')),
         'start_date': start_date.isoformat(),
         'end_date':   end_date.isoformat(),
     }
