@@ -478,18 +478,37 @@ function KanbanColumn({
   onStatusToggle,
   onEdit,
   onDelete,
+  onTaskDragStart,
+  onTaskDragEnd,
+  onDropOnColumn,
+  onDragOverColumn,
+  onDragLeaveColumn,
+  isDragOver,
+  draggingId,
 }: {
   status: ApiTask['status'];
   tasks: ApiTask[];
   onStatusToggle: (id: number) => void;
   onEdit: (task: ApiTask) => void;
   onDelete: (id: number) => void;
+  onTaskDragStart: (id: number) => void;
+  onTaskDragEnd: () => void;
+  onDropOnColumn: (status: ApiTask['status']) => void;
+  onDragOverColumn: (status: ApiTask['status']) => void;
+  onDragLeaveColumn: (status: ApiTask['status']) => void;
+  isDragOver: boolean;
+  draggingId: number | null;
 }) {
   const config = STATUS_CONFIG[status];
   const StatusIcon = config.icon;
 
   return (
-    <div className="flex flex-col min-w-[280px]">
+    <div
+      className="flex flex-col min-w-[280px]"
+      onDragOver={e => { e.preventDefault(); onDragOverColumn(status); }}
+      onDragLeave={() => onDragLeaveColumn(status)}
+      onDrop={() => onDropOnColumn(status)}
+    >
       <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg mb-3 border ${config.bg} ${config.border}`}>
         <StatusIcon className={`w-4 h-4 ${config.color}`} />
         <span className={`text-sm font-bold ${config.color}`}>{config.label}</span>
@@ -497,9 +516,19 @@ function KanbanColumn({
           {tasks.length}
         </span>
       </div>
-      <div className="space-y-3 flex-1">
+      <div className={`space-y-3 flex-1 rounded-xl transition-colors min-h-[80px] ${
+        isDragOver ? 'bg-[#F79C31]/8 outline-2 outline-dashed outline-[#F79C31]/40' : ''
+      }`}>
         {tasks.map(task => (
-          <TaskCard key={task.id} task={task} onStatusToggle={onStatusToggle} onEdit={onEdit} onDelete={onDelete} />
+          <div
+            key={task.id}
+            draggable
+            onDragStart={() => onTaskDragStart(task.id)}
+            onDragEnd={onTaskDragEnd}
+            className={`cursor-grab active:cursor-grabbing ${draggingId === task.id ? 'opacity-40' : ''}`}
+          >
+            <TaskCard task={task} onStatusToggle={onStatusToggle} onEdit={onEdit} onDelete={onDelete} />
+          </div>
         ))}
         {tasks.length === 0 && (
           <div className="border-2 border-dashed border-[var(--s-e8e8f0)] rounded-xl p-6 text-center">
@@ -831,6 +860,8 @@ export default function TareasPage() {
   const [filterStatus, setFilterStatus] = useState('all');
   const [showModal,    setShowModal]    = useState(false);
   const [editingTask,  setEditingTask]  = useState<ApiTask | null>(null);
+  const [dragId,       setDragId]       = useState<number | null>(null);
+  const [dragOver,     setDragOver]     = useState<ApiTask['status'] | null>(null);
 
   const loadTasks = async () => {
     try {
@@ -871,6 +902,21 @@ export default function TareasPage() {
       const exists = prev.find(t => t.id === saved.id);
       return exists ? prev.map(t => t.id === saved.id ? saved : t) : [saved, ...prev];
     });
+  };
+
+  const handleDropOnStatus = async (status: ApiTask['status']) => {
+    const id = dragId;
+    setDragOver(null);
+    setDragId(null);
+    if (!id) return;
+    const task = tasks.find(t => t.id === id);
+    if (!task || task.status === status) return;
+    setTasks(prev => prev.map(t => (t.id === id ? { ...t, status } : t)));
+    try {
+      await tasksApi.update(id, { status });
+    } catch {
+      setTasks(prev => prev.map(t => (t.id === id ? { ...t, status: task.status } : t)));
+    }
   };
 
   const openCreate = () => { setEditingTask(null); setShowModal(true); };
@@ -981,6 +1027,13 @@ export default function TareasPage() {
                 onStatusToggle={handleStatusToggle}
                 onEdit={openEdit}
                 onDelete={handleDelete}
+                onTaskDragStart={setDragId}
+                onTaskDragEnd={() => { setDragId(null); setDragOver(null); }}
+                onDropOnColumn={handleDropOnStatus}
+                onDragOverColumn={s => { if (dragOver !== s) setDragOver(s); }}
+                onDragLeaveColumn={s => setDragOver(d => (d === s ? null : d))}
+                isDragOver={dragOver === status}
+                draggingId={dragId}
               />
             ))}
           </div>
