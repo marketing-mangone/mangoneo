@@ -109,6 +109,52 @@ class Lead(models.Model):
         return f"[{self.get_stage_display()}] {self.name}"
 
 
+TASK_TYPE_CHOICES = [
+    ('seguimiento', 'Seguimiento'),
+    ('llamada',     'Llamada'),
+    ('email',       'Email'),
+    ('whatsapp',    'WhatsApp'),
+    ('reunion',     'Reunión'),
+    ('otro',        'Otro'),
+]
+
+TASK_STATUS_CHOICES = [
+    ('pendiente',   'Pendiente'),
+    ('completada',  'Completada'),
+]
+
+
+class LeadTask(models.Model):
+    """Tarea/recordatorio accionable asociada a un lead (estilo HubSpot)."""
+    lead = models.ForeignKey(Lead, related_name='tasks', on_delete=models.CASCADE)
+    title = models.CharField(max_length=200)
+    task_type = models.CharField(max_length=20, choices=TASK_TYPE_CHOICES, default='seguimiento')
+    due_date = models.DateTimeField(null=True, blank=True, help_text="Vencimiento del recordatorio")
+    status = models.CharField(max_length=20, choices=TASK_STATUS_CHOICES, default='pendiente')
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='media')
+
+    assigned_to = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='lead_tasks', help_text="Responsable de la tarea",
+    )
+    created_by = models.ForeignKey(
+        User, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name='lead_tasks_created',
+    )
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['status', 'due_date', '-created_at']
+        verbose_name = 'Tarea de Lead'
+        verbose_name_plural = 'Tareas de Lead'
+
+    def __str__(self):
+        return f"[{self.get_status_display()}] {self.title}"
+
+
 class LeadActivity(models.Model):
     lead = models.ForeignKey(Lead, related_name='activities', on_delete=models.CASCADE)
     activity_type = models.CharField(max_length=20, choices=ACTIVITY_TYPE_CHOICES, default='nota')

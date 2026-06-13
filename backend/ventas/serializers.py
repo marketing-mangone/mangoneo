@@ -1,6 +1,6 @@
 from django.utils import timezone
 from rest_framework import serializers
-from .models import Lead, LeadActivity, STAGE_ORDER
+from .models import Lead, LeadActivity, LeadTask, STAGE_ORDER
 
 
 def _user_name(user):
@@ -23,6 +23,43 @@ class LeadActivitySerializer(serializers.ModelSerializer):
 
     def get_created_by_name(self, obj):
         return _user_name(obj.created_by)
+
+
+class LeadTaskSerializer(serializers.ModelSerializer):
+    task_type_display = serializers.CharField(source='get_task_type_display', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    priority_display = serializers.CharField(source='get_priority_display', read_only=True)
+    assigned_to_name = serializers.SerializerMethodField()
+    created_by_name = serializers.SerializerMethodField()
+    lead_name = serializers.CharField(source='lead.name', read_only=True)
+    is_overdue = serializers.SerializerMethodField()
+
+    class Meta:
+        model = LeadTask
+        fields = [
+            'id', 'lead', 'lead_name', 'title', 'task_type', 'task_type_display',
+            'due_date', 'status', 'status_display', 'priority', 'priority_display',
+            'assigned_to', 'assigned_to_name', 'created_by', 'created_by_name',
+            'completed_at', 'is_overdue', 'created_at', 'updated_at',
+        ]
+        read_only_fields = ['created_by', 'completed_at', 'created_at', 'updated_at']
+
+    def get_assigned_to_name(self, obj):
+        return _user_name(obj.assigned_to)
+
+    def get_created_by_name(self, obj):
+        return _user_name(obj.created_by)
+
+    def get_is_overdue(self, obj):
+        return bool(obj.status == 'pendiente' and obj.due_date and obj.due_date < timezone.now())
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        validated_data['created_by'] = user
+        # Por defecto, el responsable es quien crea la tarea
+        if not validated_data.get('assigned_to'):
+            validated_data['assigned_to'] = user
+        return super().create(validated_data)
 
 
 class LeadSerializer(serializers.ModelSerializer):

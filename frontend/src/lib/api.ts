@@ -1122,6 +1122,39 @@ export type LeadSource =
   | 'website' | 'meta_ads' | 'google_ads' | 'organico' | 'redes_sociales'
   | 'golden_tickets' | 'consultation_day' | 'podcast' | 'evento' | 'otro';
 export type LeadActivityType = 'nota' | 'llamada' | 'email' | 'whatsapp' | 'reunion' | 'etapa';
+export type LeadTaskType = 'seguimiento' | 'llamada' | 'email' | 'whatsapp' | 'reunion' | 'otro';
+export type LeadTaskStatus = 'pendiente' | 'completada';
+
+export interface ApiLeadTask {
+  id: number;
+  lead: number;
+  lead_name: string;
+  title: string;
+  task_type: LeadTaskType;
+  task_type_display: string;
+  due_date: string | null;
+  status: LeadTaskStatus;
+  status_display: string;
+  priority: LeadPriority;
+  priority_display: string;
+  assigned_to: number | null;
+  assigned_to_name: string | null;
+  created_by: number | null;
+  created_by_name: string | null;
+  completed_at: string | null;
+  is_overdue: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LeadTaskInput {
+  lead: number;
+  title: string;
+  task_type?: LeadTaskType;
+  due_date?: string | null;
+  priority?: LeadPriority;
+  assigned_to?: number | null;
+}
 
 export interface LeadActivity {
   id: number;
@@ -1231,6 +1264,43 @@ export const ventasApi = {
     const res = await apiFetch('/api/ventas/leads/import/', { method: 'POST', body: form });
     if (!res.ok) throw new Error((await res.text()) || 'Error al importar');
     return res.json();
+  },
+
+  // ── Acciones masivas + export ──
+  bulk(ids: number[], action: 'stage' | 'assign' | 'delete', value?: string | number | null) {
+    return apiJSON<{ updated?: number; deleted?: number }>('/api/ventas/leads/bulk/', {
+      method: 'POST',
+      body: JSON.stringify({ ids, action, value: value ?? null }),
+    });
+  },
+  async exportCsv(params?: Record<string, string>) {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    const res = await apiFetch(`/api/ventas/leads/export/${qs}`);
+    if (!res.ok) throw new Error('Error al exportar');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'leads-mangone.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  },
+
+  // ── Tareas / recordatorios ──
+  listTasks(params?: { lead?: number; assigned_to?: number; status?: LeadTaskStatus; ordering?: string; page_size?: number }) {
+    const qs = params ? '?' + new URLSearchParams(params as Record<string, string>).toString() : '';
+    return apiJSON<{ results: ApiLeadTask[]; count: number }>(`/api/ventas/tareas/${qs}`);
+  },
+  createTask(data: LeadTaskInput) {
+    return apiJSON<ApiLeadTask>('/api/ventas/tareas/', { method: 'POST', body: JSON.stringify(data) });
+  },
+  completeTask(id: number, reopen = false) {
+    return apiJSON<ApiLeadTask>(`/api/ventas/tareas/${id}/complete/`, {
+      method: 'POST', body: JSON.stringify(reopen ? { reopen: true } : {}),
+    });
+  },
+  deleteTask(id: number) {
+    return apiFetch(`/api/ventas/tareas/${id}/`, { method: 'DELETE' });
   },
 };
 

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { ventasApi, type ApiLead, type LeadActivityType, type LeadStage } from '@/lib/api';
 import { LeadModal } from '@/components/modules/ventas/LeadModal';
+import { LeadTasksCard } from '@/components/modules/ventas/LeadTasksCard';
 import {
   PIPELINE_STAGES, STAGE_COLORS, PRIORITY_OPTIONS, ACTIVITY_TYPE_OPTIONS,
   formatMoney, formatDate,
@@ -262,6 +263,8 @@ export default function LeadDetailPage() {
               <p className="text-sm text-[var(--t-374151)] whitespace-pre-wrap">{lead.notes}</p>
             </div>
           )}
+
+          <LeadTasksCard leadId={lead.id} />
         </div>
 
         {/* Activity — 3/5 */}

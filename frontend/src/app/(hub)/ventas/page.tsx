@@ -9,6 +9,7 @@ import { ventasApi, type ApiLeadList, type VentasStats, type LeadStage } from '@
 import { LeadCard } from '@/components/modules/ventas/LeadCard';
 import { LeadModal } from '@/components/modules/ventas/LeadModal';
 import { ImportLeadsModal } from '@/components/modules/ventas/ImportLeadsModal';
+import { TasksPanel } from '@/components/modules/ventas/TasksPanel';
 import { PIPELINE_STAGES, STAGE_COLORS, formatMoney } from '@/components/modules/ventas/constants';
 
 export default function VentasPage() {
@@ -18,6 +19,8 @@ export default function VentasPage() {
   const [showAddLead, setShowAddLead] = useState(false);
   const [showImport, setShowImport] = useState(false);
   const [advancingId, setAdvancingId] = useState<number | null>(null);
+  const [dragId, setDragId] = useState<number | null>(null);
+  const [dragOver, setDragOver] = useState<LeadStage | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -46,6 +49,24 @@ export default function VentasPage() {
       console.error(e);
     } finally {
       setAdvancingId(null);
+    }
+  };
+
+  const handleDropOnStage = async (stage: LeadStage) => {
+    const id = dragId;
+    setDragOver(null);
+    setDragId(null);
+    if (!id) return;
+    const lead = leads.find(l => l.id === id);
+    if (!lead || lead.stage === stage) return;
+    // Optimista: mueve la tarjeta en UI y confirma con el backend
+    setLeads(prev => prev.map(l => (l.id === id ? { ...l, stage } : l)));
+    try {
+      await ventasApi.move(id, stage);
+      await load();
+    } catch (e) {
+      console.error(e);
+      await load(); // revertir desde el servidor si falla
     }
   };
 
@@ -122,6 +143,9 @@ export default function VentasPage() {
         </div>
       )}
 
+      {/* Tareas / recordatorios */}
+      <TasksPanel />
+
       {/* Pipeline kanban */}
       {loading ? (
         <div className="flex items-center justify-center py-24">
@@ -154,7 +178,13 @@ export default function VentasPage() {
               const stageLeads = byStage(stage.key);
               const stageValue = stageLeads.reduce((sum, l) => sum + (parseFloat(l.estimated_value ?? '0') || 0), 0);
               return (
-                <div key={stage.key} className="space-y-3">
+                <div
+                  key={stage.key}
+                  className="space-y-3"
+                  onDragOver={e => { e.preventDefault(); if (dragOver !== stage.key) setDragOver(stage.key); }}
+                  onDragLeave={() => setDragOver(d => (d === stage.key ? null : d))}
+                  onDrop={() => handleDropOnStage(stage.key)}
+                >
                   {/* Column header */}
                   <div className="bg-[var(--surface)] rounded-xl border border-[var(--s-e8eaf0)] px-3.5 py-2.5">
                     <div className="flex items-center justify-between">
@@ -168,15 +198,24 @@ export default function VentasPage() {
                       <p className="text-[10px] text-[var(--t-9ca3af)] mt-0.5">{formatMoney(stageValue)}</p>
                     )}
                   </div>
-                  {/* Cards */}
-                  <div className="space-y-2.5 min-h-[60px]">
+                  {/* Cards (drop zone) */}
+                  <div className={`space-y-2.5 min-h-[120px] rounded-xl transition-colors ${
+                    dragOver === stage.key ? 'bg-[#0C2054]/5 outline-2 outline-dashed outline-[#0C2054]/30' : ''
+                  }`}>
                     {stageLeads.map(lead => (
-                      <LeadCard
+                      <div
                         key={lead.id}
-                        lead={lead}
-                        onAdvance={handleAdvance}
-                        advancing={advancingId === lead.id}
-                      />
+                        draggable
+                        onDragStart={() => setDragId(lead.id)}
+                        onDragEnd={() => { setDragId(null); setDragOver(null); }}
+                        className={`cursor-grab active:cursor-grabbing ${dragId === lead.id ? 'opacity-40' : ''}`}
+                      >
+                        <LeadCard
+                          lead={lead}
+                          onAdvance={handleAdvance}
+                          advancing={advancingId === lead.id}
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>

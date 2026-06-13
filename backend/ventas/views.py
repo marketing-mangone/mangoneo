@@ -1,4 +1,7 @@
+import csv
+
 from django.db.models import Count, Sum, Q
+from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
@@ -8,11 +11,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
 from core.permissions import SalesAccess
-from .models import Lead, LeadActivity, STAGE_CHOICES
+from .models import Lead, LeadActivity, LeadTask, STAGE_CHOICES
 from .importer import parse_and_import
 from .serializers import (
     LeadSerializer, LeadListSerializer, LeadActivitySerializer, LeadStageSerializer,
+    LeadTaskSerializer,
 )
+
+STAGE_KEYS = [s[0] for s in STAGE_CHOICES]
 
 
 class LeadViewSet(viewsets.ModelViewSet):
@@ -83,6 +89,78 @@ class LeadViewSet(viewsets.ModelViewSet):
         result = parse_and_import(raw, request.user, skip_duplicates=skip_dupes)
         return Response(result, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['post'], url_path='bulk')
+    def bulk(self, request):
+        """
+        Acciones masivas sobre varios leads.
+        Body: {ids:[int], action:'stage'|'assign'|'delete', value: any}
+        """
+        ids = request.data.get('ids') or []
+        action_type = request.data.get('action')
+        value = request.data.get('value')
+        if not ids or not isinstance(ids, list):
+            return Response({'detail': 'Envía una lista de ids.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        qs = Lead.objects.filter(id__in=ids)
+
+        if action_type == 'delete':
+            count = qs.count()
+            qs.delete()
+            return Response({'deleted': count})
+
+        if action_type == 'assign':
+            # value = user id, o null para desasignar
+            qs.update(assigned_to_id=value or None, updated_at=timezone.now())
+            return Response({'updated': qs.count()})
+
+        if action_type == 'stage':
+            if value not in STAGE_KEYS:
+                return Response({'detail': f'Etapa inválida: {value}'}, status=status.HTTP_400_BAD_REQUEST)
+            now = timezone.now()
+            updated = 0
+            for lead in qs:
+                previous = lead.get_stage_display()
+                lead.stage = value
+                if value == 'ganado' and not lead.won_at:
+                    lead.won_at = now
+                elif value != 'ganado':
+                    lead.won_at = None
+                if value != 'perdido':
+                    lead.lost_reason = ''
+                lead.save()
+                LeadActivity.objects.create(
+                    lead=lead, activity_type='etapa',
+                    description=f"Etapa: {previous} → {lead.get_stage_display()} (acción masiva)",
+                    created_by=request.user,
+                )
+                updated += 1
+            return Response({'updated': updated})
+
+        return Response({'detail': "action debe ser 'stage', 'assign' o 'delete'."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], url_path='export')
+    def export(self, request):
+        """Exporta los leads (respetando filtros/búsqueda actuales) a CSV."""
+        qs = self.filter_queryset(self.get_queryset())
+        response = HttpResponse(content_type='text/csv; charset=utf-8')
+        response['Content-Disposition'] = 'attachment; filename="leads-mangone.csv"'
+        response.write('﻿')  # BOM para Excel
+        writer = csv.writer(response)
+        writer.writerow([
+            'name', 'email', 'phone', 'language', 'location', 'source', 'campaign',
+            'practice_area', 'stage', 'priority', 'estimated_value', 'next_followup', 'notes',
+        ])
+        for l in qs:
+            writer.writerow([
+                l.name, l.email, l.phone, l.language, l.location, l.source, l.campaign,
+                l.practice_area, l.stage, l.priority,
+                l.estimated_value if l.estimated_value is not None else '',
+                l.next_followup.isoformat() if l.next_followup else '',
+                l.notes.replace('\n', ' ') if l.notes else '',
+            ])
+        return response
+
     @action(detail=False, methods=['get'], url_path='stats')
     def stats(self, request):
         """Resumen para el dashboard de ventas: embudo, valores y conversión."""
@@ -129,6 +207,29 @@ class LeadViewSet(viewsets.ModelViewSet):
             'overdue_followups': overdue,
             'funnel': funnel,
         })
+
+
+class LeadTaskViewSet(viewsets.ModelViewSet):
+    """Tareas/recordatorios del CRM. Filtra por lead, responsable o estado."""
+    queryset = LeadTask.objects.select_related('lead', 'assigned_to', 'created_by')
+    serializer_class = LeadTaskSerializer
+    permission_classes = [SalesAccess]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['lead', 'assigned_to', 'status', 'task_type', 'priority']
+    ordering_fields = ['due_date', 'created_at', 'priority']
+
+    @action(detail=True, methods=['post'], url_path='complete')
+    def complete(self, request, pk=None):
+        """Marca la tarea como completada (o la reabre con {reopen: true})."""
+        task = self.get_object()
+        if request.data.get('reopen'):
+            task.status = 'pendiente'
+            task.completed_at = None
+        else:
+            task.status = 'completada'
+            task.completed_at = timezone.now()
+        task.save(update_fields=['status', 'completed_at', 'updated_at'])
+        return Response(LeadTaskSerializer(task).data)
 
 
 class LeadActivityViewSet(viewsets.ModelViewSet):
