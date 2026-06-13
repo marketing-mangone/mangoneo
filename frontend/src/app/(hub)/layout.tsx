@@ -1,9 +1,9 @@
-import { Sidebar } from '@/components/layout/Sidebar';
+import { SidebarWithBadge } from '@/components/layout/SidebarWithBadge';
 
 export default function HubLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: 'var(--s-eef0f6)' }}>
-      <Sidebar unreadCount={2} />
+      <SidebarWithBadge />
       {/* Main scroll area — fondo ligeramente diferente al del sidebar para crear contraste */}
       <main
         className="flex-1 overflow-y-auto min-w-0"

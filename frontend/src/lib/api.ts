@@ -554,6 +554,38 @@ export type YouTubeWeeklyData = {
   };
 };
 
+export type NotificationType =
+  | 'lead_assigned' | 'task_assigned' | 'task_due' | 'followup_overdue' | 'kpi_alert' | 'system';
+
+export interface ApiNotification {
+  id: number;
+  type: NotificationType;
+  type_display: string;
+  title: string;
+  message: string;
+  link: string;
+  read: boolean;
+  created_at: string;
+}
+
+export const notificationsApi = {
+  list() {
+    return apiJSON<{ results: ApiNotification[]; count: number }>('/api/notifications/?page_size=100');
+  },
+  unreadCount() {
+    return apiJSON<{ count: number }>('/api/notifications/unread-count/');
+  },
+  markRead(id: number) {
+    return apiJSON<ApiNotification>(`/api/notifications/${id}/read/`, { method: 'POST', body: '{}' });
+  },
+  markAllRead() {
+    return apiJSON<{ updated: number }>('/api/notifications/read-all/', { method: 'POST', body: '{}' });
+  },
+  dismiss(id: number) {
+    return apiFetch(`/api/notifications/${id}/dismiss/`, { method: 'DELETE' });
+  },
+};
+
 export const dashboardApi = {
   summary() {
     return apiJSON<DashboardSummary>('/api/dashboard/summary/');

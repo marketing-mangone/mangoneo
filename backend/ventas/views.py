@@ -110,8 +110,20 @@ class LeadViewSet(viewsets.ModelViewSet):
 
         if action_type == 'assign':
             # value = user id, o null para desasignar
+            count = qs.count()
             qs.update(assigned_to_id=value or None, updated_at=timezone.now())
-            return Response({'updated': qs.count()})
+            # Notificar al nuevo responsable (si no es quien ejecuta la acción)
+            if value and int(value) != request.user.id:
+                from django.contrib.auth.models import User
+                from notifications.services import notify
+                target = User.objects.filter(id=value).first()
+                notify(
+                    target, 'lead_assigned',
+                    title=f'Se te asignaron {count} lead(s)',
+                    message='Revisa tu pipeline de ventas.',
+                    link='/ventas/leads',
+                )
+            return Response({'updated': count})
 
         if action_type == 'stage':
             if value not in STAGE_KEYS:

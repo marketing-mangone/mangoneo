@@ -7,6 +7,7 @@ echo "==> DATABASE_URL presente: $([ -n "$DATABASE_URL" ] && echo SI || echo NO)
 python manage.py migrate --noinput
 python manage.py collectstatic --noinput
 python manage.py ensure_superuser
+python manage.py setup_periodic_tasks || echo "==> setup_periodic_tasks falló, continuando..."
 python manage.py seed_youtube_metrics
 python manage.py sync_youtube --weeks 12 || echo "==> sync_youtube falló, continuando..."
 

@@ -32,6 +32,7 @@ urlpatterns = [
     path('api/grillas/', include('grillas.urls')),
     path('api/blog/', include('blog.urls')),
     path('api/ventas/', include('ventas.urls')),
+    path('api/notifications/', include('notifications.urls')),
 ]
 
 if settings.DEBUG:

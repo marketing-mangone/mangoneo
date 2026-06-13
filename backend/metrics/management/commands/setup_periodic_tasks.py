@@ -26,6 +26,11 @@ TASKS = [
         'task':     'metrics.tasks.sync_meta_metrics',
         'crontab':  {'minute': '0', 'hour': '*/2', 'day_of_week': '*', 'day_of_month': '*', 'month_of_year': '*'},
     },
+    {
+        'name':     'CRM reminders (every hour)',
+        'task':     'notifications.tasks.generate_crm_reminders',
+        'crontab':  {'minute': '0', 'hour': '*', 'day_of_week': '*', 'day_of_month': '*', 'month_of_year': '*'},
+    },
 ]
 
 

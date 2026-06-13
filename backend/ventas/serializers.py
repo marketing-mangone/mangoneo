@@ -59,7 +59,18 @@ class LeadTaskSerializer(serializers.ModelSerializer):
         # Por defecto, el responsable es quien crea la tarea
         if not validated_data.get('assigned_to'):
             validated_data['assigned_to'] = user
-        return super().create(validated_data)
+        task = super().create(validated_data)
+        # Notificar al responsable si no es quien la creó
+        if task.assigned_to and task.assigned_to != user:
+            from notifications.services import notify
+            notify(
+                task.assigned_to, 'task_assigned',
+                title='Nueva tarea asignada',
+                message=f'{task.title} · {task.lead.name}',
+                link=f'/ventas/leads/{task.lead_id}',
+                dedup_key=f'task-assigned-{task.id}',
+            )
+        return task
 
 
 class LeadSerializer(serializers.ModelSerializer):

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'grillas',
     'blog',
     'ventas',
+    'notifications',
 ]
 
 MIDDLEWARE = [
