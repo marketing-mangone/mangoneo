@@ -10,16 +10,17 @@ import {
   TrendingUp, RefreshCw, ArrowUpRight, ArrowDownRight,
   Download, PlaySquare, Eye, Clock, UserPlus, Users,
   ChevronLeft, ChevronRight, BarChart3, Globe, MousePointerClick,
+  Camera, ThumbsUp, Heart, DollarSign, MousePointer, UserCheck,
 } from 'lucide-react';
 import {
   MOCK_KPIS, MOCK_LEADS_SERIES, MOCK_SESIONES_SERIES,
   MOCK_AD_SPEND_SERIES, MOCK_CHANNEL_DATA,
 } from '@/lib/mock-data';
 import { formatNumber, formatCurrency, calcChange } from '@/lib/utils';
-import { dashboardApi, youtubeApi, ga4Api, type DashboardSummary, type YouTubeWeeklyData, type GA4Summary, type GA4Slug } from '@/lib/api';
+import { dashboardApi, youtubeApi, ga4Api, metaApi, type DashboardSummary, type YouTubeWeeklyData, type GA4Summary, type GA4Slug, type MetaSummary, type MetaSlug } from '@/lib/api';
 
 const PERIODS = ['Este mes', 'Último trimestre', 'Últimos 6 meses', 'Este año'];
-const TABS = ['Departamentales', 'Google Analytics', 'YouTube'];
+const TABS = ['Departamentales', 'Google Analytics', 'YouTube', 'Meta'];
 
 function fmtWatchTime(minutes: number): string {
   if (minutes >= 60) return `${(minutes / 60).toFixed(1)}h`;
@@ -152,6 +153,7 @@ export default function MetricasPage() {
             >
               {tab === 'YouTube'          && <PlaySquare className="w-3.5 h-3.5 text-red-500" />}
               {tab === 'Google Analytics' && <BarChart3   className="w-3.5 h-3.5 text-blue-500" />}
+              {tab === 'Meta'             && <Camera   className="w-3.5 h-3.5 text-pink-500" />}
               {tab}
             </button>
           ))}
@@ -162,6 +164,8 @@ export default function MetricasPage() {
         {activeTab === 'YouTube' && (
           <YouTubeSection subscribersTotal={ytData?.['youtube-subscribers-total']?.value ?? null} />
         )}
+
+        {activeTab === 'Meta' && <MetaSection />}
 
         {activeTab === 'Departamentales' && <>
           {/* Period selector */}
@@ -628,6 +632,187 @@ function YouTubeSection({ subscribersTotal }: { subscribersTotal: number | null 
             </Card>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Meta Section (Facebook + Instagram + Ads) ─── */
+
+type MetaStat = {
+  slug: MetaSlug;
+  label: string;
+  icon: React.ReactNode;
+  fmt: (v: number) => string;
+  accent: string;   // clases para el contenedor del ícono
+  goodUp: boolean;
+};
+
+const META_FB_STATS: MetaStat[] = [
+  { slug: 'meta-fb-impressions', label: 'Impresiones',  icon: <Eye className="w-5 h-5" />,         fmt: formatNumber, accent: 'bg-blue-50 text-blue-600',   goodUp: true },
+  { slug: 'meta-fb-reach',       label: 'Alcance',      icon: <Users className="w-5 h-5" />,       fmt: formatNumber, accent: 'bg-blue-50 text-blue-600',   goodUp: true },
+  { slug: 'meta-fb-engagement',  label: 'Engagement',   icon: <Heart className="w-5 h-5" />,       fmt: formatNumber, accent: 'bg-blue-50 text-blue-600',   goodUp: true },
+];
+
+const META_IG_STATS: MetaStat[] = [
+  { slug: 'meta-ig-impressions',   label: 'Impresiones',       icon: <Eye className="w-5 h-5" />,       fmt: formatNumber, accent: 'bg-pink-50 text-pink-600', goodUp: true },
+  { slug: 'meta-ig-reach',         label: 'Alcance',           icon: <Users className="w-5 h-5" />,     fmt: formatNumber, accent: 'bg-pink-50 text-pink-600', goodUp: true },
+  { slug: 'meta-ig-profile-views', label: 'Visitas al perfil', icon: <UserCheck className="w-5 h-5" />, fmt: formatNumber, accent: 'bg-pink-50 text-pink-600', goodUp: true },
+];
+
+const META_ADS_STATS: MetaStat[] = [
+  { slug: 'meta-ads-spend',       label: 'Inversión',     icon: <DollarSign className="w-5 h-5" />,   fmt: formatCurrency, accent: 'bg-violet-50 text-violet-600', goodUp: false },
+  { slug: 'meta-ads-impressions', label: 'Impresiones',   icon: <Eye className="w-5 h-5" />,          fmt: formatNumber,   accent: 'bg-violet-50 text-violet-600', goodUp: true  },
+  { slug: 'meta-ads-reach',       label: 'Alcance pagado', icon: <Users className="w-5 h-5" />,       fmt: formatNumber,   accent: 'bg-violet-50 text-violet-600', goodUp: true  },
+  { slug: 'meta-ads-clicks',      label: 'Clics',         icon: <MousePointer className="w-5 h-5" />, fmt: formatNumber,   accent: 'bg-violet-50 text-violet-600', goodUp: true  },
+];
+
+function MetaStatCard({ stat, data }: { stat: MetaStat; data: MetaSummary | null }) {
+  const entry     = data?.metrics[stat.slug];
+  const value     = entry?.value ?? null;
+  const changePct = entry?.change_pct ?? null;
+  const isPos     = changePct !== null && (stat.goodUp ? changePct >= 0 : changePct <= 0);
+
+  return (
+    <Card className="p-5">
+      <div className="flex items-center justify-between mb-4">
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${stat.accent}`}>
+          {stat.icon}
+        </div>
+        {changePct !== null && (
+          <span className={`flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded-full ${
+            isPos ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-600'
+          }`}>
+            {isPos ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+            {Math.abs(changePct).toFixed(1)}%
+          </span>
+        )}
+      </div>
+      <p className="text-[10px] font-bold text-[var(--t-9ca3af)] uppercase tracking-[0.08em] mb-1.5">{stat.label}</p>
+      {value !== null ? (
+        <p className="text-2xl font-extrabold text-[var(--t-111827)] leading-none tracking-tight">
+          {stat.fmt(value)}
+        </p>
+      ) : (
+        <p className="text-base font-semibold text-[var(--t-d1d5db)] leading-none">Sin datos</p>
+      )}
+      {entry?.prev_value != null && (
+        <p className="text-[10px] text-[var(--t-9ca3af)] mt-1.5">
+          Semana anterior: {stat.fmt(entry.prev_value)}
+        </p>
+      )}
+    </Card>
+  );
+}
+
+function MetaSection() {
+  const [weekStr, setWeekStr] = useState(getCurrentISOWeek());
+  const [data,    setData]    = useState<MetaSummary | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(true);
+    metaApi.weekly(weekStr)
+      .then(setData)
+      .catch(() => setData(null))
+      .finally(() => setLoading(false));
+  }, [weekStr]);
+
+  const currentWeek   = getCurrentISOWeek();
+  const isCurrentWeek = weekStr === currentWeek;
+  const fbFans        = data?.totals?.['meta-fb-fans']?.value ?? null;
+  const igFollowers   = data?.totals?.['meta-ig-followers']?.value ?? null;
+
+  return (
+    <div className="space-y-8">
+
+      {/* Banners de totales */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="rounded-2xl p-6 flex items-center gap-5"
+          style={{ background: 'linear-gradient(135deg, #1877f2 0%, #0a52c4 100%)' }}>
+          <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+            <ThumbsUp className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Fans de Facebook</p>
+            <p className="text-white text-4xl font-extrabold leading-none">
+              {fbFans !== null ? formatNumber(fbFans) : '—'}
+            </p>
+          </div>
+        </div>
+        <div className="rounded-2xl p-6 flex items-center gap-5"
+          style={{ background: 'linear-gradient(135deg, #e1306c 0%, #c13584 50%, #833ab4 100%)' }}>
+          <div className="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center flex-shrink-0">
+            <Camera className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <p className="text-white/60 text-xs font-semibold uppercase tracking-widest mb-1">Seguidores de Instagram</p>
+            <p className="text-white text-4xl font-extrabold leading-none">
+              {igFollowers !== null ? formatNumber(igFollowers) : '—'}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navegador de semana */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setWeekStr(w => addWeeks(w, -1))}
+            className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div className="text-center min-w-[160px]">
+            <p className="text-sm font-bold text-[var(--t-111827)]">
+              {data ? fmtDateRange(data.period_start, data.period_end) : weekStr}
+            </p>
+            <p className="text-[11px] text-[var(--t-9ca3af)]">
+              {weekStr}{isCurrentWeek ? ' · Semana actual' : ''}
+            </p>
+          </div>
+          <button
+            onClick={() => setWeekStr(w => addWeeks(w, 1))}
+            disabled={isCurrentWeek}
+            className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+        {loading && <span className="text-xs text-[var(--t-9ca3af)] animate-pulse">Cargando...</span>}
+      </div>
+
+      {/* Facebook */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <ThumbsUp className="w-4 h-4 text-[#1877f2]" />
+          <h3 className="text-sm font-bold text-[var(--t-111827)]">Facebook — orgánico</h3>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+          {META_FB_STATS.map(stat => <MetaStatCard key={stat.slug} stat={stat} data={data} />)}
+        </div>
+      </div>
+
+      {/* Instagram */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <Camera className="w-4 h-4 text-[#e1306c]" />
+          <h3 className="text-sm font-bold text-[var(--t-111827)]">Instagram — orgánico</h3>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+          {META_IG_STATS.map(stat => <MetaStatCard key={stat.slug} stat={stat} data={data} />)}
+        </div>
+      </div>
+
+      {/* Meta Ads */}
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <DollarSign className="w-4 h-4 text-violet-600" />
+          <h3 className="text-sm font-bold text-[var(--t-111827)]">Meta Ads — pagado</h3>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {META_ADS_STATS.map(stat => <MetaStatCard key={stat.slug} stat={stat} data={data} />)}
+        </div>
       </div>
     </div>
   );

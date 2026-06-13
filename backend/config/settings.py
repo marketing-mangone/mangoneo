@@ -222,3 +222,11 @@ GA4_CLIENT_ID      = config('GA4_CLIENT_ID', default='')
 GA4_CLIENT_SECRET  = config('GA4_CLIENT_SECRET', default='')
 GA4_REFRESH_TOKEN  = config('GA4_REFRESH_TOKEN', default='')
 GA4_PROPERTY_ID    = config('GA4_PROPERTY_ID', default='')   # solo el número, ej: 123456789
+
+# ── Meta Graph API (Facebook + Instagram + Ads) ───────────────────────────────
+META_APP_ID               = config('META_APP_ID', default='')
+META_APP_SECRET           = config('META_APP_SECRET', default='')
+META_ACCESS_TOKEN         = config('META_ACCESS_TOKEN', default='')         # System User o Long-lived token
+META_PAGE_ID              = config('META_PAGE_ID', default='')              # Facebook Page ID (numérico)
+META_INSTAGRAM_ACCOUNT_ID = config('META_INSTAGRAM_ACCOUNT_ID', default='') # Instagram Business Account ID (numérico)
+META_AD_ACCOUNT_ID        = config('META_AD_ACCOUNT_ID', default='')        # solo el número, sin 'act_'
