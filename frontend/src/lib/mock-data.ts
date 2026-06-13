@@ -125,6 +125,84 @@ export const MOCK_CHANNEL_DATA = [
   { channel: 'Referral', leads: 24, spend: 0, cpl: 0 },
 ];
 
+/* ────────────────────────────────────────────────────────────────────────────
+ * EMBUDO DE LA FIRMA — Reach → Leads → Qlfy Leads → Ventas → Conversiones
+ * Datos mock estructurados para cablear a HubSpot (leads/ventas) y
+ * Meta/GA4 (reach) más adelante. Cada etapa trae su desglose para el hover.
+ * ──────────────────────────────────────────────────────────────────────────── */
+export type FunnelBreakdownItem = { label: string; value: number };
+export type FunnelStage = {
+  key: string;
+  label: string;
+  value: number;
+  breakdownLabel: string;   // "Por canal" | "Por tipo de caso"
+  breakdown: FunnelBreakdownItem[];
+};
+
+export const MOCK_FUNNEL: FunnelStage[] = [
+  {
+    key: 'reach', label: 'Reach', value: 142800, breakdownLabel: 'Por canal',
+    breakdown: [
+      { label: 'Instagram', value: 58200 },
+      { label: 'Facebook',  value: 46100 },
+      { label: 'Google',    value: 21500 },
+      { label: 'YouTube',   value: 11200 },
+      { label: 'TikTok',    value: 5800  },
+    ],
+  },
+  {
+    key: 'leads', label: 'Leads', value: 284, breakdownLabel: 'Por canal',
+    breakdown: [
+      { label: 'Meta Ads',   value: 128 },
+      { label: 'Google Ads', value: 87  },
+      { label: 'Orgánico',   value: 45  },
+      { label: 'Referral',   value: 24  },
+    ],
+  },
+  {
+    key: 'qlfy', label: 'Qlfy Leads', value: 176, breakdownLabel: 'Por canal',
+    breakdown: [
+      { label: 'Meta Ads',   value: 74 },
+      { label: 'Google Ads', value: 58 },
+      { label: 'Orgánico',   value: 28 },
+      { label: 'Referral',   value: 16 },
+    ],
+  },
+  {
+    key: 'ventas', label: 'Ventas', value: 63, breakdownLabel: 'Por tipo de caso',
+    breakdown: [
+      { label: 'VAWA',                value: 22 },
+      { label: 'Visa U',              value: 18 },
+      { label: 'Visa Juvenil (SIJS)', value: 14 },
+      { label: 'Visa T',              value: 9  },
+    ],
+  },
+  {
+    key: 'conversiones', label: 'Conversiones', value: 41, breakdownLabel: 'Por tipo de caso',
+    breakdown: [
+      { label: 'VAWA',                value: 15 },
+      { label: 'Visa U',              value: 11 },
+      { label: 'Visa Juvenil (SIJS)', value: 9  },
+      { label: 'Visa T',              value: 6  },
+    ],
+  },
+];
+
+// Resumen financiero del mes (mock — cablear a HubSpot/contabilidad)
+export const MOCK_FINANCE = {
+  spent:    10934,    // inversión publicitaria del mes (Meta + Google)
+  revenue:  128500,   // ingresos por casos firmados este mes
+  goal:     150000,   // objetivo de ingresos del mes
+};
+
+export const MOCK_REVENUE_SERIES = [
+  { date: 'Ene', value: 92000 },
+  { date: 'Feb', value: 101500 },
+  { date: 'Mar', value: 118000 },
+  { date: 'Abr', value: 112400 },
+  { date: 'May', value: 128500 },
+];
+
 export const MOCK_DOCUMENTS: Document[] = [
   {
     id: 1, title: 'Manual de Marca v2.0', category: 'brand',
