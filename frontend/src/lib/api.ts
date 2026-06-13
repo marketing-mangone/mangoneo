@@ -586,6 +586,17 @@ export const notificationsApi = {
   },
 };
 
+export type ChatMessage = { role: 'user' | 'assistant'; content: string };
+
+export const chatApi = {
+  send(messages: ChatMessage[]) {
+    return apiJSON<{ reply: string }>('/api/chat/', {
+      method: 'POST',
+      body: JSON.stringify({ messages }),
+    });
+  },
+};
+
 export const dashboardApi = {
   summary() {
     return apiJSON<DashboardSummary>('/api/dashboard/summary/');

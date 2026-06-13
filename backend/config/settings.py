@@ -145,6 +145,7 @@ REST_FRAMEWORK = {
         'login': '10/minute',
         'refresh': '20/minute',
         'logout': '20/minute',
+        'chat': '40/minute',
     },
 }
 
