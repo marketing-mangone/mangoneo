@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, ChevronLeft, ChevronRight,
-  LogOut, Target, Wrench, Link2, Sun, Moon, Handshake,
+  LogOut, Wrench, Link2, Sun, Moon, Handshake,
 } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { auth } from '@/lib/api';
@@ -26,6 +26,19 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
     label: 'Principal',
     items: [
       { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', desc: 'Vista general' },
+      {
+        href: '/herramientas',
+        icon: Wrench,
+        label: 'Herramientas',
+        desc: 'Utilidades de marketing',
+        subItems: [
+          { href: '/herramientas', label: 'Auditor de Contenido', exact: true },
+          { href: '/herramientas/strategic-builder', label: 'Strategic Builder' },
+          { href: '/herramientas/grillas', label: 'Generador de Grillas' },
+          { href: '/herramientas/publicaciones', label: 'Publicaciones' },
+          { href: '/competencia', label: 'Benchmarking' },
+        ],
+      },
       {
         href: '/metricas',
         icon: BarChart3,
@@ -61,28 +74,6 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
       { href: '/equipo', icon: Users, label: 'Equipo', desc: 'Directorio' },
       { href: '/tareas', icon: CheckSquare, label: 'Tareas', desc: 'Kanban' },
       { href: '/calendario', icon: Calendar, label: 'Calendario', desc: 'Contenido' },
-    ],
-  },
-  {
-    label: 'Inteligencia',
-    items: [
-      { href: '/competencia', icon: Target, label: 'Competencia', desc: 'Radar competitivo' },
-    ],
-  },
-  {
-    label: 'Herramientas',
-    items: [
-      {
-        href: '/herramientas',
-        icon: Wrench,
-        label: 'Herramientas',
-        desc: 'Utilidades de marketing',
-        subItems: [
-          { href: '/herramientas', label: 'Auditor de Contenido', exact: true },
-          { href: '/herramientas/grillas', label: 'Generador de Grillas' },
-          { href: '/herramientas/publicaciones', label: 'Publicaciones' },
-        ],
-      },
     ],
   },
 ];

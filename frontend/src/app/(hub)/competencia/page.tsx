@@ -78,7 +78,7 @@ export default function CompetenciaPage() {
             <div className="w-9 h-9 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center">
               <Target className="w-5 h-5 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-[var(--t-0c2054)]">Radar Competitivo</h1>
+            <h1 className="text-2xl font-bold text-[var(--t-0c2054)]">Benchmarking</h1>
           </div>
           <p className="text-[var(--t-6b7280)] text-sm ml-12">Monitorea las estrategias, presencia digital y publicidad de la competencia</p>
         </div>
