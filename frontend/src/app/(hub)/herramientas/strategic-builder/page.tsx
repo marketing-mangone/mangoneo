@@ -9,7 +9,16 @@ import { teamApi, type ApiTeamMember } from '@/lib/api';
 
 // ── Tipos ───────────────────────────────────────────────────────────────
 type Quarter = 'Q1' | 'Q2' | 'Q3' | 'Q4';
+type Category = 'contenido' | 'email' | 'seo' | 'ads' | 'afines';
 type Status = 'pending' | 'in_progress' | 'done';
+
+const CATEGORIES: { key: Category; label: string }[] = [
+  { key: 'contenido', label: 'Contenido' },
+  { key: 'email',     label: 'Email Marketing' },
+  { key: 'seo',       label: 'SEO' },
+  { key: 'ads',       label: 'ADS' },
+  { key: 'afines',    label: 'Afines' },
+];
 
 interface Objective { id: string; text: string }
 interface Milestone { id: string; title: string; date: string; status: Status }
@@ -37,13 +46,13 @@ const STATUS_CFG: Record<Status, { label: string; cls: string }> = {
 };
 
 const EMPTY: QuarterData = { objectives: [], milestones: [], tasks: [], kpis: [] };
-const LS_KEY = (year: number, q: Quarter) => `sb-${year}-${q}`;
+const LS_KEY = (year: number, cat: Category, q: Quarter) => `sb-${year}-${cat}-${q}`;
 const uid = () => `${Date.now()}-${Math.round(performance.now())}-${Math.floor(performance.now() * 1000) % 1000}`;
 
-function load(year: number, q: Quarter): QuarterData {
+function load(year: number, cat: Category, q: Quarter): QuarterData {
   if (typeof window === 'undefined') return EMPTY;
   try {
-    const raw = localStorage.getItem(LS_KEY(year, q));
+    const raw = localStorage.getItem(LS_KEY(year, cat, q));
     if (raw) return { ...EMPTY, ...JSON.parse(raw) };
   } catch { /* ignore */ }
   return EMPTY;
@@ -55,6 +64,7 @@ export default function StrategicBuilderPage() {
   const [mounted, setMounted] = useState(false);
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
+  const [category, setCategory] = useState<Category>('contenido');
   const [quarter, setQuarter] = useState<Quarter>('Q1');
   const [data, setData] = useState<QuarterData>(EMPTY);
   const [team, setTeam] = useState<ApiTeamMember[]>([]);
@@ -65,14 +75,14 @@ export default function StrategicBuilderPage() {
   }, []);
 
   useEffect(() => {
-    if (mounted) setData(load(year, quarter));
-  }, [year, quarter, mounted]);
+    if (mounted) setData(load(year, category, quarter));
+  }, [year, category, quarter, mounted]);
 
   // Persiste en cada cambio
   const update = useCallback((next: QuarterData) => {
     setData(next);
-    localStorage.setItem(LS_KEY(year, quarter), JSON.stringify(next));
-  }, [year, quarter]);
+    localStorage.setItem(LS_KEY(year, category, quarter), JSON.stringify(next));
+  }, [year, category, quarter]);
 
   if (!mounted) {
     return <div className="flex items-center justify-center py-32"><Loader2 className="w-8 h-8 animate-spin text-[var(--t-f79c31)]" /></div>;
@@ -104,7 +114,24 @@ export default function StrategicBuilderPage() {
         }
       />
 
-      <div className="px-10 py-10 space-y-8">
+      <div className="px-10 py-10 space-y-6">
+        {/* Selector de categoría (área estratégica) */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {CATEGORIES.map(c => (
+            <button
+              key={c.key}
+              onClick={() => setCategory(c.key)}
+              className={`text-sm font-semibold px-4 py-2 rounded-full border transition-all ${
+                category === c.key
+                  ? 'bg-[#F79C31] text-white border-[#F79C31] shadow-sm'
+                  : 'bg-[var(--surface)] text-[var(--t-4a4a6a)] border-[var(--s-e8e8f0)] hover:bg-[var(--s-f7f8fc)]'
+              }`}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+
         {/* Tabs de trimestre */}
         <div className="flex items-center gap-2 flex-wrap">
           {QUARTERS.map(q => (
@@ -121,7 +148,7 @@ export default function StrategicBuilderPage() {
               <span className={`text-[11px] mt-1 ${quarter === q.key ? 'text-white/70' : 'text-[var(--t-9ca3af)]'}`}>{q.months}</span>
             </button>
           ))}
-          <span className="ml-auto text-xs text-[var(--t-9ca3af)]">{quarter} {year} · {counts}</span>
+          <span className="ml-auto text-xs text-[var(--t-9ca3af)]">{CATEGORIES.find(c => c.key === category)?.label} · {quarter} {year} · {counts}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -194,7 +221,7 @@ export default function StrategicBuilderPage() {
         </div>
 
         <p className="text-xs text-[var(--t-9ca3af)] text-center">
-          Los cambios se guardan automáticamente en este navegador. {QUARTERS.find(q => q.key === quarter)?.months} · {year}
+          Los cambios se guardan automáticamente en este navegador. {CATEGORIES.find(c => c.key === category)?.label} · {QUARTERS.find(q => q.key === quarter)?.months} · {year}
         </p>
       </div>
     </div>
