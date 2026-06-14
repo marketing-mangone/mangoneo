@@ -4,7 +4,7 @@ import { Header } from '@/components/layout/Header';
 import { Card } from '@/components/ui/Card';
 import {
   ChevronLeft, ChevronRight, Pencil, Save, X,
-  Loader2, Users, UserMinus, Settings2, Plus, Trash2, RotateCcw,
+  Loader2, Users, UserMinus, Settings2, Plus, Trash2, RotateCcw, Lock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { teamApi, type ApiTeamMember } from '@/lib/api';
@@ -727,6 +727,39 @@ export default function MetricasIndividualesPage() {
   // Only exclude members with no KPIs configured (null). Members with unset values count as 0%.
   const validPcts = memberPcts.filter((v): v is number => v !== null);
   const teamPct = validPcts.length > 0 ? validPcts.reduce((a, b) => a + b, 0) / validPcts.length : null;
+
+  // Evita parpadeo antes de leer el rol desde localStorage
+  if (!mounted) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <Loader2 className="w-8 h-8 animate-spin text-[var(--t-f79c31)]" />
+      </div>
+    );
+  }
+
+  // Acceso restringido: solo Admin
+  if (!isAdmin) {
+    return (
+      <div className="animate-fade-in">
+        <Header
+          title="Métricas Individuales"
+          subtitle="Cumplimiento semanal de KPIs por miembro del equipo"
+        />
+        <div className="px-10 py-10">
+          <Card className="p-12 text-center max-w-md mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-[var(--s-f0f2f8)] flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-7 h-7 text-[var(--t-9ca3af)]" />
+            </div>
+            <h3 className="font-bold text-[var(--t-1a1a2e)] text-lg mb-2">Acceso restringido</h3>
+            <p className="text-sm text-[var(--t-6b7280)]">
+              Esta sección está disponible únicamente para administradores. Si necesitas acceso,
+              contacta a Sebastian (Director de Marketing).
+            </p>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in">

@@ -12,7 +12,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { auth } from '@/lib/api';
 import { useTheme } from '@/components/theme/ThemeProvider';
 
-type SubNavItem = { href: string; label: string; exact?: boolean };
+type SubNavItem = { href: string; label: string; exact?: boolean; adminOnly?: boolean };
 type NavItem = {
   href: string;
   icon: React.ElementType;
@@ -33,7 +33,7 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
         desc: 'KPIs y datos',
         subItems: [
           { href: '/metricas', label: 'Departamentales', exact: true },
-          { href: '/metricas/individuales', label: 'Individuales' },
+          { href: '/metricas/individuales', label: 'Individuales', adminOnly: true },
           { href: '/metricas/integraciones', label: 'Integraciones' },
         ],
       },
@@ -197,7 +197,18 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
 
   const displayName = currentUser?.name || currentUser?.username || 'Usuario';
   const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
-  const roleLabel = currentUser?.role === 'admin' ? 'Admin' : currentUser?.role || '';
+  const isAdmin = currentUser?.role === 'admin';
+  const roleLabel = isAdmin ? 'Admin' : currentUser?.role || '';
+
+  // NAV filtrado por rol: oculta sub-items adminOnly a quienes no son admin
+  const navMain = NAV_MAIN.map(group => ({
+    ...group,
+    items: group.items.map(item =>
+      item.subItems
+        ? { ...item, subItems: item.subItems.filter(s => !s.adminOnly || isAdmin) }
+        : item
+    ),
+  }));
 
   // Close flyout on route change
   useEffect(() => { setFlyout(null); }, [pathname]);
@@ -271,7 +282,7 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
         {/* ── NAV ── */}
         <nav className="relative z-10 flex-1 px-3 py-5 overflow-y-auto">
           <ul className="space-y-1">
-            {NAV_MAIN.flatMap(group => group.items).map(item => {
+            {navMain.flatMap(group => group.items).map(item => {
               const { href, icon: Icon, label, desc, subItems } = item;
               const active = pathname === href || pathname.startsWith(href + '/');
               const hasFlyout = !!subItems;
