@@ -13,7 +13,7 @@ import {
   ClipboardList, ChevronDown, ChevronRight, Shield, Wrench,
   Link2, ExternalLink, Globe,
 } from 'lucide-react';
-import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar } from '@/lib/api';
+import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar, teamApi, type ApiTeamMember } from '@/lib/api';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -1687,6 +1687,7 @@ interface SOPData {
   quality?: string;     // Estándares de calidad
   frequency?: string;   // Frecuencia y tiempos de entrega
   escalation?: string;  // Qué hacer ante excepciones o problemas
+  members?: string[];   // Miembros del equipo asignados a este SOP (nombres)
 }
 
 const SOP_STORAGE_KEY = 'mangone_sops_data';
@@ -3237,10 +3238,12 @@ function SOPsTab() {
   const [activeSection, setActiveSection] = useState<'ficha' | 'phases' | 'roles' | 'tools' | 'rules'>('ficha');
   const [viewMode, setViewMode] = useState<'area' | 'persona'>('area');
   const [activePerson, setActivePerson] = useState<string | null>(null);
+  const [team, setTeam] = useState<ApiTeamMember[]>([]);
 
   useEffect(() => {
     setSOPs(loadSOPs());
     setMounted(true);
+    teamApi.list().then(r => setTeam(r.results.filter(m => m.status === 'active'))).catch(() => {});
   }, []);
 
   const currentSOP = sops[activeSOP] ?? null;
@@ -3341,13 +3344,15 @@ function SOPsTab() {
     setDraft({ ...draft, [field]: value });
   };
 
-  // Personas (responsables) derivadas de todos los SOPs, para el modo "Por persona"
-  const allPeople = Array.from(new Set(
-    sops.flatMap(s => [
-      ...s.roles.map(r => r.name),
-      ...s.phases.flatMap(p => p.steps.map(st => st.responsible)),
-    ]).filter(Boolean)
-  )).sort();
+  const toggleMember = (name: string) => {
+    if (!draft) return;
+    const current = draft.members ?? [];
+    const next = current.includes(name) ? current.filter(m => m !== name) : [...current, name];
+    setDraft({ ...draft, members: next });
+  };
+
+  // "Por persona": solo miembros reales del equipo
+  const allPeople = team.map(m => m.name).sort();
 
   if (!mounted || !d) return null;
 
@@ -3503,6 +3508,29 @@ function SOPsTab() {
           {/* ── Ficha (objetivo, responsable, calidad, frecuencia, excepciones) ── */}
           {activeSection === 'ficha' && (
             <div className="space-y-5">
+              {/* Miembros del equipo asignados */}
+              <div>
+                <p className="text-xs font-bold text-[var(--t-0c2054)] uppercase tracking-wide mb-0.5">Miembros del equipo asignados</p>
+                <p className="text-[11px] text-[var(--t-9ca3af)] mb-1.5">Selecciona 1 o más responsables de este proceso</p>
+                {editing ? (
+                  <MemberSelect team={team} selected={d.members ?? []} onToggle={toggleMember} />
+                ) : (d.members && d.members.length > 0) ? (
+                  <div className="flex flex-wrap gap-2">
+                    {d.members.map(name => (
+                      <span key={name} className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full bg-[var(--s-f0f2f8)] border border-[var(--s-e0e4f0)]">
+                        <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
+                          style={{ background: getInitialsColor(name.split(' ').map(n => n[0]).join('').slice(0, 2)) }}>
+                          {name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </span>
+                        <span className="text-xs font-medium text-[var(--t-0c2054)]">{name}</span>
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[var(--t-c0c0d0)] italic">Sin miembros asignados — edita el SOP para asignarlos.</p>
+                )}
+              </div>
+
               <FichaField
                 label="Objetivo del proceso"
                 hint="Qué logra y por qué importa"
@@ -3715,6 +3743,63 @@ function SOPsTab() {
   );
 }
 
+// ── Multi-select de miembros del equipo ─────────────────────────────────────────
+function MemberSelect({ team, selected, onToggle }: {
+  team: ApiTeamMember[]; selected: string[]; onToggle: (name: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ini = (name: string) => name.split(' ').map(n => n[0]).join('').slice(0, 2);
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center justify-between gap-2 w-full max-w-xs text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none hover:border-[var(--s-f79c31)] transition-colors bg-[var(--surface)]"
+      >
+        <span className={selected.length ? 'text-[var(--t-1a1a2e)]' : 'text-[var(--t-9ca3af)]'}>
+          {selected.length ? `${selected.length} miembro(s) seleccionado(s)` : 'Seleccionar miembros…'}
+        </span>
+        <ChevronDown className="w-4 h-4 text-[var(--t-8888a8)]" />
+      </button>
+
+      {/* Chips de seleccionados */}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {selected.map(name => (
+            <span key={name} className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-[var(--s-f0f2f8)] border border-[var(--s-e0e4f0)]">
+              <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold" style={{ background: getInitialsColor(ini(name)) }}>{ini(name)}</span>
+              <span className="text-xs font-medium text-[var(--t-0c2054)]">{name}</span>
+              <button onClick={() => onToggle(name)} className="text-[var(--t-8888a8)] hover:text-red-500"><X className="w-3 h-3" /></button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute z-20 mt-1 w-64 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl shadow-lg py-1 max-h-64 overflow-y-auto">
+            {team.length === 0 && <p className="text-xs text-[var(--t-8888a8)] px-3 py-2">Cargando equipo…</p>}
+            {team.map(m => {
+              const checked = selected.includes(m.name);
+              return (
+                <button
+                  key={m.user_id}
+                  onClick={() => onToggle(m.name)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--s-f7f8fc)] text-left transition-colors"
+                >
+                  <input type="checkbox" checked={checked} readOnly className="w-4 h-4 rounded accent-[#0C2054] pointer-events-none" />
+                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0" style={{ background: getInitialsColor(ini(m.name)) }}>{ini(m.name)}</span>
+                  <span className="text-sm text-[var(--t-374151)] truncate">{m.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── Ficha field (campo editable de la ficha del SOP) ────────────────────────────
 function FichaField({ label, hint, value, editing, onChange, placeholder, single }: {
   label: string; hint?: string; value?: string; editing: boolean;
@@ -3755,14 +3840,15 @@ function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData
   if (!person) {
     return <p className="text-sm text-[var(--t-8888a8)] italic px-1">Selecciona una persona para ver sus responsabilidades.</p>;
   }
-  // Pasos de esta persona agrupados por SOP
+  // SOPs asignados a la persona (vía el desplegable de miembros) + sus pasos
   const groups = sops.map(sop => ({
     sop,
+    assigned: (sop.members ?? []).includes(person),
     role: sop.roles.find(r => r.name === person),
     steps: sop.phases.flatMap(p => p.steps
       .filter(st => st.responsible === person)
       .map(st => ({ ...st, phaseTitle: p.title }))),
-  })).filter(g => g.steps.length > 0 || g.role);
+  })).filter(g => g.assigned || g.steps.length > 0 || g.role);
 
   const totalSteps = groups.reduce((a, g) => a + g.steps.length, 0);
 
@@ -3782,11 +3868,12 @@ function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData
       <div className="p-6 space-y-5">
         {groups.length === 0 ? (
           <p className="text-sm text-[var(--t-8888a8)] italic">Esta persona no tiene pasos asignados en los SOPs.</p>
-        ) : groups.map(({ sop, role, steps }) => (
+        ) : groups.map(({ sop, role, steps, assigned }) => (
           <div key={sop.id} className="rounded-xl border border-[var(--s-e8eaf0)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--s-f7f8fc)] border-b border-[var(--s-f0f0f0)]">
               <ClipboardList className="w-4 h-4 text-[var(--t-0c2054)]" />
               <span className="text-sm font-bold text-[var(--t-0c2054)]">{sop.name}</span>
+              {assigned && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Asignado</span>}
               {role && <span className="text-[11px] text-[var(--t-8888a8)] ml-1 truncate">· {role.desc}</span>}
             </div>
             {steps.length > 0 ? (
