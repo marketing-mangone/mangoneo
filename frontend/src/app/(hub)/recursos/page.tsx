@@ -1680,14 +1680,6 @@ interface SOPData {
   tools: string[];
   rules: string[];
   phases: SOPPhase[];
-  // Campos de ficha (opcionales — se rellenan editando; no rompen SOPs existentes)
-  objective?: string;   // Objetivo del proceso
-  owner?: string;       // Quién ejecuta
-  approver?: string;    // Quién aprueba
-  quality?: string;     // Estándares de calidad
-  frequency?: string;   // Frecuencia y tiempos de entrega
-  escalation?: string;  // Qué hacer ante excepciones o problemas
-  members?: string[];   // Miembros del equipo asignados a este SOP (nombres)
 }
 
 const SOP_STORAGE_KEY = 'mangone_sops_data';
@@ -3235,7 +3227,7 @@ function SOPsTab() {
   const [draft, setDraft] = useState<SOPData | null>(null);
   const [newTool, setNewTool] = useState('');
   const [newRule, setNewRule] = useState('');
-  const [activeSection, setActiveSection] = useState<'ficha' | 'phases' | 'roles' | 'tools' | 'rules'>('ficha');
+  const [activeSection, setActiveSection] = useState<'phases' | 'roles' | 'tools' | 'rules'>('phases');
   const [viewMode, setViewMode] = useState<'area' | 'persona'>('area');
   const [activePerson, setActivePerson] = useState<string | null>(null);
   const [team, setTeam] = useState<ApiTeamMember[]>([]);
@@ -3339,28 +3331,15 @@ function SOPsTab() {
     setDraft({ ...draft, roles: draft.roles.map((r, idx) => idx === i ? { ...r, [field]: value } : r) });
   };
 
-  const updateField = (field: 'objective' | 'owner' | 'approver' | 'quality' | 'frequency' | 'escalation', value: string) => {
-    if (!draft) return;
-    setDraft({ ...draft, [field]: value });
-  };
-
-  const toggleMember = (name: string) => {
-    if (!draft) return;
-    const current = draft.members ?? [];
-    const next = current.includes(name) ? current.filter(m => m !== name) : [...current, name];
-    setDraft({ ...draft, members: next });
-  };
-
   // "Por persona": solo miembros reales del equipo
   const allPeople = team.map(m => m.name).sort();
 
   if (!mounted || !d) return null;
 
   const SECTION_TABS = [
-    { key: 'ficha' as const, label: 'Ficha', icon: FileText },
     { key: 'phases' as const, label: 'Procedimiento', icon: ClipboardList },
     { key: 'roles' as const, label: 'Roles', icon: Users },
-    { key: 'tools' as const, label: 'Herramientas y accesos', icon: Wrench },
+    { key: 'tools' as const, label: 'Herramientas', icon: Wrench },
     { key: 'rules' as const, label: 'Reglas', icon: Shield },
   ];
 
@@ -3421,7 +3400,7 @@ function SOPsTab() {
           ? sops.map((sop, i) => (
               <button
                 key={sop.id}
-                onClick={() => { setActiveSOP(i); setEditing(false); setDraft(null); setActiveSection('ficha'); }}
+                onClick={() => { setActiveSOP(i); setEditing(false); setDraft(null); setActiveSection('phases'); }}
                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                   activeSOP === i ? 'bg-[var(--s-0c2054)] text-white shadow-sm' : 'text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)]'
                 }`}
@@ -3504,77 +3483,6 @@ function SOPsTab() {
 
         {/* Section content */}
         <div className="p-6">
-
-          {/* ── Ficha (objetivo, responsable, calidad, frecuencia, excepciones) ── */}
-          {activeSection === 'ficha' && (
-            <div className="space-y-5">
-              {/* Miembros del equipo asignados */}
-              <div>
-                <p className="text-xs font-bold text-[var(--t-0c2054)] uppercase tracking-wide mb-0.5">Miembros del equipo asignados</p>
-                <p className="text-[11px] text-[var(--t-9ca3af)] mb-1.5">Selecciona 1 o más responsables de este proceso</p>
-                {editing ? (
-                  <MemberSelect team={team} selected={d.members ?? []} onToggle={toggleMember} />
-                ) : (d.members && d.members.length > 0) ? (
-                  <div className="flex flex-wrap gap-2">
-                    {d.members.map(name => (
-                      <span key={name} className="flex items-center gap-1.5 pl-1 pr-3 py-1 rounded-full bg-[var(--s-f0f2f8)] border border-[var(--s-e0e4f0)]">
-                        <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold"
-                          style={{ background: getInitialsColor(name.split(' ').map(n => n[0]).join('').slice(0, 2)) }}>
-                          {name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </span>
-                        <span className="text-xs font-medium text-[var(--t-0c2054)]">{name}</span>
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-sm text-[var(--t-c0c0d0)] italic">Sin miembros asignados — edita el SOP para asignarlos.</p>
-                )}
-              </div>
-
-              <FichaField
-                label="Objetivo del proceso"
-                hint="Qué logra y por qué importa"
-                value={d.objective} editing={editing}
-                onChange={v => updateField('objective', v)}
-                placeholder="Describe qué logra este proceso y por qué es importante para la firma…"
-              />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FichaField
-                  label="Responsable — Ejecuta"
-                  value={d.owner} editing={editing}
-                  onChange={v => updateField('owner', v)}
-                  placeholder="Quién ejecuta el proceso…" single
-                />
-                <FichaField
-                  label="Responsable — Aprueba"
-                  value={d.approver} editing={editing}
-                  onChange={v => updateField('approver', v)}
-                  placeholder="Quién revisa y aprueba…" single
-                />
-              </div>
-              <FichaField
-                label="Estándares de calidad"
-                hint="Qué define un trabajo bien hecho: formatos, tiempos, tono, lineamientos de marca"
-                value={d.quality} editing={editing}
-                onChange={v => updateField('quality', v)}
-                placeholder="Ej. tono empático y no alarmista, sin la palabra 'especialistas', assets en Dropbox, captions revisados legalmente…"
-              />
-              <FichaField
-                label="Frecuencia y tiempos de entrega"
-                hint="Cada cuánto se hace y plazos"
-                value={d.frequency} editing={editing}
-                onChange={v => updateField('frequency', v)}
-                placeholder="Ej. grilla semanal con 2 semanas de anticipación; flyers de eventos con 21 días…"
-              />
-              <FichaField
-                label="Qué hacer ante excepciones o problemas"
-                hint="A quién escalar y cómo"
-                value={d.escalation} editing={editing}
-                onChange={v => updateField('escalation', v)}
-                placeholder="Ej. requerimientos extraordinarios los asigna Sebastián o C-Level; bloqueos se reportan al Director de Marketing…"
-              />
-            </div>
-          )}
 
           {/* ── Procedimiento ── */}
           {activeSection === 'phases' && (
@@ -3743,112 +3651,19 @@ function SOPsTab() {
   );
 }
 
-// ── Multi-select de miembros del equipo ─────────────────────────────────────────
-function MemberSelect({ team, selected, onToggle }: {
-  team: ApiTeamMember[]; selected: string[]; onToggle: (name: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ini = (name: string) => name.split(' ').map(n => n[0]).join('').slice(0, 2);
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="flex items-center justify-between gap-2 w-full max-w-xs text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none hover:border-[var(--s-f79c31)] transition-colors bg-[var(--surface)]"
-      >
-        <span className={selected.length ? 'text-[var(--t-1a1a2e)]' : 'text-[var(--t-9ca3af)]'}>
-          {selected.length ? `${selected.length} miembro(s) seleccionado(s)` : 'Seleccionar miembros…'}
-        </span>
-        <ChevronDown className="w-4 h-4 text-[var(--t-8888a8)]" />
-      </button>
-
-      {/* Chips de seleccionados */}
-      {selected.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {selected.map(name => (
-            <span key={name} className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-[var(--s-f0f2f8)] border border-[var(--s-e0e4f0)]">
-              <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold" style={{ background: getInitialsColor(ini(name)) }}>{ini(name)}</span>
-              <span className="text-xs font-medium text-[var(--t-0c2054)]">{name}</span>
-              <button onClick={() => onToggle(name)} className="text-[var(--t-8888a8)] hover:text-red-500"><X className="w-3 h-3" /></button>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 mt-1 w-64 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl shadow-lg py-1 max-h-64 overflow-y-auto">
-            {team.length === 0 && <p className="text-xs text-[var(--t-8888a8)] px-3 py-2">Cargando equipo…</p>}
-            {team.map(m => {
-              const checked = selected.includes(m.name);
-              return (
-                <button
-                  key={m.user_id}
-                  onClick={() => onToggle(m.name)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--s-f7f8fc)] text-left transition-colors"
-                >
-                  <input type="checkbox" checked={checked} readOnly className="w-4 h-4 rounded accent-[#0C2054] pointer-events-none" />
-                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0" style={{ background: getInitialsColor(ini(m.name)) }}>{ini(m.name)}</span>
-                  <span className="text-sm text-[var(--t-374151)] truncate">{m.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
-// ── Ficha field (campo editable de la ficha del SOP) ────────────────────────────
-function FichaField({ label, hint, value, editing, onChange, placeholder, single }: {
-  label: string; hint?: string; value?: string; editing: boolean;
-  onChange: (v: string) => void; placeholder?: string; single?: boolean;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-bold text-[var(--t-0c2054)] uppercase tracking-wide mb-0.5">{label}</p>
-      {hint && <p className="text-[11px] text-[var(--t-9ca3af)] mb-1.5">{hint}</p>}
-      {editing ? (
-        single ? (
-          <input
-            value={value ?? ''}
-            onChange={e => onChange(e.target.value)}
-            placeholder={placeholder}
-            className="w-full text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none focus:border-[var(--s-f79c31)]"
-          />
-        ) : (
-          <textarea
-            value={value ?? ''}
-            onChange={e => onChange(e.target.value)}
-            placeholder={placeholder}
-            rows={3}
-            className="w-full text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none focus:border-[var(--s-f79c31)] resize-none"
-          />
-        )
-      ) : value ? (
-        <p className="text-sm text-[var(--t-1a1a2e)] leading-relaxed whitespace-pre-wrap">{value}</p>
-      ) : (
-        <p className="text-sm text-[var(--t-c0c0d0)] italic">Sin definir — edita el SOP para completarlo.</p>
-      )}
-    </div>
-  );
-}
-
 // ── Vista consolidada por persona ───────────────────────────────────────────────
 function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData[] }) {
   if (!person) {
     return <p className="text-sm text-[var(--t-8888a8)] italic px-1">Selecciona una persona para ver sus responsabilidades.</p>;
   }
-  // SOPs asignados a la persona (vía el desplegable de miembros) + sus pasos
+  // Pasos de esta persona agrupados por SOP
   const groups = sops.map(sop => ({
     sop,
-    assigned: (sop.members ?? []).includes(person),
     role: sop.roles.find(r => r.name === person),
     steps: sop.phases.flatMap(p => p.steps
       .filter(st => st.responsible === person)
       .map(st => ({ ...st, phaseTitle: p.title }))),
-  })).filter(g => g.assigned || g.steps.length > 0 || g.role);
+  })).filter(g => g.steps.length > 0 || g.role);
 
   const totalSteps = groups.reduce((a, g) => a + g.steps.length, 0);
 
@@ -3868,12 +3683,11 @@ function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData
       <div className="p-6 space-y-5">
         {groups.length === 0 ? (
           <p className="text-sm text-[var(--t-8888a8)] italic">Esta persona no tiene pasos asignados en los SOPs.</p>
-        ) : groups.map(({ sop, role, steps, assigned }) => (
+        ) : groups.map(({ sop, role, steps }) => (
           <div key={sop.id} className="rounded-xl border border-[var(--s-e8eaf0)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--s-f7f8fc)] border-b border-[var(--s-f0f0f0)]">
               <ClipboardList className="w-4 h-4 text-[var(--t-0c2054)]" />
               <span className="text-sm font-bold text-[var(--t-0c2054)]">{sop.name}</span>
-              {assigned && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Asignado</span>}
               {role && <span className="text-[11px] text-[var(--t-8888a8)] ml-1 truncate">· {role.desc}</span>}
             </div>
             {steps.length > 0 ? (
