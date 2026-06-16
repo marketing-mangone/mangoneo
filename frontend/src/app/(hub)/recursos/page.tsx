@@ -1680,6 +1680,8 @@ interface SOPData {
   tools: string[];
   rules: string[];
   phases: SOPPhase[];
+  objective?: string;   // Objetivo del proceso (se muestra en Procedimiento)
+  members?: string[];   // Miembros del equipo asignados (nombres)
 }
 
 const SOP_STORAGE_KEY = 'mangone_sops_data';
@@ -3240,6 +3242,17 @@ function SOPsTab() {
 
   const currentSOP = sops[activeSOP] ?? null;
 
+  // Asignación de miembros: persiste de inmediato (no requiere modo edición)
+  const toggleMemberLive = (name: string) => {
+    if (!currentSOP) return;
+    const cur = currentSOP.members ?? [];
+    const next = cur.includes(name) ? cur.filter(m => m !== name) : [...cur, name];
+    const updated = sops.map((s, i) => i === activeSOP ? { ...s, members: next } : s);
+    setSOPs(updated);
+    saveSOPs(updated);
+    if (draft) setDraft({ ...draft, members: next });
+  };
+
   const startEdit = () => {
     if (!currentSOP) return;
     setDraft(JSON.parse(JSON.stringify(currentSOP)));
@@ -3329,6 +3342,11 @@ function SOPsTab() {
   const updateRole = (i: number, field: keyof SOPRole, value: string) => {
     if (!draft) return;
     setDraft({ ...draft, roles: draft.roles.map((r, idx) => idx === i ? { ...r, [field]: value } : r) });
+  };
+
+  const updateObjective = (value: string) => {
+    if (!draft) return;
+    setDraft({ ...draft, objective: value });
   };
 
   // "Por persona": solo miembros reales del equipo
@@ -3487,6 +3505,30 @@ function SOPsTab() {
           {/* ── Procedimiento ── */}
           {activeSection === 'phases' && (
             <div className="space-y-3">
+              {/* Objetivo del proceso */}
+              <div className="rounded-xl border border-[var(--s-e8eaf0)] bg-[var(--s-fafafa)] p-4">
+                <p className="text-xs font-bold text-[var(--t-0c2054)] uppercase tracking-wide mb-1.5">Objetivo del proceso</p>
+                {editing ? (
+                  <textarea
+                    value={d.objective ?? ''}
+                    onChange={e => updateObjective(e.target.value)}
+                    rows={2}
+                    placeholder="Qué logra este proceso y por qué importa…"
+                    className="w-full text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none focus:border-[var(--s-f79c31)] resize-none bg-[var(--surface)]"
+                  />
+                ) : d.objective ? (
+                  <p className="text-sm text-[var(--t-1a1a2e)] leading-relaxed whitespace-pre-wrap">{d.objective}</p>
+                ) : (
+                  <p className="text-sm text-[var(--t-c0c0d0)] italic">Sin objetivo definido — edita el SOP para agregarlo.</p>
+                )}
+              </div>
+
+              {/* Miembros del equipo asignados (siempre editable, guarda al instante) */}
+              <div className="rounded-xl border border-[var(--s-e8eaf0)] bg-[var(--s-fafafa)] p-4">
+                <p className="text-xs font-bold text-[var(--t-0c2054)] uppercase tracking-wide mb-1.5">Miembros del equipo</p>
+                <MemberSelect team={team} selected={currentSOP?.members ?? []} onToggle={toggleMemberLive} />
+              </div>
+
               {d.phases.map((phase, pi) => (
                 <SOPPhaseRow
                   key={phase.id}
@@ -3651,19 +3693,76 @@ function SOPsTab() {
   );
 }
 
+// ── Multi-select de miembros del equipo ─────────────────────────────────────────
+function MemberSelect({ team, selected, onToggle }: {
+  team: ApiTeamMember[]; selected: string[]; onToggle: (name: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ini = (name: string) => name.split(' ').map(n => n[0]).join('').slice(0, 2);
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center justify-between gap-2 w-full max-w-xs text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none hover:border-[var(--s-f79c31)] transition-colors bg-[var(--surface)]"
+      >
+        <span className={selected.length ? 'text-[var(--t-1a1a2e)]' : 'text-[var(--t-9ca3af)]'}>
+          {selected.length ? `${selected.length} miembro(s) seleccionado(s)` : 'Seleccionar miembros…'}
+        </span>
+        <ChevronDown className="w-4 h-4 text-[var(--t-8888a8)] flex-shrink-0" />
+      </button>
+
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {selected.map(name => (
+            <span key={name} className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-[var(--s-f0f2f8)] border border-[var(--s-e0e4f0)]">
+              <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold" style={{ background: getInitialsColor(ini(name)) }}>{ini(name)}</span>
+              <span className="text-xs font-medium text-[var(--t-0c2054)]">{name}</span>
+              <button onClick={() => onToggle(name)} className="text-[var(--t-8888a8)] hover:text-red-500"><X className="w-3 h-3" /></button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute z-20 mt-1 w-64 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl shadow-lg py-1 max-h-64 overflow-y-auto">
+            {team.length === 0 && <p className="text-xs text-[var(--t-8888a8)] px-3 py-2">Cargando equipo…</p>}
+            {team.map(m => {
+              const checked = selected.includes(m.name);
+              return (
+                <button
+                  key={m.user_id}
+                  onClick={() => onToggle(m.name)}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--s-f7f8fc)] text-left transition-colors"
+                >
+                  <input type="checkbox" checked={checked} readOnly className="w-4 h-4 rounded accent-[#0C2054] pointer-events-none" />
+                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0" style={{ background: getInitialsColor(ini(m.name)) }}>{ini(m.name)}</span>
+                  <span className="text-sm text-[var(--t-374151)] truncate">{m.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 // ── Vista consolidada por persona ───────────────────────────────────────────────
 function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData[] }) {
   if (!person) {
     return <p className="text-sm text-[var(--t-8888a8)] italic px-1">Selecciona una persona para ver sus responsabilidades.</p>;
   }
-  // Pasos de esta persona agrupados por SOP
+  // SOPs de esta persona: asignados (desplegable de miembros) + donde tiene pasos/rol
   const groups = sops.map(sop => ({
     sop,
+    assigned: (sop.members ?? []).includes(person),
     role: sop.roles.find(r => r.name === person),
     steps: sop.phases.flatMap(p => p.steps
       .filter(st => st.responsible === person)
       .map(st => ({ ...st, phaseTitle: p.title }))),
-  })).filter(g => g.steps.length > 0 || g.role);
+  })).filter(g => g.assigned || g.steps.length > 0 || g.role);
 
   const totalSteps = groups.reduce((a, g) => a + g.steps.length, 0);
 
@@ -3683,11 +3782,12 @@ function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData
       <div className="p-6 space-y-5">
         {groups.length === 0 ? (
           <p className="text-sm text-[var(--t-8888a8)] italic">Esta persona no tiene pasos asignados en los SOPs.</p>
-        ) : groups.map(({ sop, role, steps }) => (
+        ) : groups.map(({ sop, role, steps, assigned }) => (
           <div key={sop.id} className="rounded-xl border border-[var(--s-e8eaf0)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--s-f7f8fc)] border-b border-[var(--s-f0f0f0)]">
               <ClipboardList className="w-4 h-4 text-[var(--t-0c2054)]" />
               <span className="text-sm font-bold text-[var(--t-0c2054)]">{sop.name}</span>
+              {assigned && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Asignado</span>}
               {role && <span className="text-[11px] text-[var(--t-8888a8)] ml-1 truncate">· {role.desc}</span>}
             </div>
             {steps.length > 0 ? (
