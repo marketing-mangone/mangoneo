@@ -1,6 +1,6 @@
 import csv
 
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q, Avg, F, ExpressionWrapper, DurationField
 from django.http import HttpResponse
 from django.utils import timezone
 from rest_framework import viewsets, status
@@ -11,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter, SearchFilter
 
 from core.permissions import SalesAccess
-from .models import Lead, LeadActivity, LeadTask, STAGE_CHOICES
+from .models import Lead, LeadActivity, LeadTask, STAGE_CHOICES, SOURCE_CHOICES, PRACTICE_AREA_CHOICES
 from .importer import parse_and_import
 from .serializers import (
     LeadSerializer, LeadListSerializer, LeadActivitySerializer, LeadStageSerializer,
@@ -206,6 +206,36 @@ class LeadViewSet(viewsets.ModelViewSet):
         overdue = qs.exclude(stage__in=['ganado', 'perdido']).filter(
             next_followup__lt=now.date()).count()
 
+        # ── Desgloses (reporting) ──
+        def breakdown(field, choices):
+            totals = {r[field]: r['n'] for r in qs.values(field).annotate(n=Count('id'))}
+            wons = {r[field]: r['n'] for r in qs.filter(stage='ganado').values(field).annotate(n=Count('id'))}
+            return [
+                {'key': k, 'label': lbl, 'count': totals.get(k, 0), 'won': wons.get(k, 0)}
+                for k, lbl in choices if totals.get(k, 0)
+            ]
+
+        by_source = breakdown('source', SOURCE_CHOICES)
+        by_practice_area = breakdown('practice_area', PRACTICE_AREA_CHOICES)
+
+        # Por responsable
+        by_assignee = []
+        rows = (qs.filter(assigned_to__isnull=False)
+                .values('assigned_to_id', 'assigned_to__first_name', 'assigned_to__last_name', 'assigned_to__username')
+                .annotate(count=Count('id'), won=Count('id', filter=Q(stage='ganado'))))
+        for r in rows:
+            name = (f"{r['assigned_to__first_name']} {r['assigned_to__last_name']}".strip()
+                    or r['assigned_to__username'])
+            by_assignee.append({'user_id': r['assigned_to_id'], 'name': name,
+                                'count': r['count'], 'won': r['won']})
+        by_assignee.sort(key=lambda x: x['count'], reverse=True)
+
+        # Velocidad de venta: días promedio de creación → ganado
+        cycle = (qs.filter(stage='ganado', won_at__isnull=False)
+                 .annotate(dur=ExpressionWrapper(F('won_at') - F('created_at'), output_field=DurationField()))
+                 .aggregate(a=Avg('dur'))['a'])
+        avg_cycle_days = round(cycle.total_seconds() / 86400, 1) if cycle else None
+
         return Response({
             'total': total,
             'open': open_count,
@@ -218,6 +248,10 @@ class LeadViewSet(viewsets.ModelViewSet):
             'won_value': float(won_value),
             'overdue_followups': overdue,
             'funnel': funnel,
+            'by_source': by_source,
+            'by_practice_area': by_practice_area,
+            'by_assignee': by_assignee,
+            'avg_cycle_days': avg_cycle_days,
         })
 
 

@@ -116,6 +116,13 @@ export default function VentasPage() {
             <Upload className="w-4 h-4 text-[var(--t-f79c31)]" />
             Importar
           </button>
+          <Link
+            href="/ventas/reportes"
+            className="flex items-center gap-2 border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-[var(--t-374151)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--s-f9fafb)] transition-all"
+          >
+            <TrendingUp className="w-4 h-4 text-[var(--t-f79c31)]" />
+            Reportes
+          </Link>
           <button
             onClick={() => setShowAddLead(true)}
             className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"

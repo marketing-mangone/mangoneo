@@ -1263,6 +1263,10 @@ export interface VentasStats {
   won_value: number;
   overdue_followups: number;
   funnel: { stage: LeadStage; label: string; count: number; value: number }[];
+  by_source?: { key: string; label: string; count: number; won: number }[];
+  by_practice_area?: { key: string; label: string; count: number; won: number }[];
+  by_assignee?: { user_id: number; name: string; count: number; won: number }[];
+  avg_cycle_days?: number | null;
 }
 
 export const ventasApi = {

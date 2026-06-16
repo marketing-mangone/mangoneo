@@ -63,6 +63,7 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
         subItems: [
           { href: '/ventas', label: 'Pipeline', exact: true },
           { href: '/ventas/leads', label: 'Leads' },
+          { href: '/ventas/reportes', label: 'Reportes' },
         ],
       },
     ],
