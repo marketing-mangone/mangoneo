@@ -106,6 +106,12 @@ class LeadSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data['created_by'] = self.context['request'].user
+        # Automatización: asignación balanceada si llega sin responsable
+        if not validated_data.get('assigned_to'):
+            from .automations import pick_assignee
+            uid = pick_assignee()
+            if uid:
+                validated_data['assigned_to_id'] = uid
         return super().create(validated_data)
 
 
@@ -175,4 +181,7 @@ class LeadStageSerializer(serializers.Serializer):
             description=f"Etapa: {previous} → {lead.get_stage_display()}",
             created_by=request.user,
         )
+        # Automatización: tarea de seguimiento al avanzar de etapa (no terminal)
+        from .automations import auto_followup_on_stage
+        auto_followup_on_stage(lead, request.user)
         return lead

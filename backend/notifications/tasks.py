@@ -52,5 +52,22 @@ def generate_crm_reminders():
         if n:
             created += 1
 
+    # ── SLA: leads NUEVOS sin contactar pasadas 24h ──
+    sla_cutoff = now - timedelta(hours=24)
+    sla_leads = Lead.objects.filter(
+        stage='nuevo', last_contact_at__isnull=True,
+        created_at__lt=sla_cutoff, assigned_to__isnull=False,
+    ).select_related('assigned_to')
+    for lead in sla_leads:
+        n = notify(
+            lead.assigned_to, 'followup_overdue',
+            title='Lead sin contactar (SLA 24h)',
+            message=f'{lead.name} lleva más de 24h sin primer contacto.',
+            link=f'/ventas/leads/{lead.id}',
+            dedup_key=f'sla-nuevo-{lead.id}-{today_str}',
+        )
+        if n:
+            created += 1
+
     logger.info('generate_crm_reminders: %s notificaciones creadas', created)
     return created
