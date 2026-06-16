@@ -3696,17 +3696,38 @@ function SOPsTab() {
   );
 }
 
+// Normaliza nombres: sin tildes, minúsculas, sin espacios sobrantes.
+function nameNorm(s: string): string {
+  return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+// ¿El responsable de un paso/rol corresponde a esta persona del equipo?
+// Tolera tildes, mayúsculas, nombres parciales ("Jesús" → "Jesús Méndez") y
+// responsables combinados ("Andrés Coronel + Francisco Parra", "... → CX").
+function personMatches(responsible: string, person: string): boolean {
+  const a = nameNorm(responsible), b = nameNorm(person);
+  if (!a || !b) return false;
+  if (a === b) return true;
+  const ta = a.split(/\s+/).filter(Boolean);
+  const tb = b.split(/\s+/).filter(Boolean);
+  if (!ta.length || !tb.length) return false;
+  const [short, long] = ta.length <= tb.length ? [ta, tb] : [tb, ta];
+  // todos los tokens del nombre más corto aparecen en el otro (subset)
+  return short.every(t => long.includes(t));
+}
+
 // ── Vista consolidada por persona ───────────────────────────────────────────────
 function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData[] }) {
   if (!person) {
     return <p className="text-sm text-[var(--t-8888a8)] italic px-1">Selecciona una persona para ver sus responsabilidades.</p>;
   }
-  // SOPs donde la persona es responsable de algún paso (o tiene un rol)
+  // SOPs donde la persona es responsable de algún paso (o tiene un rol).
+  // Matching tolerante (tildes, nombres parciales, responsables combinados).
   const groups = sops.map(sop => ({
     sop,
-    role: sop.roles.find(r => r.name === person),
+    role: sop.roles.find(r => personMatches(r.name, person)),
     steps: sop.phases.flatMap(p => p.steps
-      .filter(st => st.responsible === person)
+      .filter(st => personMatches(st.responsible, person))
       .map(st => ({ ...st, phaseTitle: p.title }))),
   })).filter(g => g.steps.length > 0 || g.role);
 
