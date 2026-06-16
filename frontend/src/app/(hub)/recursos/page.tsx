@@ -1681,7 +1681,6 @@ interface SOPData {
   rules: string[];
   phases: SOPPhase[];
   objective?: string;   // Objetivo del proceso (se muestra en Procedimiento)
-  members?: string[];   // Miembros del equipo asignados (nombres)
 }
 
 const SOP_STORAGE_KEY = 'mangone_sops_data';
@@ -3085,12 +3084,14 @@ function getInitialsColor(initials: string): string {
 function SOPPhaseRow({
   phase,
   editing,
+  team,
   onUpdateStep,
   onAddStep,
   onRemoveStep,
 }: {
   phase: SOPPhase;
   editing: boolean;
+  team: ApiTeamMember[];
   onUpdateStep: (stepIdx: number, field: keyof SOPStep, value: string) => void;
   onAddStep: () => void;
   onRemoveStep: (stepIdx: number) => void;
@@ -3167,13 +3168,27 @@ function SOPPhaseRow({
                     </td>
                     <td className="px-4 py-2.5">
                       {editing ? (
-                        <input
+                        <select
                           value={step.responsible}
                           onChange={e => onUpdateStep(si, 'responsible', e.target.value)}
-                          className="w-full text-xs border border-[var(--s-e8e8f0)] rounded px-1.5 py-1 outline-none focus:border-[var(--s-f79c31)]"
-                        />
+                          className="w-full text-xs border border-[var(--s-e8e8f0)] rounded px-1.5 py-1 outline-none focus:border-[var(--s-f79c31)] bg-[var(--surface)] text-[var(--t-4a4a6a)]"
+                        >
+                          <option value="">— Responsable —</option>
+                          {step.responsible && !team.some(m => m.name === step.responsible) && (
+                            <option value={step.responsible}>{step.responsible}</option>
+                          )}
+                          {team.map(m => <option key={m.user_id} value={m.name}>{m.name}</option>)}
+                        </select>
+                      ) : step.responsible ? (
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] font-bold flex-shrink-0"
+                            style={{ background: getInitialsColor(step.responsible.split(' ').map(n => n[0]).join('').slice(0, 2)) }}>
+                            {step.responsible.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          </span>
+                          <span className="text-[var(--t-4a4a6a)]">{step.responsible}</span>
+                        </span>
                       ) : (
-                        <span className="text-[var(--t-4a4a6a)]">{step.responsible}</span>
+                        <span className="text-[var(--t-c0c0d0)] italic">Sin asignar</span>
                       )}
                     </td>
                     <td className="px-4 py-2.5">
@@ -3241,17 +3256,6 @@ function SOPsTab() {
   }, []);
 
   const currentSOP = sops[activeSOP] ?? null;
-
-  // Asignación de miembros: persiste de inmediato (no requiere modo edición)
-  const toggleMemberLive = (name: string) => {
-    if (!currentSOP) return;
-    const cur = currentSOP.members ?? [];
-    const next = cur.includes(name) ? cur.filter(m => m !== name) : [...cur, name];
-    const updated = sops.map((s, i) => i === activeSOP ? { ...s, members: next } : s);
-    setSOPs(updated);
-    saveSOPs(updated);
-    if (draft) setDraft({ ...draft, members: next });
-  };
 
   const startEdit = () => {
     if (!currentSOP) return;
@@ -3523,17 +3527,16 @@ function SOPsTab() {
                 )}
               </div>
 
-              {/* Miembros del equipo asignados (siempre editable, guarda al instante) */}
-              <div className="rounded-xl border border-[var(--s-e8eaf0)] bg-[var(--s-fafafa)] p-4">
-                <p className="text-xs font-bold text-[var(--t-0c2054)] uppercase tracking-wide mb-1.5">Miembros del equipo</p>
-                <MemberSelect team={team} selected={currentSOP?.members ?? []} onToggle={toggleMemberLive} />
-              </div>
+              <p className="text-[11px] text-[var(--t-9ca3af)] px-1">
+                Asigna el <strong>responsable</strong> de cada paso (al editar) — eso alimenta la vista <strong>Por persona</strong>.
+              </p>
 
               {d.phases.map((phase, pi) => (
                 <SOPPhaseRow
                   key={phase.id}
                   phase={phase}
                   editing={editing}
+                  team={team}
                   onUpdateStep={(si, field, value) => updatePhaseStep(pi, si, field, value)}
                   onAddStep={() => addStep(pi)}
                   onRemoveStep={(si) => removeStep(pi, si)}
@@ -3693,76 +3696,19 @@ function SOPsTab() {
   );
 }
 
-// ── Multi-select de miembros del equipo ─────────────────────────────────────────
-function MemberSelect({ team, selected, onToggle }: {
-  team: ApiTeamMember[]; selected: string[]; onToggle: (name: string) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ini = (name: string) => name.split(' ').map(n => n[0]).join('').slice(0, 2);
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className="flex items-center justify-between gap-2 w-full max-w-xs text-sm border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 outline-none hover:border-[var(--s-f79c31)] transition-colors bg-[var(--surface)]"
-      >
-        <span className={selected.length ? 'text-[var(--t-1a1a2e)]' : 'text-[var(--t-9ca3af)]'}>
-          {selected.length ? `${selected.length} miembro(s) seleccionado(s)` : 'Seleccionar miembros…'}
-        </span>
-        <ChevronDown className="w-4 h-4 text-[var(--t-8888a8)] flex-shrink-0" />
-      </button>
-
-      {selected.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
-          {selected.map(name => (
-            <span key={name} className="flex items-center gap-1.5 pl-1 pr-2 py-1 rounded-full bg-[var(--s-f0f2f8)] border border-[var(--s-e0e4f0)]">
-              <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold" style={{ background: getInitialsColor(ini(name)) }}>{ini(name)}</span>
-              <span className="text-xs font-medium text-[var(--t-0c2054)]">{name}</span>
-              <button onClick={() => onToggle(name)} className="text-[var(--t-8888a8)] hover:text-red-500"><X className="w-3 h-3" /></button>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {open && (
-        <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute z-20 mt-1 w-64 bg-[var(--surface)] border border-[var(--s-e8e8f0)] rounded-xl shadow-lg py-1 max-h-64 overflow-y-auto">
-            {team.length === 0 && <p className="text-xs text-[var(--t-8888a8)] px-3 py-2">Cargando equipo…</p>}
-            {team.map(m => {
-              const checked = selected.includes(m.name);
-              return (
-                <button
-                  key={m.user_id}
-                  onClick={() => onToggle(m.name)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 hover:bg-[var(--s-f7f8fc)] text-left transition-colors"
-                >
-                  <input type="checkbox" checked={checked} readOnly className="w-4 h-4 rounded accent-[#0C2054] pointer-events-none" />
-                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0" style={{ background: getInitialsColor(ini(m.name)) }}>{ini(m.name)}</span>
-                  <span className="text-sm text-[var(--t-374151)] truncate">{m.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </>
-      )}
-    </div>
-  );
-}
-
 // ── Vista consolidada por persona ───────────────────────────────────────────────
 function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData[] }) {
   if (!person) {
     return <p className="text-sm text-[var(--t-8888a8)] italic px-1">Selecciona una persona para ver sus responsabilidades.</p>;
   }
-  // SOPs de esta persona: asignados (desplegable de miembros) + donde tiene pasos/rol
+  // SOPs donde la persona es responsable de algún paso (o tiene un rol)
   const groups = sops.map(sop => ({
     sop,
-    assigned: (sop.members ?? []).includes(person),
     role: sop.roles.find(r => r.name === person),
     steps: sop.phases.flatMap(p => p.steps
       .filter(st => st.responsible === person)
       .map(st => ({ ...st, phaseTitle: p.title }))),
-  })).filter(g => g.assigned || g.steps.length > 0 || g.role);
+  })).filter(g => g.steps.length > 0 || g.role);
 
   const totalSteps = groups.reduce((a, g) => a + g.steps.length, 0);
 
@@ -3782,12 +3728,12 @@ function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData
       <div className="p-6 space-y-5">
         {groups.length === 0 ? (
           <p className="text-sm text-[var(--t-8888a8)] italic">Esta persona no tiene pasos asignados en los SOPs.</p>
-        ) : groups.map(({ sop, role, steps, assigned }) => (
+        ) : groups.map(({ sop, role, steps }) => (
           <div key={sop.id} className="rounded-xl border border-[var(--s-e8eaf0)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-2.5 bg-[var(--s-f7f8fc)] border-b border-[var(--s-f0f0f0)]">
               <ClipboardList className="w-4 h-4 text-[var(--t-0c2054)]" />
               <span className="text-sm font-bold text-[var(--t-0c2054)]">{sop.name}</span>
-              {assigned && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700">Asignado</span>}
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--s-f0f2f8)] text-[var(--t-0c2054)]">{steps.length} paso(s)</span>
               {role && <span className="text-[11px] text-[var(--t-8888a8)] ml-1 truncate">· {role.desc}</span>}
             </div>
             {steps.length > 0 ? (
