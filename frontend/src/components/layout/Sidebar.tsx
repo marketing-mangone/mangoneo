@@ -74,7 +74,7 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
       { href: '/recursos', icon: FolderOpen, label: 'Recursos', desc: 'Docs y brand' },
       { href: '/equipo', icon: Users, label: 'Equipo', desc: 'Directorio' },
       { href: '/tareas', icon: CheckSquare, label: 'Tareas', desc: 'Kanban' },
-      { href: '/calendario', icon: Calendar, label: 'Calendario', desc: 'Contenido' },
+      { href: '/calendario', icon: Calendar, label: 'Calendario y Horario', desc: 'Planificación del equipo' },
     ],
   },
 ];
