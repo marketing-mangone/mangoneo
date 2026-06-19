@@ -6,6 +6,7 @@ Roles del sistema (ver accounts.models.UserProfile.ROLE_CHOICES):
     team        — Equipo de marketing. Operación diaria.
     leadership  — Auguy + partners. Vista ejecutiva de solo lectura.
     viewer      — Otros departamentos. Solo recursos públicos.
+    guest       — Invitado externo. Solo lectura; sin acceso a documentos ni archivos.
 
 Un superusuario sin perfil se trata como 'admin'.
 """
@@ -28,6 +29,21 @@ class IsAdminRole(BasePermission):
         return get_role(request.user) == 'admin'
 
 
+class GuestReadOnly(BasePermission):
+    """
+    Los invitados (role='guest') solo pueden ejecutar métodos seguros (GET, HEAD, OPTIONS).
+    Cualquier mutación (POST, PUT, PATCH, DELETE) retorna 403.
+    Los demás roles no son afectados por esta clase — combinar con IsAuthenticated u otras.
+    """
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        role = get_role(request.user)
+        if role == 'guest' and request.method not in SAFE_METHODS:
+            return False
+        return True
+
+
 class RoleBasedAccess(BasePermission):
     """
     Base RBAC: define `read_roles` (métodos seguros) y `write_roles` (mutaciones).
@@ -48,10 +64,10 @@ class TeamModuleAccess(RoleBasedAccess):
     """
     Módulos internos del equipo (tareas, calendario, ventas).
       admin, team        → lectura y escritura (operación colaborativa)
-      leadership         → solo lectura (vista ejecutiva)
+      leadership, guest  → solo lectura (vista ejecutiva / invitado)
       viewer             → sin acceso (otros departamentos no ven operación interna)
     """
-    read_roles = {'admin', 'team', 'leadership'}
+    read_roles = {'admin', 'team', 'leadership', 'guest'}
     write_roles = {'admin', 'team'}
 
 

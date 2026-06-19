@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, BarChart3, FolderOpen, Users,
   CheckSquare, Calendar, ChevronLeft, ChevronRight,
-  LogOut, Wrench, Link2, Sun, Moon, Handshake,
+  LogOut, Wrench, Link2, Sun, Moon, Handshake, EyeOff,
 } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { auth } from '@/lib/api';
@@ -19,6 +19,7 @@ type NavItem = {
   label: string;
   desc: string;
   subItems?: SubNavItem[];
+  guestHidden?: boolean; // ocultar para usuarios con rol 'guest'
 };
 
 const NAV_MAIN: { label: string; items: NavItem[] }[] = [
@@ -71,7 +72,7 @@ const NAV_MAIN: { label: string; items: NavItem[] }[] = [
   {
     label: 'Gestión',
     items: [
-      { href: '/recursos', icon: FolderOpen, label: 'Recursos', desc: 'Docs y brand' },
+      { href: '/recursos', icon: FolderOpen, label: 'Recursos', desc: 'Docs y brand', guestHidden: true },
       { href: '/equipo', icon: Users, label: 'Equipo', desc: 'Directorio' },
       { href: '/tareas', icon: CheckSquare, label: 'Tareas', desc: 'Kanban' },
       { href: '/calendario', icon: Calendar, label: 'Calendario y Horario', desc: 'Planificación del equipo' },
@@ -190,16 +191,19 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
   const displayName = currentUser?.name || currentUser?.username || 'Usuario';
   const initials = displayName.split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
   const isAdmin = currentUser?.role === 'admin';
-  const roleLabel = isAdmin ? 'Admin' : currentUser?.role || '';
+  const isGuest = currentUser?.role === 'guest';
+  const roleLabel = isAdmin ? 'Admin' : isGuest ? 'Invitado' : currentUser?.role || '';
 
-  // NAV filtrado por rol: oculta sub-items adminOnly a quienes no son admin
+  // NAV filtrado por rol: oculta adminOnly a no-admins y guestHidden a invitados
   const navMain = NAV_MAIN.map(group => ({
     ...group,
-    items: group.items.map(item =>
-      item.subItems
-        ? { ...item, subItems: item.subItems.filter(s => !s.adminOnly || isAdmin) }
-        : item
-    ),
+    items: group.items
+      .filter(item => !(item.guestHidden && isGuest))
+      .map(item =>
+        item.subItems
+          ? { ...item, subItems: item.subItems.filter(s => !s.adminOnly || isAdmin) }
+          : item
+      ),
   }));
 
   // Close flyout on route change
@@ -377,6 +381,14 @@ export function Sidebar({ unreadCount = 0 }: { unreadCount?: number }) {
               </span>
             )}
           </button>
+
+          {/* Badge modo invitado */}
+          {isGuest && !collapsed && (
+            <div className="mx-1 mb-1 flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20">
+              <EyeOff style={{ width: 13, height: 13 }} className="text-amber-400 flex-shrink-0" />
+              <span className="text-[11px] font-semibold text-amber-300 leading-tight">Solo lectura · Sin archivos</span>
+            </div>
+          )}
 
           {/* User → perfil + logout */}
           <div className={cn(

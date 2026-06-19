@@ -30,6 +30,7 @@ const ROLES = [
   { value: 'team',       label: 'Team' },
   { value: 'leadership', label: 'Leadership' },
   { value: 'viewer',     label: 'Viewer' },
+  { value: 'guest',      label: 'Invitado' },
 ];
 
 function avatarColor(initials: string) {

@@ -7,7 +7,7 @@ import {
   Calendar, MoreVertical, X, Loader2, Trash2, Pencil, CheckSquare,
   GanttChart, ChevronLeft, ChevronRight,
 } from 'lucide-react';
-import { tasksApi, teamApi, ApiTask, ApiTeamMember } from '@/lib/api';
+import { tasksApi, teamApi, auth, ApiTask, ApiTeamMember } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 
 // ── Config ────────────────────────────────────────────────────────────────────
@@ -853,6 +853,8 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
 // ── Página principal ──────────────────────────────────────────────────────────
 
 export default function TareasPage() {
+  const isGuest = typeof window !== 'undefined' && auth.getCurrentUser()?.role === 'guest';
+
   const [tasks,        setTasks]        = useState<ApiTask[]>([]);
   const [loading,      setLoading]      = useState(true);
   const [view,         setView]         = useState<'kanban' | 'list' | 'roadmap'>('kanban');
@@ -946,13 +948,15 @@ export default function TareasPage() {
         title="Tareas"
         subtitle="Gestión de actividades del departamento de marketing"
         actions={
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Nueva tarea
-          </button>
+          !isGuest ? (
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Nueva tarea
+            </button>
+          ) : undefined
         }
       />
 

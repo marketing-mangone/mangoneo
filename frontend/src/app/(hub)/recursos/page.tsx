@@ -13,7 +13,7 @@ import {
   ClipboardList, ChevronDown, ChevronRight, Shield, Wrench,
   Link2, ExternalLink, Globe,
 } from 'lucide-react';
-import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar, teamApi, type ApiTeamMember } from '@/lib/api';
+import { documentsApi, ApiDocument, avatarsApi, ApiCustomerAvatar, teamApi, auth, type ApiTeamMember } from '@/lib/api';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -3782,6 +3782,9 @@ function PersonaSOPView({ person, sops }: { person: string | null; sops: SOPData
 // ── Main Page ─────────────────────────────────────────────────────────────────
 
 export default function RecursosPage() {
+  const currentUser = typeof window !== 'undefined' ? auth.getCurrentUser() : null;
+  const isGuest = currentUser?.role === 'guest';
+
   const [activeTab, setActiveTab] = useState<'docs' | 'brand' | 'avatar' | 'brainstorming' | 'sops' | 'links'>('docs');
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
@@ -3872,6 +3875,26 @@ export default function RecursosPage() {
   const totalActive = docs.filter(d => d.status === 'active').length;
   const totalJD = docs.filter(d => d.category === 'jd').length;
   const totalSOP = docs.filter(d => d.category === 'sop').length;
+
+  // Invitados no tienen acceso a Recursos
+  if (isGuest) {
+    return (
+      <div className="animate-fade-in">
+        <Header title="Recursos" subtitle="Documentos, brand assets y manual de marca" />
+        <div className="flex items-center justify-center" style={{ minHeight: '60vh' }}>
+          <div className="text-center max-w-sm px-8">
+            <div className="w-16 h-16 rounded-2xl bg-[var(--s-f7f8fc)] border border-[var(--s-e8e8f0)] flex items-center justify-center mx-auto mb-5">
+              <Shield className="w-8 h-8 text-[var(--t-8888a8)]" />
+            </div>
+            <h2 className="text-lg font-bold text-[var(--t-1a1a2e)] mb-2">Acceso restringido</h2>
+            <p className="text-sm text-[var(--t-8888a8)] leading-relaxed">
+              Los usuarios invitados no tienen acceso a documentos, archivos ni recursos del Hub. Contacta a un administrador para solicitar acceso.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-fade-in">

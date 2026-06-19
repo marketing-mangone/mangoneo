@@ -5,7 +5,7 @@ import {
   Plus, RefreshCw, Handshake, TrendingUp, DollarSign,
   Trophy, AlertTriangle, List, Upload,
 } from 'lucide-react';
-import { ventasApi, type ApiLeadList, type VentasStats, type LeadStage } from '@/lib/api';
+import { ventasApi, auth, type ApiLeadList, type VentasStats, type LeadStage } from '@/lib/api';
 import { LeadCard } from '@/components/modules/ventas/LeadCard';
 import { LeadModal } from '@/components/modules/ventas/LeadModal';
 import { ImportLeadsModal } from '@/components/modules/ventas/ImportLeadsModal';
@@ -13,6 +13,8 @@ import { TasksPanel } from '@/components/modules/ventas/TasksPanel';
 import { PIPELINE_STAGES, STAGE_COLORS, formatMoney } from '@/components/modules/ventas/constants';
 
 export default function VentasPage() {
+  const isGuest = typeof window !== 'undefined' && auth.getCurrentUser()?.role === 'guest';
+
   const [leads, setLeads] = useState<ApiLeadList[]>([]);
   const [stats, setStats] = useState<VentasStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -109,13 +111,15 @@ export default function VentasPage() {
             <List className="w-4 h-4 text-[var(--t-f79c31)]" />
             Ver todos los leads
           </Link>
-          <button
-            onClick={() => setShowImport(true)}
-            className="flex items-center gap-2 border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-[var(--t-374151)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--s-f9fafb)] transition-all"
-          >
-            <Upload className="w-4 h-4 text-[var(--t-f79c31)]" />
-            Importar
-          </button>
+          {!isGuest && (
+            <button
+              onClick={() => setShowImport(true)}
+              className="flex items-center gap-2 border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-[var(--t-374151)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--s-f9fafb)] transition-all"
+            >
+              <Upload className="w-4 h-4 text-[var(--t-f79c31)]" />
+              Importar
+            </button>
+          )}
           <Link
             href="/ventas/reportes"
             className="flex items-center gap-2 border border-[var(--s-e5e7eb)] bg-[var(--surface)] text-[var(--t-374151)] px-4 py-2 rounded-xl text-sm font-medium hover:bg-[var(--s-f9fafb)] transition-all"
@@ -123,13 +127,15 @@ export default function VentasPage() {
             <TrendingUp className="w-4 h-4 text-[var(--t-f79c31)]" />
             Reportes
           </Link>
-          <button
-            onClick={() => setShowAddLead(true)}
-            className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"
-          >
-            <Plus className="w-4 h-4" />
-            Nuevo lead
-          </button>
+          {!isGuest && (
+            <button
+              onClick={() => setShowAddLead(true)}
+              className="flex items-center gap-2 bg-[var(--s-0c2054)] text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-[var(--s-1a3a7a)] transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              Nuevo lead
+            </button>
+          )}
         </div>
       </div>
 

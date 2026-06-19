@@ -14,6 +14,7 @@ from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from core.permissions import GuestReadOnly
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from .models import Document
@@ -52,7 +53,7 @@ def _ext_to_type(filename: str) -> str:
 class DocumentViewSet(viewsets.ModelViewSet):
     queryset = Document.objects.select_related('uploaded_by').all()
     serializer_class = DocumentSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, GuestReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'file_name']
     ordering_fields = ['created_at', 'updated_at', 'title', 'file_size']
@@ -60,8 +61,11 @@ class DocumentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # Enforce visibility: only admin/leadership can see leadership-only docs
         role = getattr(getattr(self.request.user, 'profile', None), 'role', None)
+        # Guests cannot access any documents
+        if role == 'guest':
+            return qs.none()
+        # Enforce visibility: only admin/leadership can see leadership-only docs
         if role not in ('admin', 'leadership'):
             qs = qs.filter(visibility__in=['team', 'all'])
         category = self.request.query_params.get('category')

@@ -7,7 +7,7 @@ import {
   Globe, Mic, Play, X, Loader2, Trash2, AlertCircle,
   Clock, Users,
 } from 'lucide-react';
-import { calendarApi, ApiCalendarEvent } from '@/lib/api';
+import { calendarApi, auth, ApiCalendarEvent } from '@/lib/api';
 
 const DAYS   = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -313,7 +313,7 @@ function AddScheduleModal({ prefillDay, prefillHour, onClose, onAdd }: {
 
 // ── Horario Tab ────────────────────────────────────────────────────────────────
 
-function HorarioTab() {
+function HorarioTab({ isGuest = false }: { isGuest?: boolean }) {
   const [blocks,        setBlocks]        = useState<ScheduleBlock[]>([]);
   const [hiddenMembers, setHiddenMembers] = useState<Set<string>>(new Set());
   const [addModal,      setAddModal]      = useState<{ day?: number; hour?: number } | null>(null);
@@ -389,12 +389,14 @@ function HorarioTab() {
               </button>
             );
           })}
-          <button
-            onClick={() => setAddModal({})}
-            className="ml-auto flex items-center gap-1.5 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-[var(--s-e08a20)] transition-colors shadow-sm">
-            <Plus className="w-3.5 h-3.5" />
-            Agregar turno
-          </button>
+          {!isGuest && (
+            <button
+              onClick={() => setAddModal({})}
+              className="ml-auto flex items-center gap-1.5 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-[var(--s-e08a20)] transition-colors shadow-sm">
+              <Plus className="w-3.5 h-3.5" />
+              Agregar turno
+            </button>
+          )}
         </div>
       </Card>
 
@@ -495,6 +497,9 @@ export default function CalendarioPage() {
   const today    = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
 
+  const currentUser = typeof window !== 'undefined' ? auth.getCurrentUser() : null;
+  const isGuest = currentUser?.role === 'guest';
+
   const [activeTab,    setActiveTab]    = useState<'calendario' | 'horario'>('calendario');
   const [currentDate,  setCurrentDate]  = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState<string>(todayStr);
@@ -567,7 +572,7 @@ export default function CalendarioPage() {
         title="Calendario y Horario"
         subtitle="Planificación de contenido y disponibilidad del equipo"
         actions={
-          activeTab === 'calendario' ? (
+          activeTab === 'calendario' && !isGuest ? (
             <button onClick={() => setAddOpen(true)}
               className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm">
               <Plus className="w-3.5 h-3.5" />
@@ -785,7 +790,7 @@ export default function CalendarioPage() {
           </>
         )}
 
-        {activeTab === 'horario' && <HorarioTab />}
+        {activeTab === 'horario' && <HorarioTab isGuest={isGuest} />}
       </div>
     </div>
   );
