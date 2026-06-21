@@ -50,15 +50,57 @@ const TEAM = [
   { id: 'sebas',     name: 'Sebas',     role: 'Director',  color: '#0c2054', initial: 'S' },
 ];
 
-const GRID_HOURS  = Array.from({ length: 13 }, (_, i) => i + 7); // 7:00–19:00
+const GRID_HOURS  = Array.from({ length: 15 }, (_, i) => i + 7); // 7:00–21:00
 const SCHED_DAYS  = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 const STORAGE_KEY = 'mangone_horario_v1';
 
+const DEFAULT_BLOCKS: ScheduleBlock[] = [
+  // Andrés — Lun a Vie 8:30am–5:30pm
+  { id: 'd-and-0', memberId: 'andres', dayOfWeek: 0, startHour: 8, endHour: 18, note: '8:30am–5:30pm · Almuerzo ~2pm' },
+  { id: 'd-and-1', memberId: 'andres', dayOfWeek: 1, startHour: 8, endHour: 18, note: '8:30am–5:30pm · Almuerzo ~2pm' },
+  { id: 'd-and-2', memberId: 'andres', dayOfWeek: 2, startHour: 8, endHour: 18, note: '8:30am–5:30pm · Almuerzo ~2pm' },
+  { id: 'd-and-3', memberId: 'andres', dayOfWeek: 3, startHour: 8, endHour: 18, note: '8:30am–5:30pm · Almuerzo ~2pm' },
+  { id: 'd-and-4', memberId: 'andres', dayOfWeek: 4, startHour: 8, endHour: 18, note: '8:30am–5:30pm · Almuerzo ~2pm' },
+  // Andrés — Sáb mañana ~4h
+  { id: 'd-and-5', memberId: 'andres', dayOfWeek: 5, startHour: 8, endHour: 12, note: 'Disponible mañana ~4h' },
+  // Alejandra — Lun/Mié/Vie 9am–5pm
+  { id: 'd-ale-0', memberId: 'alejandra', dayOfWeek: 0, startHour: 9, endHour: 17 },
+  { id: 'd-ale-2', memberId: 'alejandra', dayOfWeek: 2, startHour: 9, endHour: 17 },
+  { id: 'd-ale-4', memberId: 'alejandra', dayOfWeek: 4, startHour: 9, endHour: 17 },
+  // Alejandra — Mar/Jue hasta 9pm
+  { id: 'd-ale-1', memberId: 'alejandra', dayOfWeek: 1, startHour: 9, endHour: 21, note: 'Hasta 9pm' },
+  { id: 'd-ale-3', memberId: 'alejandra', dayOfWeek: 3, startHour: 9, endHour: 21, note: 'Hasta 9pm' },
+  // Gloriana — Lun a Vie 12pm–9pm
+  { id: 'd-glo-0', memberId: 'gloriana', dayOfWeek: 0, startHour: 12, endHour: 21 },
+  { id: 'd-glo-1', memberId: 'gloriana', dayOfWeek: 1, startHour: 12, endHour: 21 },
+  { id: 'd-glo-2', memberId: 'gloriana', dayOfWeek: 2, startHour: 12, endHour: 21 },
+  { id: 'd-glo-3', memberId: 'gloriana', dayOfWeek: 3, startHour: 12, endHour: 21 },
+  { id: 'd-glo-4', memberId: 'gloriana', dayOfWeek: 4, startHour: 12, endHour: 21 },
+  // Sebas — Lun a Vie 8am–12pm y 1pm–5pm (almuerzo 12–1)
+  { id: 'd-seb-0a', memberId: 'sebas', dayOfWeek: 0, startHour: 8, endHour: 12 },
+  { id: 'd-seb-0b', memberId: 'sebas', dayOfWeek: 0, startHour: 13, endHour: 17 },
+  { id: 'd-seb-1a', memberId: 'sebas', dayOfWeek: 1, startHour: 8, endHour: 12 },
+  { id: 'd-seb-1b', memberId: 'sebas', dayOfWeek: 1, startHour: 13, endHour: 17 },
+  { id: 'd-seb-2a', memberId: 'sebas', dayOfWeek: 2, startHour: 8, endHour: 12 },
+  { id: 'd-seb-2b', memberId: 'sebas', dayOfWeek: 2, startHour: 13, endHour: 17 },
+  { id: 'd-seb-3a', memberId: 'sebas', dayOfWeek: 3, startHour: 8, endHour: 12 },
+  { id: 'd-seb-3b', memberId: 'sebas', dayOfWeek: 3, startHour: 13, endHour: 17 },
+  { id: 'd-seb-4a', memberId: 'sebas', dayOfWeek: 4, startHour: 8, endHour: 12 },
+  { id: 'd-seb-4b', memberId: 'sebas', dayOfWeek: 4, startHour: 13, endHour: 17 },
+  // Sebas — Sáb y Dom 4pm–6pm
+  { id: 'd-seb-5', memberId: 'sebas', dayOfWeek: 5, startHour: 16, endHour: 18 },
+  { id: 'd-seb-6', memberId: 'sebas', dayOfWeek: 6, startHour: 16, endHour: 18 },
+];
+
 function loadBlocks(): ScheduleBlock[] {
   if (typeof window === 'undefined') return [];
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]') as ScheduleBlock[]; }
-  catch { return []; }
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === null) return DEFAULT_BLOCKS;
+    return JSON.parse(stored) as ScheduleBlock[];
+  }
+  catch { return DEFAULT_BLOCKS; }
 }
 function saveBlocks(b: ScheduleBlock[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(b));
@@ -265,7 +307,7 @@ function AddScheduleModal({ prefillDay, prefillHour, onClose, onAdd }: {
               <label className="block text-xs font-semibold text-[var(--t-4a4a6a)] mb-1.5">Hasta</label>
               <select value={endHour} onChange={e => setEndHour(+e.target.value)}
                 className="w-full px-3 py-2.5 text-sm border border-[var(--s-e8e8f0)] rounded-lg outline-none focus:border-[var(--s-f79c31)] bg-[var(--surface)] transition-colors">
-                {Array.from({ length: 20 - startHour }, (_, i) => startHour + 1 + i).map(h => (
+                {Array.from({ length: 22 - startHour }, (_, i) => startHour + 1 + i).map(h => (
                   <option key={h} value={h}>{String(h).padStart(2, '0')}:00</option>
                 ))}
               </select>
