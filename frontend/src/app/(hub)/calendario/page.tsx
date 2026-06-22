@@ -53,7 +53,7 @@ const TEAM = [
 const GRID_HOURS  = Array.from({ length: 15 }, (_, i) => i + 7); // 7:00–21:00
 const SCHED_DAYS  = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-const STORAGE_KEY = 'mangone_horario_v1';
+const STORAGE_KEY = 'mangone_horario_v2';
 
 const DEFAULT_BLOCKS: ScheduleBlock[] = [
   // Andrés — Lun a Vie 8:30am–5:30pm
