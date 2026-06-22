@@ -53,7 +53,7 @@ const TEAM = [
 const GRID_HOURS  = Array.from({ length: 15 }, (_, i) => i + 7); // 7:00–21:00
 const SCHED_DAYS  = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-const STORAGE_KEY = 'mangone_horario_v2';
+const STORAGE_KEY = 'mangone_horario_v3';
 
 const DEFAULT_BLOCKS: ScheduleBlock[] = [
   // Andrés — Lun a Vie 8:30am–5:30pm
@@ -71,6 +71,14 @@ const DEFAULT_BLOCKS: ScheduleBlock[] = [
   // Alejandra — Mar/Jue hasta 9pm
   { id: 'd-ale-1', memberId: 'alejandra', dayOfWeek: 1, startHour: 9, endHour: 21, note: 'Hasta 9pm' },
   { id: 'd-ale-3', memberId: 'alejandra', dayOfWeek: 3, startHour: 9, endHour: 21, note: 'Hasta 9pm' },
+  // Sara — Lun a Vie 7:30am–6pm + sáb/dom mañana 8am–1pm
+  { id: 'd-sar-0', memberId: 'sara', dayOfWeek: 0, startHour: 7, endHour: 18, note: '7:30am–6pm' },
+  { id: 'd-sar-1', memberId: 'sara', dayOfWeek: 1, startHour: 7, endHour: 18, note: '7:30am–6pm' },
+  { id: 'd-sar-2', memberId: 'sara', dayOfWeek: 2, startHour: 7, endHour: 18, note: '7:30am–6pm' },
+  { id: 'd-sar-3', memberId: 'sara', dayOfWeek: 3, startHour: 7, endHour: 18, note: '7:30am–6pm' },
+  { id: 'd-sar-4', memberId: 'sara', dayOfWeek: 4, startHour: 7, endHour: 18, note: '7:30am–6pm' },
+  { id: 'd-sar-5', memberId: 'sara', dayOfWeek: 5, startHour: 8, endHour: 13 },
+  { id: 'd-sar-6', memberId: 'sara', dayOfWeek: 6, startHour: 8, endHour: 13 },
   // Gloriana — Lun a Vie 12pm–9pm
   { id: 'd-glo-0', memberId: 'gloriana', dayOfWeek: 0, startHour: 12, endHour: 21 },
   { id: 'd-glo-1', memberId: 'gloriana', dayOfWeek: 1, startHour: 12, endHour: 21 },
