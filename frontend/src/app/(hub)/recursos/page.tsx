@@ -1683,12 +1683,13 @@ interface SOPData {
   objective?: string;   // Objetivo del proceso (se muestra en Procedimiento)
 }
 
-const SOP_STORAGE_KEY = 'mangone_sops_data';
+const SOP_STORAGE_KEY = 'mangone_sops_data_v2';
 
 const INITIAL_SOPS_DATA: SOPData[] = [
   {
     "id": "contenido",
     "name": "Contenido",
+    "objective": "Ejecutar de forma consistente la estrategia de contenido digital de Mangone Law Firm, garantizando presencia activa en todas las plataformas, cumplimiento legal en cada publicación y alineación permanente con la identidad de marca.",
     "roles": [
       {
         "initials": "AA",
@@ -1713,12 +1714,17 @@ const INITIAL_SOPS_DATA: SOPData[] = [
     ],
     "tools": [
       "Gemini — Captions y copys",
+      "Claude — Generación de parrilla semanal y reportes automatizados",
       "Canva — Diseño de piezas gráficas",
+      "Google Sheets — Planificación editorial y registro de publicaciones",
       "Dropbox — Almacenamiento de assets",
       "Meta Business Suite — Programación IG/FB",
       "TikTok — Carga manual",
       "YouTube Studio — Carga manual",
-      "LinkedIn — Carga manual"
+      "LinkedIn — Carga manual",
+      "Google Business Profile — Publicación en perfil local de la firma",
+      "Spotify for Podcasters — Distribución del podcast",
+      "Apple Podcasts — Distribución del podcast"
     ],
     "rules": [
       "Prohibido usar la palabra \"especialistas\" (restricción ética legal)",
@@ -1982,11 +1988,17 @@ const INITIAL_SOPS_DATA: SOPData[] = [
   {
     "id": "webseo",
     "name": "Web & SEO",
+    "objective": "Garantizar el posicionamiento orgánico y el rendimiento técnico del sitio web de Mangone Law Firm, mediante optimización SEO continua, publicación de contenido de calidad y análisis periódico del tráfico y las conversiones.",
     "roles": [
       {
         "initials": "AC",
         "name": "Andrés Coronel",
         "desc": "Desarrollador Web / SEO — Único acceso a Framer. Construcción, optimización, blogs, landings, tracking y reportes"
+      },
+      {
+        "initials": "AM",
+        "name": "Auguy Mangone Esq.",
+        "desc": "Revisión y aprobación legal del copy antes de publicar cualquier página o landing"
       },
       {
         "initials": "FP",
@@ -2001,13 +2013,18 @@ const INITIAL_SOPS_DATA: SOPData[] = [
     ],
     "tools": [
       "Framer — CMS y desarrollo web (acceso exclusivo: Andrés)",
-      "Alli AI — Optimización SEO continua",
-      "Google Search Console — Indexación y rendimiento orgánico",
-      "Google Analytics — Tráfico y comportamiento",
-      "Google Ads — Campañas vinculadas a landings",
+      "Alli AI — Optimización SEO continua y auditoría",
+      "Google Search Console (GSC) — Indexación y rendimiento orgánico",
+      "Google Analytics 4 (GA4) — Tráfico y comportamiento (ID: G-NW7BHW4EXG)",
+      "Google Ads — Campañas vinculadas a landings (ID: AW-16457343674)",
       "HubSpot — Tracking de eventos e interacciones",
-      "Google PageSpeed — Auditoría técnica",
-      "IA (generación de blogs) — Redacción de contenido SEO"
+      "GTM — Gestión de etiquetas (ID: GTM-PQZ22C3J)",
+      "Ahrefs — Investigación de keywords y backlinks",
+      "Screaming Frog — Auditoría técnica de rastreo",
+      "PageSpeed Insights — Velocidad y Core Web Vitals",
+      "Adobe Photoshop — Optimización de imágenes",
+      "Claude AI — Redacción de blogs y copy SEO",
+      "Google Docs — Revisión y edición de contenido"
     ],
     "rules": [
       "Solo Andrés Coronel tiene acceso a Framer — ningún otro miembro del equipo modifica el sitio",
@@ -2030,7 +2047,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "1.1",
             "action": "Recibir requerimiento de página nueva (C-Level o marketing) y documentarlo",
             "responsible": "Sebastián Quijada",
-            "tool": ""
+            "tool": "Slack / Marketing Hub"
           },
           {
             "num": "1.2",
@@ -2042,25 +2059,25 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "1.3",
             "action": "Investigar keywords objetivo y definir estructura SEO de la página",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Alli AI / Ahrefs"
           },
           {
             "num": "1.4",
             "action": "Redactar copy de la página (títulos, cuerpo, CTAs) alineado a keywords y lineamientos de marca",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Claude AI / Google Docs"
           },
           {
             "num": "1.5",
             "action": "Construir la página en Framer integrando copy, assets y estructura SEO",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer"
           },
           {
             "num": "1.6",
             "action": "Configurar tracking de HubSpot en páginas con formularios o interacciones",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "HubSpot / GTM / GA4"
           },
           {
             "num": "1.7",
@@ -2072,7 +2089,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "1.8",
             "action": "Publicar página y verificar indexación en Google Search Console",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer / GSC"
           }
         ]
       },
@@ -2086,37 +2103,37 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "2.1",
             "action": "Identificar keywords con potencial de posicionamiento para los 2 blogs de la semana",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Alli AI / GSC"
           },
           {
             "num": "2.2",
             "action": "Generar artículo con IA usando keyword objetivo, estructura H1-H3 y longitud adecuada",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Claude AI"
           },
           {
             "num": "2.3",
             "action": "Revisar y editar el artículo: precisión legal, tono de marca, cumplimiento y calidad",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Google Docs"
           },
           {
             "num": "2.4",
             "action": "Publicar el blog en Framer con metadatos SEO (título, meta descripción, slug, imagen)",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer"
           },
           {
             "num": "2.5",
             "action": "Verificar indexación del artículo en Google Search Console",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "GSC"
           },
           {
             "num": "2.6",
             "action": "Monitorear posicionamiento del artículo a 30-60-90 días",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Alli AI / GSC"
           }
         ]
       },
@@ -2130,31 +2147,31 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "3.1",
             "action": "Revisar oportunidades de mejora SEO en páginas existentes (keywords, estructura, contenido)",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Alli AI / GSC"
           },
           {
             "num": "3.2",
             "action": "Optimizar títulos, meta descripciones y headers (H1-H3) según oportunidades detectadas",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer / Alli AI"
           },
           {
             "num": "3.3",
             "action": "Optimizar imágenes: alt text, compresión y nombres de archivo descriptivos",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer / Adobe Photoshop"
           },
           {
             "num": "3.4",
             "action": "Revisar y actualizar enlaces internos entre páginas y blogs",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer"
           },
           {
             "num": "3.5",
             "action": "Monitorear backlinks y buscar oportunidades de link building",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Ahrefs / GSC"
           }
         ]
       },
@@ -2168,37 +2185,37 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "4.1",
             "action": "Auditar velocidad de carga y Core Web Vitals",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "PageSpeed Insights"
           },
           {
             "num": "4.2",
             "action": "Verificar indexación correcta de todas las páginas activas",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "GSC"
           },
           {
             "num": "4.3",
             "action": "Detectar y corregir errores de rastreo, enlaces rotos y redirecciones",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Screaming Frog / GSC"
           },
           {
             "num": "4.4",
             "action": "Revisar y actualizar sitemap y robots.txt si hay cambios en la estructura del sitio",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer / GSC"
           },
           {
             "num": "4.5",
             "action": "Auditar integraciones activas: pixels, HubSpot tracking, Google Tags",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "GTM Preview / GA4"
           },
           {
             "num": "4.6",
             "action": "Presentar hallazgos y plan de corrección a Sebastián Quijada",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Slack / Marketing Hub"
           }
         ]
       },
@@ -2212,25 +2229,25 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "5.1",
             "action": "Definir estrategia de la campaña y objetivo de conversión de la landing (consulta, formulario, llamada)",
             "responsible": "Andrés Coronel + Francisco Parra",
-            "tool": ""
+            "tool": "Google Ads / HubSpot"
           },
           {
             "num": "5.2",
             "action": "Redactar y construir la landing en Framer optimizada para conversión",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Framer"
           },
           {
             "num": "5.3",
             "action": "Configurar tracking de HubSpot y pixel de conversión de Google Ads",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "GTM / GA4 / HubSpot"
           },
           {
             "num": "5.4",
             "action": "Verificar que el pixel de conversión dispara correctamente antes de activar campaña",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "GTM Preview"
           },
           {
             "num": "5.5",
@@ -2242,7 +2259,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "5.6",
             "action": "Monitorear rendimiento: tasa de conversión, CPL, bounce rate y ajustar según resultados",
             "responsible": "Andrés Coronel + Francisco Parra",
-            "tool": ""
+            "tool": "GA4 / Google Ads"
           }
         ]
       },
@@ -2256,25 +2273,25 @@ const INITIAL_SOPS_DATA: SOPData[] = [
             "num": "6.1",
             "action": "Extraer métricas semanales: tráfico, fuentes, páginas top, keywords posicionados, CTR",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "GA4 / GSC"
           },
           {
             "num": "6.2",
             "action": "Extraer rendimiento de landing pages: conversiones, CPL, bounce rate",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "GA4 / Google Ads"
           },
           {
             "num": "6.3",
             "action": "Compartir métricas con Sebastián Quijada para análisis conjunto",
             "responsible": "Andrés Coronel",
-            "tool": ""
+            "tool": "Slack"
           },
           {
             "num": "6.4",
             "action": "Definir ajustes y tareas accionables para la semana siguiente",
             "responsible": "Andrés Coronel + Sebastián Quijada",
-            "tool": ""
+            "tool": "Slack / Marketing Hub"
           }
         ]
       }
@@ -2283,6 +2300,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
   {
     "id": "analitica",
     "name": "Analítica",
+    "objective": "Consolidar y analizar las métricas de marketing digital del departamento para tomar decisiones informadas que mejoren el rendimiento general, el retorno de inversión y la cadencia de contenido.",
     "roles": [
       {
         "initials": "SQ",
@@ -2453,6 +2471,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
   {
     "id": "email",
     "name": "Email Marketing",
+    "objective": "Gestionar las campañas de email marketing de la firma con precisión técnica, segmentación correcta y cumplimiento legal, maximizando el engagement y las conversiones de los contactos.",
     "roles": [
       {
         "initials": "SQ",
@@ -2460,7 +2479,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
         "desc": "Director de Marketing — Estrategia, creación de campañas, grilla de newsletters, definición de segmentos"
       },
       {
-        "initials": "J",
+        "initials": "JE",
         "name": "Jesús",
         "desc": "Administración técnica — Gestión técnica de listas, segmentos y configuración en HubSpot"
       }
@@ -2687,6 +2706,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
   {
     "id": "reputacion",
     "name": "Reputación",
+    "objective": "Mantener y fortalecer la reputación online de Mangone Law Firm mediante la gestión proactiva de reseñas en Google Business Profile, respuesta oportuna a reviews y escalamiento correcto de situaciones problemáticas.",
     "roles": [
       {
         "initials": "SQ",
@@ -2854,6 +2874,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
   {
     "id": "requerimientos",
     "name": "Requerimientos",
+    "objective": "Gestionar eficientemente todos los requerimientos de marketing internos y externos, garantizando calidad, cumplimiento de lineamientos de marca y tiempos de entrega acordados.",
     "roles": [
       {
         "initials": "SQ",
@@ -3053,6 +3074,762 @@ const INITIAL_SOPS_DATA: SOPData[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "gloriana",
+    "name": "Creadora de Contenido",
+    "objective": "Construir y afianzar la conexión entre Mangone Law Firm y su audiencia de manera real, cálida y orgánica a través de contenido que guíe a los usuarios hacia la adquisición de los servicios de la firma.",
+    "roles": [
+      {
+        "initials": "GL",
+        "name": "Gloriana López",
+        "desc": "Creadora de Contenido — Grabación, edición y entrega de videos informativos y compartibles según la planificación semanal"
+      },
+      {
+        "initials": "AA",
+        "name": "Alejandra Andrade",
+        "desc": "Community Manager — Entrega la planificación y los temas semanales que Gloriana ejecuta"
+      },
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Supervisor directo — Escalamiento ante excepciones y requerimientos extraordinarios"
+      }
+    ],
+    "tools": [
+      "Canva Pro — Edición de videos informativos, textos en video y piezas visuales",
+      "Slack (#contenido) — Canal de entrega de archivos finales con título",
+      "TikTok — Referencia de trends virales, audios y contenido compartible",
+      "Cuentas de Mangone — Referencia de videos e información para contenido de Visa T"
+    ],
+    "rules": [
+      "La prioridad de grabación siempre es: 1) Planificación del CM → 2) Eventos de Consulta (CD) → 3) Contenido extra",
+      "Los videos informativos deben editarse en Canva y entregarse en Slack #contenido con título en cada archivo",
+      "Los videos compartibles de TikTok deben incluir textos añadidos antes de su entrega",
+      "El contenido sobre Visa T debe basarse en cuentas oficiales de Mangone y referencias validadas como @inmigraciontv",
+      "El trabajo de fin de semana es eventual, no es una obligación fija",
+      "Ante cualquier excepción que impida ejecutar el proceso, notificar al supervisor directo de inmediato"
+    ],
+    "phases": [
+      {
+        "id": "gl-p1",
+        "num": "1",
+        "title": "Lunes — Investigación y Organización",
+        "subtitle": "Gloriana López — Investigación de trends y organización semanal",
+        "steps": [
+          {
+            "num": "1.1",
+            "action": "Buscar ideas y referencias para el contenido compartible de la semana en TikTok usando términos como \"humor de inmigrantes\", \"latinos en USA\", \"psicología y marketing\" y \"marketing humor\"",
+            "responsible": "Gloriana López",
+            "tool": "TikTok"
+          },
+          {
+            "num": "1.2",
+            "action": "Identificar audios virales de TikTok que puedan usarse para el contenido compartible de la semana",
+            "responsible": "Gloriana López",
+            "tool": "TikTok"
+          },
+          {
+            "num": "1.3",
+            "action": "Revisar contenido reciente de cuentas de referencia: @inmigraciontv, @abogadalatina, @immigration_attorney_moumita para identificar trends y formatos relevantes",
+            "responsible": "Gloriana López",
+            "tool": "TikTok"
+          },
+          {
+            "num": "1.4",
+            "action": "Organizar el contenido próximo a grabar según la planificación entregada por el Community Manager",
+            "responsible": "Gloriana López",
+            "tool": "Slack (#contenido)"
+          }
+        ]
+      },
+      {
+        "id": "gl-p2",
+        "num": "2",
+        "title": "Martes — Día de Grabación (Prioridad 1)",
+        "subtitle": "Gloriana López — Grabación de planificación CM y Eventos de Consulta",
+        "steps": [
+          {
+            "num": "2.1",
+            "action": "Grabar el contenido según la planificación del Community Manager — esta es la prioridad principal del día",
+            "responsible": "Gloriana López",
+            "tool": "Cuentas de Mangone"
+          },
+          {
+            "num": "2.2",
+            "action": "Grabar contenido para Eventos de Consulta (CD) si está programado para la semana",
+            "responsible": "Gloriana López",
+            "tool": "Cuentas de Mangone"
+          }
+        ]
+      },
+      {
+        "id": "gl-p3",
+        "num": "3",
+        "title": "Miércoles — Edición e Investigación",
+        "subtitle": "Gloriana López — Edición de videos y contenido Visa T",
+        "steps": [
+          {
+            "num": "3.1",
+            "action": "Editar los videos informativos grabados el martes en Canva",
+            "responsible": "Gloriana López",
+            "tool": "Canva Pro"
+          },
+          {
+            "num": "3.2",
+            "action": "Entregar los archivos editados al canal #contenido en Slack con el título correspondiente a cada video",
+            "responsible": "Gloriana López",
+            "tool": "Slack (#contenido)"
+          },
+          {
+            "num": "3.3",
+            "action": "Organizar y redactar contenido informativo sobre Visa T apoyándose en videos y contenido de las cuentas de Mangone, usando @inmigraciontv como referencia",
+            "responsible": "Gloriana López",
+            "tool": "Cuentas de Mangone"
+          }
+        ]
+      },
+      {
+        "id": "gl-p4",
+        "num": "4",
+        "title": "Jueves — Día de Grabación (Prioridad 2)",
+        "subtitle": "Gloriana López — Contenido extra, historias, TikTok y Visa T",
+        "steps": [
+          {
+            "num": "4.1",
+            "action": "Terminar la planificación semanal pendiente del Community Manager",
+            "responsible": "Gloriana López",
+            "tool": "Cuentas de Mangone"
+          },
+          {
+            "num": "4.2",
+            "action": "Grabar contenido extra pendiente: Eventos de Consulta (CD), historias, TikTok, YouTube y videos solicitados",
+            "responsible": "Gloriana López",
+            "tool": "Cuentas de Mangone"
+          },
+          {
+            "num": "4.3",
+            "action": "Grabar contenido compartible de la semana adaptado a los trends identificados el lunes",
+            "responsible": "Gloriana López",
+            "tool": "TikTok"
+          },
+          {
+            "num": "4.4",
+            "action": "Grabar videos para la nueva cuenta de Instagram sobre Visa T si aplica",
+            "responsible": "Gloriana López",
+            "tool": "Cuentas de Mangone"
+          }
+        ]
+      },
+      {
+        "id": "gl-p5",
+        "num": "5",
+        "title": "Viernes — Edición y Entrega Final",
+        "subtitle": "Gloriana López — Edición de pendientes y entrega en Slack",
+        "steps": [
+          {
+            "num": "5.1",
+            "action": "Editar el contenido grabado pendiente de la semana en Canva",
+            "responsible": "Gloriana López",
+            "tool": "Canva Pro"
+          },
+          {
+            "num": "5.2",
+            "action": "Añadir textos a los videos compartibles de TikTok antes de su entrega",
+            "responsible": "Gloriana López",
+            "tool": "Canva Pro"
+          },
+          {
+            "num": "5.3",
+            "action": "Enviar todos los archivos finalizados al canal #contenido en Slack como archivo con título",
+            "responsible": "Gloriana López",
+            "tool": "Slack (#contenido)"
+          }
+        ]
+      },
+      {
+        "id": "gl-p6",
+        "num": "6",
+        "title": "Fin de Semana — Si Aplica",
+        "subtitle": "Gloriana López — Solo cuando el flujo semanal no permitió terminar todo",
+        "steps": [
+          {
+            "num": "6.1",
+            "action": "Completar videos compartibles pendientes o videos con ayudante que no pudieron terminarse durante los días hábiles",
+            "responsible": "Gloriana López",
+            "tool": "Canva Pro"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "project-manager",
+    "name": "Project Manager",
+    "objective": "Garantizar que los procesos de marketing se ejecuten con consistencia, que los requerimientos internos y externos se gestionen correctamente, y que la operación del departamento de marketing funcione de forma continua e independiente de la presencia de una sola persona.",
+    "roles": [
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Project Manager — Eje central del departamento: supervisa la ejecución del equipo, gestiona las comunicaciones, opera los canales de email marketing, analiza las métricas y lidera el desarrollo de productos internos"
+      },
+      {
+        "initials": "CS",
+        "name": "Cristofer Saab",
+        "desc": "Escalamiento — Decisiones estratégicas o excepciones fuera del alcance del departamento de marketing"
+      }
+    ],
+    "tools": [
+      "HubSpot — Email marketing, CRM, automatizaciones y gestión de contactos",
+      "Marketing Hub — CRM interno del departamento, registro y seguimiento de requerimientos",
+      "Claude — Automatizaciones, dashboard de métricas y soporte operativo",
+      "Google Drive — Almacenamiento y colaboración de documentos",
+      "Dropbox — Repositorio de assets de marca y recursos visuales",
+      "Slack — Comunicación interna, recepción de requerimientos y notificaciones",
+      "Vercel — Despliegue de proyectos web del departamento",
+      "Railway — Infraestructura backend para automatizaciones y proyectos",
+      "CapCut — Edición de video puntual",
+      "Paquete Adobe — Edición de imagen y diseño cuando se requiere",
+      "SMS (plataforma) — Mensajes masivos para asistentes a eventos de consulta",
+      "Dashboard de Marketing — Visualización automatizada de métricas de RRSS, Ads y Email"
+    ],
+    "rules": [
+      "Prohibido usar la palabra \"especialistas\" en cualquier pieza de comunicación",
+      "Todo contenido producido o supervisado debe cumplir los lineamientos de marca de Mangone Law Firm",
+      "Ningún correo electrónico se envía sin aprobación previa de C-Level",
+      "Todo requerimiento recibido debe quedar registrado en el Marketing Hub",
+      "El tono de todas las comunicaciones debe ser empático, profesional y no alarmista",
+      "Los disclaimers legales deben estar presentes en todo contenido que lo requiera",
+      "Toda excepción, bloqueo o decisión fuera del alcance se escala a Cristofer Saab"
+    ],
+    "phases": [
+      {
+        "id": "pm-p1",
+        "num": "4.1",
+        "title": "Supervisión y Cumplimiento del Equipo",
+        "subtitle": "Sebastián Quijada — Frecuencia: Diaria / Continua",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Revisar el canal #Marketing Daily Numbers en Slack para verificar el reporte diario de publicaciones enviado por Alejandra",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "2",
+            "action": "Verificar que la cadencia de publicación del día se cumplió en todas las plataformas (Instagram, Facebook, TikTok, YouTube, LinkedIn)",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "3",
+            "action": "Monitorear el avance de tareas activas en el Marketing Hub",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "4",
+            "action": "Identificar bloqueos, retrasos o incumplimientos en el equipo y gestionar su resolución",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "5",
+            "action": "Dar feedback puntual a los miembros del equipo según sea necesario",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          }
+        ]
+      },
+      {
+        "id": "pm-p2",
+        "num": "4.2",
+        "title": "Aprobación de Grilla Semanal de Contenido",
+        "subtitle": "Sebastián Quijada — Frecuencia: Semanal",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Recibir la grilla semanal enviada por Alejandra (Community Manager) vía Slack",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "2",
+            "action": "Revisar cada pieza planificada: tema, formato, plataforma, caption y cumplimiento legal",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "3",
+            "action": "Verificar que ningún caption incluya términos prohibidos (ej. \"especialistas\") ni promesas de resultados",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4",
+            "action": "Si hay temas sensibles o que involucren a C-Level: coordinar aprobación con las partes correspondientes antes de dar luz verde",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "5",
+            "action": "Aprobar la grilla o devolver con observaciones específicas a Alejandra",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "6",
+            "action": "Notificar al equipo de producción (Sara y Gloriana) que la grilla está aprobada",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          }
+        ]
+      },
+      {
+        "id": "pm-p3a",
+        "num": "4.3a",
+        "title": "Email — Newsletter Semanal Informativo",
+        "subtitle": "Sebastián Quijada — Frecuencia: Semanal",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Definir el tema y ángulo del newsletter según la agenda del departamento y novedades de la firma",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "2",
+            "action": "Redactar el copy del correo en español: subject, preheader, cuerpo y CTA",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "3",
+            "action": "Configurar el email en HubSpot: template, segmento (todos los contactos) y personalización",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "4",
+            "action": "Enviar prueba interna y revisar en móvil y desktop",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "5",
+            "action": "Enviar borrador a C-Level para confirmación y aprobación",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "6",
+            "action": "Programar o enviar el correo tras recibir aprobación",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "7",
+            "action": "Monitorear resultados 48 horas post-envío: open rate, CTR y unsubscribes",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          }
+        ]
+      },
+      {
+        "id": "pm-p3b",
+        "num": "4.3b",
+        "title": "Email — Correo de Morosidad (Mensual)",
+        "subtitle": "Sebastián Quijada — Frecuencia: Mensual, coordinado con Collections",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Recibir el listado de clientes con pagos pendientes del Departamento de Collections",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "2",
+            "action": "Coordinar con Jesús para cargar el listado como segmento en HubSpot",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "3",
+            "action": "Redactar el copy del correo en español con tono profesional y no confrontacional",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "4",
+            "action": "Configurar el email con el segmento de morosidad como único destinatario",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "5",
+            "action": "Enviar para aprobación de C-Level",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "6",
+            "action": "Enviar el correo tras recibir aprobación",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          }
+        ]
+      },
+      {
+        "id": "pm-p3c",
+        "num": "4.3c",
+        "title": "Email — Correo de Evento de Consulta",
+        "subtitle": "Sebastián Quijada — Frecuencia: Por evento, cuando aplique",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Confirmar fecha y detalles del próximo evento de consulta",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "2",
+            "action": "Redactar el correo de invitación con información del evento: fecha, hora y link de registro o contacto",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "3",
+            "action": "Configurar en HubSpot con segmento general (todos los contactos)",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          },
+          {
+            "num": "4",
+            "action": "Enviar para aprobación de C-Level",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "5",
+            "action": "Enviar el correo tras recibir aprobación",
+            "responsible": "Sebastián Quijada",
+            "tool": "HubSpot"
+          }
+        ]
+      },
+      {
+        "id": "pm-p4",
+        "num": "4.4",
+        "title": "Mensajes Masivos SMS para Eventos de Consulta",
+        "subtitle": "Sebastián Quijada — Frecuencia: Por evento, 3 días de anticipación",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Obtener el listado de asistentes confirmados al evento de consulta",
+            "responsible": "Sebastián Quijada",
+            "tool": "SMS (plataforma)"
+          },
+          {
+            "num": "2",
+            "action": "Redactar el mensaje de recordatorio en español: fecha, hora, ubicación o link e instrucciones necesarias",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3",
+            "action": "Revisar que el mensaje sea claro, conciso y sin términos prohibidos",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "4",
+            "action": "Cargar el listado en la plataforma de SMS",
+            "responsible": "Sebastián Quijada",
+            "tool": "SMS (plataforma)"
+          },
+          {
+            "num": "5",
+            "action": "Programar el envío masivo con 3 días de anticipación al evento",
+            "responsible": "Sebastián Quijada",
+            "tool": "SMS (plataforma)"
+          },
+          {
+            "num": "6",
+            "action": "Verificar que el envío se procesó correctamente",
+            "responsible": "Sebastián Quijada",
+            "tool": "SMS (plataforma)"
+          }
+        ]
+      },
+      {
+        "id": "pm-p5",
+        "num": "4.5",
+        "title": "Asistencia a Transmisión en Vivo — Eventos de Consulta",
+        "subtitle": "Sebastián Quijada — Frecuencia: Por evento",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Crear el cronograma del evento: tiempos, secciones, transiciones y responsables",
+            "responsible": "Sebastián Quijada",
+            "tool": "Google Drive"
+          },
+          {
+            "num": "2",
+            "action": "Redactar el script del host con los puntos clave: apertura, desarrollo y cierre del evento",
+            "responsible": "Sebastián Quijada",
+            "tool": "Google Drive"
+          },
+          {
+            "num": "3",
+            "action": "Compartir cronograma y script con el host con suficiente anticipación (mínimo 48 horas)",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "4",
+            "action": "Dar instrucciones técnicas y de conducción al host antes del inicio de la transmisión",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "5",
+            "action": "Monitorear la transmisión en tiempo real: verificar calidad de audio, video y fluidez del contenido",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "6",
+            "action": "Hacer seguimiento de comentarios durante el evento y escalar al host situaciones que requieran atención",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "7",
+            "action": "Verificar que la grabación quedó disponible para su posterior distribución",
+            "responsible": "Sebastián Quijada",
+            "tool": "Google Drive"
+          }
+        ]
+      },
+      {
+        "id": "pm-p6",
+        "num": "4.6",
+        "title": "Métricas y Analítica",
+        "subtitle": "Sebastián Quijada — Frecuencia: Monitoreo diario / Análisis y recomendaciones semanal",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Verificar diariamente que el dashboard de marketing se actualizó correctamente vía API (RRSS, Ads y Email)",
+            "responsible": "Sebastián Quijada",
+            "tool": "Dashboard de Marketing"
+          },
+          {
+            "num": "2",
+            "action": "Si hay anomalías o datos faltantes: diagnosticar y corregir la integración",
+            "responsible": "Sebastián Quijada",
+            "tool": "Dashboard de Marketing"
+          },
+          {
+            "num": "3",
+            "action": "Revisar semanalmente el dashboard completo: identificar tendencias, picos de rendimiento y caídas",
+            "responsible": "Sebastián Quijada",
+            "tool": "Dashboard de Marketing"
+          },
+          {
+            "num": "4",
+            "action": "Cruzar datos del dashboard con el reporte diario de publicaciones de Alejandra en Slack",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "5",
+            "action": "Integrar el análisis web de Andrés Coronel (Google Analytics + Search Console) al análisis general",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "6",
+            "action": "Redactar recomendaciones accionables: qué replicar, qué ajustar, qué eliminar",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "7",
+            "action": "Presentar el análisis y recomendaciones en la reunión semanal del equipo",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "8",
+            "action": "Convertir recomendaciones aprobadas en tareas asignadas en el Marketing Hub",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          }
+        ]
+      },
+      {
+        "id": "pm-p7",
+        "num": "4.7",
+        "title": "Gestión de Requerimientos Internos",
+        "subtitle": "Sebastián Quijada — Frecuencia: Continua",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Recibir el requerimiento vía Slack y confirmar recepción al solicitante",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "2",
+            "action": "Si falta información: solicitar objetivo, público, fecha deseada y referencias",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "3",
+            "action": "Registrar el requerimiento en el Marketing Hub",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "4",
+            "action": "Evaluar viabilidad según carga del equipo",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "5",
+            "action": "Asignar al ejecutor correspondiente: Sara (diseño), Gloriana (video), Andrés (web), Sebastián (email)",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "6",
+            "action": "Comunicar al solicitante la fecha estimada de entrega",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "7",
+            "action": "Revisar el entregable: calidad, alineación a marca y cumplimiento del brief",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "8",
+            "action": "Si requiere correcciones: devolver al ejecutor con feedback específico",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "9",
+            "action": "Entregar el producto final al solicitante vía Slack y confirmar su conformidad",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "10",
+            "action": "Cerrar el requerimiento en el Marketing Hub",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          }
+        ]
+      },
+      {
+        "id": "pm-p8",
+        "num": "4.8",
+        "title": "Intermediación Interdepartamental",
+        "subtitle": "Sebastián Quijada — Frecuencia: Según demanda",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Recibir la solicitud o comunicación del otro departamento vía Slack",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "2",
+            "action": "Evaluar si requiere acción del equipo de marketing o solo una respuesta informativa",
+            "responsible": "Sebastián Quijada",
+            "tool": ""
+          },
+          {
+            "num": "3",
+            "action": "Si requiere acción: gestionar como requerimiento interno (ver proceso 4.7)",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "4",
+            "action": "Si requiere coordinación con múltiples áreas: definir responsables y plazos",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "5",
+            "action": "Hacer seguimiento del cumplimiento de los compromisos adquiridos",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          },
+          {
+            "num": "6",
+            "action": "Notificar al departamento solicitante el estado o resultado de la gestión",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          }
+        ]
+      },
+      {
+        "id": "pm-p9",
+        "num": "4.9",
+        "title": "Desarrollo de Productos y Herramientas Internas",
+        "subtitle": "Sebastián Quijada — Frecuencia: Según proyectos activos",
+        "steps": [
+          {
+            "num": "1",
+            "action": "Identificar la necesidad u oportunidad de mejora operativa",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "2",
+            "action": "Definir el alcance del proyecto: qué problema resuelve, quién lo usa y qué resultado se espera",
+            "responsible": "Sebastián Quijada",
+            "tool": "Google Drive"
+          },
+          {
+            "num": "3",
+            "action": "Desarrollar o configurar la solución usando las herramientas disponibles (Claude, Vercel, Railway, HubSpot, entre otras)",
+            "responsible": "Sebastián Quijada",
+            "tool": "Claude / Vercel / Railway"
+          },
+          {
+            "num": "4",
+            "action": "Probar la solución en un entorno controlado antes de implementar en producción",
+            "responsible": "Sebastián Quijada",
+            "tool": "Vercel / Railway"
+          },
+          {
+            "num": "5",
+            "action": "Implementar y documentar el funcionamiento del producto o herramienta",
+            "responsible": "Sebastián Quijada",
+            "tool": "Google Drive"
+          },
+          {
+            "num": "6",
+            "action": "Capacitar al equipo en el uso de la nueva herramienta si aplica",
+            "responsible": "Sebastián Quijada",
+            "tool": "Slack"
+          },
+          {
+            "num": "7",
+            "action": "Monitorear el funcionamiento post-implementación y ajustar según sea necesario",
+            "responsible": "Sebastián Quijada",
+            "tool": "Marketing Hub"
+          }
+        ]
+      }
+    ]
   }
 ];
 
@@ -3073,6 +3850,7 @@ const MEMBER_COLORS_SOP: Record<string, string> = {
   AA: '#0C2054', SC: '#ec4899', GL: '#8b5cf6', SQ: '#F79C31',
   AC: '#10b981', FP: '#ef4444', JE: '#06b6d4', EO: '#6b7280',
   EV: '#f59e0b', DC: '#3b82f6', SO: '#a855f7',
+  AM: '#1e40af', CS: '#64748b',
 };
 
 function getInitialsColor(initials: string): string {
