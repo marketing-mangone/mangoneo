@@ -46,7 +46,6 @@ const TEAM = [
   { id: 'sara',      name: 'Sara',      role: 'Diseño',    color: '#ec4899', initial: 'S' },
   { id: 'gloriana',  name: 'Gloriana',  role: 'Video',     color: '#8b5cf6', initial: 'G' },
   { id: 'andres',    name: 'Andrés',    role: 'Web/SEO',   color: '#10b981', initial: 'A' },
-  { id: 'jesus',     name: 'Jesús',     role: 'HubSpot',   color: '#f59e0b', initial: 'J' },
   { id: 'sebas',     name: 'Sebas',     role: 'Director',  color: '#0c2054', initial: 'S' },
 ];
 

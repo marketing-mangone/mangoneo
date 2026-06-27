@@ -33,7 +33,6 @@ const AVATAR_COLORS: Record<string, string> = {
   'Andrés Coronel':    '#0984e3',
   'Gloriana López':    '#00b894',
   'Sara Castaño':      '#e17055',
-  'Jesús Méndez':      '#F79C31',
 };
 
 function getInitials(name: string | null) {

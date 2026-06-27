@@ -84,16 +84,15 @@ const TEAM_MEMBERS = [
   { name: 'Sara', role: 'Diseño' },
   { name: 'Gloriana', role: 'Video' },
   { name: 'Andrés', role: 'Web/SEO' },
-  { name: 'Jesús', role: 'HubSpot' },
 ];
 
 const MEMBER_INITIALS: Record<string, string> = {
-  Sebas: 'SE', Alejandra: 'AL', Sara: 'SA', Gloriana: 'GL', Andrés: 'AN', Jesús: 'JE',
+  Sebas: 'SE', Alejandra: 'AL', Sara: 'SA', Gloriana: 'GL', Andrés: 'AN',
 };
 
 const MEMBER_COLORS: Record<string, string> = {
   Sebas: '#0C2054', Alejandra: '#F79C31', Sara: '#ec4899',
-  Gloriana: '#8b5cf6', Andrés: '#10b981', Jesús: '#06b6d4',
+  Gloriana: '#8b5cf6', Andrés: '#10b981',
 };
 
 const BRAINSTORM_STORAGE_KEY = 'mangone_brainstorming_ideas';
@@ -2478,11 +2477,6 @@ const INITIAL_SOPS_DATA: SOPData[] = [
         "name": "Sebastián Quijada",
         "desc": "Director de Marketing — Estrategia, creación de campañas, grilla de newsletters, definición de segmentos"
       },
-      {
-        "initials": "JE",
-        "name": "Jesús",
-        "desc": "Administración técnica — Gestión técnica de listas, segmentos y configuración en HubSpot"
-      }
     ],
     "tools": [
       "HubSpot — Plataforma central de email marketing",
@@ -2492,7 +2486,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
     ],
     "rules": [
       "Todos los emails se redactan exclusivamente en español",
-      "La definición semántica de segmentos la realiza Sebastián; la implementación técnica la ejecuta Jesús",
+      "Sebastián Quijada gestiona la segmentación semántica y la configuración técnica en HubSpot",
       "Todo email debe pasar por prueba interna (móvil + desktop) antes de enviarse",
       "Todo workflow nuevo debe probarse con contacto de prueba antes de activarse",
       "Prohibido usar la palabra \"especialistas\" en cualquier email",
@@ -2514,19 +2508,19 @@ const INITIAL_SOPS_DATA: SOPData[] = [
           {
             "num": "1.2",
             "action": "Crear y configurar listas y segmentos en HubSpot según criterios definidos",
-            "responsible": "Jesús",
+            "responsible": "Sebastián Quijada",
             "tool": ""
           },
           {
             "num": "1.3",
             "action": "Limpiar contactos inactivos, rebotados y duplicados (mensual)",
-            "responsible": "Jesús",
+            "responsible": "Sebastián Quijada",
             "tool": ""
           },
           {
             "num": "1.4",
             "action": "Verificar que nuevos contactos se asignan correctamente a los segmentos activos",
-            "responsible": "Jesús",
+            "responsible": "Sebastián Quijada",
             "tool": ""
           },
           {
@@ -2640,7 +2634,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
           {
             "num": "4.3",
             "action": "Configurar el workflow técnicamente en HubSpot",
-            "responsible": "Jesús",
+            "responsible": "Sebastián Quijada",
             "tool": ""
           },
           {
@@ -2652,7 +2646,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
           {
             "num": "4.5",
             "action": "Activar workflow y monitorear primeros disparos",
-            "responsible": "Jesús",
+            "responsible": "Sebastián Quijada",
             "tool": ""
           },
           {
@@ -3633,7 +3627,7 @@ const INITIAL_SOPS_DATA: SOPData[] = [
           },
           {
             "num": "2",
-            "action": "Coordinar con Jesús para cargar el listado como segmento en HubSpot",
+            "action": "Cargar el listado como segmento en HubSpot",
             "responsible": "Sebastián Quijada",
             "tool": "HubSpot"
           },
@@ -4032,7 +4026,7 @@ function saveSOPs(sops: SOPData[]) {
 
 const MEMBER_COLORS_SOP: Record<string, string> = {
   AA: '#0C2054', SC: '#ec4899', GL: '#8b5cf6', SQ: '#F79C31',
-  AC: '#10b981', FP: '#ef4444', JE: '#06b6d4', EO: '#6b7280',
+  AC: '#10b981', FP: '#ef4444', EO: '#6b7280',
   EV: '#f59e0b', DC: '#3b82f6', SO: '#a855f7',
   AM: '#1e40af', CS: '#64748b',
 };
@@ -4664,7 +4658,7 @@ function nameNorm(s: string): string {
 }
 
 // ¿El responsable de un paso/rol corresponde a esta persona del equipo?
-// Tolera tildes, mayúsculas, nombres parciales ("Jesús" → "Jesús Méndez") y
+// Tolera tildes, mayúsculas y nombres parciales o compuestos
 // responsables combinados ("Andrés Coronel + Francisco Parra", "... → CX").
 function personMatches(responsible: string, person: string): boolean {
   const a = nameNorm(responsible), b = nameNorm(person);

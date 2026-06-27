@@ -41,14 +41,6 @@ export const MOCK_TEAM: TeamMember[] = [
     skills: ['Figma', 'Illustrator', 'Photoshop', 'Canva Pro'],
     avatar: 'SC',
   },
-  {
-    id: 6, name: 'Jesús Méndez', email: 'jesus@mangonelawfirmllc.com',
-    role: 'team', position: 'HubSpot & Ads Manager', department: 'Marketing',
-    area: 'Paid Media', start_date: '2024-02-20', status: 'active',
-    bio: 'Gestiona campañas de paid media, CRM en HubSpot y automatizaciones de marketing.',
-    skills: ['HubSpot', 'Meta Ads', 'Google Ads', 'CRM'],
-    avatar: 'JM',
-  },
 ];
 
 export const MOCK_KPIS: KPI[] = [
@@ -282,7 +274,7 @@ export const MOCK_TASKS: Task[] = [
   {
     id: 3, title: 'Actualizar campañas Meta Ads — VAWA',
     description: 'Optimizar las creatividades y audiencias de las campañas activas sobre VAWA.',
-    status: 'in_progress', priority: 'urgent', assignee: 'Jesús Méndez',
+    status: 'in_progress', priority: 'urgent', assignee: 'Andrés Coronel',
     dueDate: '2026-05-12', createdAt: '2026-05-01',
     tags: ['ads', 'meta', 'vawa'], project: 'Paid Media Q2',
     progress: 80,
@@ -375,7 +367,7 @@ export const MOCK_EVENTS: CalendarEvent[] = [
   {
     id: 9, title: 'Lanzamiento Campaña Meta — Deportación',
     type: 'campaign', date: '2026-05-18', time: '09:00',
-    channel: 'facebook', status: 'scheduled', assignee: 'Jesús Méndez',
+    channel: 'facebook', status: 'scheduled', assignee: 'Andrés Coronel',
   },
   {
     id: 10, title: 'Reunión semanal del equipo',
