@@ -3076,6 +3076,190 @@ const INITIAL_SOPS_DATA: SOPData[] = [
     ]
   },
   {
+    "id": "sara",
+    "name": "Diseño & Edición",
+    "objective": "Establecer los flujos de trabajo para el diseño estático, la edición de video y la atención a requerimientos internos, garantizando consistencia visual, calidad de producción y cumplimiento de los tiempos de entrega.",
+    "roles": [
+      {
+        "initials": "SC",
+        "name": "Sara Castaño",
+        "desc": "Diseñadora / Editora — Ejecución de todos los procesos de diseño gráfico, edición de video y requerimientos especiales"
+      },
+      {
+        "initials": "AA",
+        "name": "Alejandra Andrade",
+        "desc": "Community Manager — Proporciona copys, temáticas y recibe los entregables de diseño para revisión y aprobación"
+      },
+      {
+        "initials": "GL",
+        "name": "Gloriana López",
+        "desc": "Creadora de Contenido — Sube el material en crudo al Canal de Contenido para que Sara inicie el montaje"
+      },
+      {
+        "initials": "SQ",
+        "name": "Sebastián Quijada",
+        "desc": "Project Manager — Asigna requerimientos especiales con descripción, deadline y nivel de urgencia"
+      }
+    ],
+    "tools": [
+      "Canva — Diseño ágil de carruseles y flyers (alternativa de velocidad)",
+      "Adobe Illustrator — Diseño de piezas de alto valor conceptual y a medida",
+      "CapCut Desktop — Edición de videos cortos con dinámica visual",
+      "Adobe Premiere Pro — Edición de videos con mayor complejidad técnica",
+      "Google Drive — Organización y entrega de videos en subcarpetas temáticas",
+      "Slack (#contenido) — Monitoreo de material en crudo subido por Gloriana"
+    ],
+    "rules": [
+      "Todo video debe incluir obligatoriamente: subtítulos dinámicos, efectos/transiciones, imágenes de apoyo, énfasis visual en palabras clave, diseño sonoro y cierre con logotipo de la firma",
+      "Adobe Illustrator para piezas de alto valor conceptual; Canva como alternativa ágil según urgencia",
+      "Los carruseles y flyers siguen la planificación quincenal entregada por Alejandra",
+      "Los videos se exportan en máxima resolución y se organizan en Google Drive por subcarpetas temáticas",
+      "Los entregables de video se comparten como enlace de Google Drive — nunca comprimidos por otras plataformas",
+      "Los requerimientos especiales se procesan en orden de urgencia según indicación de Sebastián",
+      "SLA carruseles (5-6 piezas): 1.5 días hábiles — SLA video corto (30-60 seg): 1.5 horas por video"
+    ],
+    "phases": [
+      {
+        "id": "sc-p1",
+        "num": "A",
+        "title": "Diseño de Carruseles y Flyers de Efemérides",
+        "subtitle": "Sara Castaño — Planificación quincenal para Meta y LinkedIn",
+        "steps": [
+          {
+            "num": "A.1",
+            "action": "Recibir de Alejandra el documento centralizado con copys, enfoques y temáticas de los carruseles planificados para las próximas 2 semanas",
+            "responsible": "Sara Castaño",
+            "tool": "Slack (#contenido)"
+          },
+          {
+            "num": "A.2",
+            "action": "Revisar el calendario de efemérides e identificar los flyers correspondientes al periodo de trabajo",
+            "responsible": "Sara Castaño",
+            "tool": ""
+          },
+          {
+            "num": "A.3",
+            "action": "Seleccionar herramienta: Adobe Illustrator para piezas de alto valor conceptual, Canva para urgencias o velocidad requerida",
+            "responsible": "Sara Castaño",
+            "tool": "Adobe Illustrator / Canva"
+          },
+          {
+            "num": "A.4",
+            "action": "Diseñar las piezas para Meta (Instagram/Facebook) y LinkedIn usando correctamente los elementos visuales de la firma",
+            "responsible": "Sara Castaño",
+            "tool": "Adobe Illustrator / Canva"
+          },
+          {
+            "num": "A.5",
+            "action": "Recopilar todos los archivos editables y enviar a Alejandra para revisión, feedback y aprobación final",
+            "responsible": "Sara Castaño",
+            "tool": "Slack (#contenido)"
+          }
+        ]
+      },
+      {
+        "id": "sc-p2",
+        "num": "B",
+        "title": "Edición y Entrega de Video",
+        "subtitle": "Sara Castaño — Edición dinámica del material bruto de Gloriana",
+        "steps": [
+          {
+            "num": "B.1",
+            "action": "Monitorear el Canal de Contenido y descargar el material en crudo subido por Gloriana",
+            "responsible": "Sara Castaño",
+            "tool": "Slack (#contenido)"
+          },
+          {
+            "num": "B.2",
+            "action": "Importar el material a CapCut Desktop o Adobe Premiere Pro según la complejidad técnica de la pieza",
+            "responsible": "Sara Castaño",
+            "tool": "CapCut Desktop / Adobe Premiere Pro"
+          },
+          {
+            "num": "B.3",
+            "action": "Agregar subtítulos dinámicos sincronizados perfectamente con el audio y visualmente atractivos",
+            "responsible": "Sara Castaño",
+            "tool": "CapCut Desktop / Adobe Premiere Pro"
+          },
+          {
+            "num": "B.4",
+            "action": "Aplicar efectos y transiciones: cortes limpios y fluidos que mantengan el ritmo visual",
+            "responsible": "Sara Castaño",
+            "tool": "CapCut Desktop / Adobe Premiere Pro"
+          },
+          {
+            "num": "B.5",
+            "action": "Insertar imágenes de apoyo o clips adicionales que refuercen visualmente el contenido hablado",
+            "responsible": "Sara Castaño",
+            "tool": "CapCut Desktop / Adobe Premiere Pro"
+          },
+          {
+            "num": "B.6",
+            "action": "Aplicar énfasis visual en palabras clave o frases importantes: cambios de tamaño, color o animaciones en el texto",
+            "responsible": "Sara Castaño",
+            "tool": "CapCut Desktop / Adobe Premiere Pro"
+          },
+          {
+            "num": "B.7",
+            "action": "Seleccionar y mezclar música de fondo idónea, cuidando los niveles para no opacar la voz principal",
+            "responsible": "Sara Castaño",
+            "tool": "CapCut Desktop / Adobe Premiere Pro"
+          },
+          {
+            "num": "B.8",
+            "action": "Incluir el logotipo oficial de la firma como cierre al final de cada pieza audiovisual — sin excepción",
+            "responsible": "Sara Castaño",
+            "tool": "CapCut Desktop / Adobe Premiere Pro"
+          },
+          {
+            "num": "B.9",
+            "action": "Exportar el video en máxima resolución y organizar en Google Drive en subcarpetas temáticas (por tema o fecha)",
+            "responsible": "Sara Castaño",
+            "tool": "Google Drive"
+          },
+          {
+            "num": "B.10",
+            "action": "Compartir los enlaces directos de las carpetas de Google Drive a Alejandra para descarga en formato original sin compresión",
+            "responsible": "Sara Castaño",
+            "tool": "Google Drive"
+          }
+        ]
+      },
+      {
+        "id": "sc-p3",
+        "num": "C",
+        "title": "Requerimientos Especiales",
+        "subtitle": "Sara Castaño — Asignados por Sebastián con deadline y urgencia",
+        "steps": [
+          {
+            "num": "C.1",
+            "action": "Recibir de Sebastián la descripción detallada del entregable visual requerido y su fecha límite (deadline)",
+            "responsible": "Sara Castaño",
+            "tool": "Slack"
+          },
+          {
+            "num": "C.2",
+            "action": "Evaluar el nivel de urgencia y posicionar la tarea en la cola de trabajo según prioridad asignada",
+            "responsible": "Sara Castaño",
+            "tool": ""
+          },
+          {
+            "num": "C.3",
+            "action": "Elaborar el gráfico, reporte visual o elemento solicitado manteniendo el estándar corporativo de la firma",
+            "responsible": "Sara Castaño",
+            "tool": "Adobe Illustrator / Canva"
+          },
+          {
+            "num": "C.4",
+            "action": "Presentar el diseño finalizado a Sebastián y aplicar correcciones o ajustes según su retroalimentación antes de cerrar el ticket",
+            "responsible": "Sara Castaño",
+            "tool": "Slack"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "gloriana",
     "name": "Creadora de Contenido",
     "objective": "Construir y afianzar la conexión entre Mangone Law Firm y su audiencia de manera real, cálida y orgánica a través de contenido que guíe a los usuarios hacia la adquisición de los servicios de la firma.",
