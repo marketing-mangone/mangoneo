@@ -1,9 +1,11 @@
 import { SidebarWithBadge } from '@/components/layout/SidebarWithBadge';
 import { ChatBubble } from '@/components/layout/ChatBubble';
+import { SessionKeepAlive } from '@/components/layout/SessionKeepAlive';
 
 export default function HubLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: 'var(--s-eef0f6)' }}>
+      <SessionKeepAlive />
       <SidebarWithBadge />
       {/* Main scroll area — fondo ligeramente diferente al del sidebar para crear contraste.
           ml-3 crea un gutter consistente para que el contenido nunca quede pegado al sidebar

@@ -48,6 +48,12 @@ async function _doRefresh(): Promise<boolean> {
   }
 }
 
+// Proactive silent refresh — call on app mount and every ~10 min to keep _memToken alive.
+export async function silentRefresh(): Promise<boolean> {
+  if (!_refreshing) _refreshing = _doRefresh().finally(() => { _refreshing = null; });
+  return _refreshing;
+}
+
 async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
     // CSRF: header custom que el navegador no permite enviar cross-site sin
