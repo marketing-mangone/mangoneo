@@ -10,7 +10,7 @@ import {
   TrendingUp, RefreshCw, ArrowUpRight, ArrowDownRight,
   Download, PlaySquare, Eye, Clock, UserPlus, Users,
   ChevronLeft, ChevronRight, BarChart3, Globe, MousePointerClick,
-  Camera, ThumbsUp, Heart, DollarSign, MousePointer, UserCheck,
+  Camera, ThumbsUp, Heart, DollarSign, MousePointer, UserCheck, Loader2,
 } from 'lucide-react';
 import {
   MOCK_KPIS, MOCK_LEADS_SERIES, MOCK_SESIONES_SERIES,
@@ -18,6 +18,7 @@ import {
 } from '@/lib/mock-data';
 import { formatNumber, formatCurrency, calcChange } from '@/lib/utils';
 import { dashboardApi, youtubeApi, ga4Api, metaApi, type DashboardSummary, type YouTubeWeeklyData, type GA4Summary, type GA4Slug, type MetaSummary, type MetaSlug } from '@/lib/api';
+import { MetricsReportDocument } from '@/components/reports/MetricsReportPDF';
 
 const PERIODS = ['Este mes', 'Último trimestre', 'Últimos 6 meses', 'Este año'];
 const TABS = ['Departamentales', 'Google Analytics', 'YouTube', 'Meta'];
@@ -104,10 +105,54 @@ export default function MetricasPage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeTab, setActiveTab] = useState(TABS[0]);
   const [ytData, setYtData] = useState<DashboardSummary['youtube'] | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     dashboardApi.summary().then(d => setYtData(d.youtube)).catch(() => {});
   }, []);
+
+  async function handleExportPDF() {
+    setExporting(true);
+    try {
+      const currentWeek = getCurrentISOWeek();
+      const dateRange   = weekToDateRange(currentWeek);
+
+      const [ga4Res, ytRes, metaRes] = await Promise.allSettled([
+        ga4Api.monthly(),
+        youtubeApi.weekly(currentWeek),
+        metaApi.weekly(currentWeek),
+      ]);
+
+      const ga4Data  = ga4Res.status  === 'fulfilled' ? ga4Res.value  : null;
+      const ytWkData = ytRes.status   === 'fulfilled' ? ytRes.value   : null;
+      const metaData = metaRes.status === 'fulfilled' ? metaRes.value : null;
+
+      const { pdf } = await import('@react-pdf/renderer');
+      const React   = (await import('react')).default;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const el = React.createElement(MetricsReportDocument, {
+        weekStr: currentWeek,
+        dateRange,
+        ga4:      ga4Data,
+        yt:       ytWkData,
+        ytTotals: ytData,
+        meta:     metaData,
+      }) as any;
+
+      const blob = await pdf(el).toBlob();
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `metricas-mangone-${currentWeek}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error generando PDF:', err);
+    } finally {
+      setExporting(false);
+    }
+  }
 
   const filtered = activeCategory === 'all'
     ? MOCK_KPIS
@@ -129,9 +174,15 @@ export default function MetricasPage() {
               <RefreshCw className="w-3.5 h-3.5" />
               Actualizar
             </button>
-            <button className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors">
-              <Download className="w-3.5 h-3.5" />
-              Exportar
+            <button
+              onClick={handleExportPDF}
+              disabled={exporting}
+              className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {exporting
+                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                : <Download className="w-3.5 h-3.5" />}
+              {exporting ? 'Generando…' : 'Exportar PDF'}
             </button>
           </div>
         }
@@ -480,6 +531,17 @@ function GA4Section() {
 }
 
 /* ─── ISO week helpers ─── */
+
+function weekToDateRange(weekStr: string): string {
+  const [yearStr, wStr] = weekStr.split('-W');
+  const monday = mondayOfISOWeek(parseInt(yearStr), parseInt(wStr));
+  const sunday = new Date(monday.getTime());
+  sunday.setDate(monday.getDate() + 6);
+  const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const fmt = (d: Date) => `${d.getDate()} ${months[d.getMonth()]}`;
+  return `${fmt(monday)} – ${fmt(sunday)} ${sunday.getFullYear()}`;
+}
+
 function getISOWeekYear(d: Date): { year: number; week: number } {
   const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
