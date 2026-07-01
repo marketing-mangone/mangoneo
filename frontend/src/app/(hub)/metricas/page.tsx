@@ -100,59 +100,194 @@ const COMBINED_SERIES = MOCK_LEADS_SERIES.map((d, i) => ({
   spend: MOCK_AD_SPEND_SERIES[i].value,
 }));
 
-export default function MetricasPage() {
-  const [period, setPeriod] = useState(PERIODS[0]);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [activeTab, setActiveTab] = useState(TABS[0]);
-  const [ytData, setYtData] = useState<DashboardSummary['youtube'] | null>(null);
+// ── Modal exportar PDF ────────────────────────────────────────────────────────
+
+function ExportModal({
+  onClose,
+  ytTotals,
+}: {
+  onClose: () => void;
+  ytTotals: DashboardSummary['youtube'] | null;
+}) {
+  const current = getCurrentISOWeek();
+  const [week, setWeek]         = useState(current);
   const [exporting, setExporting] = useState(false);
+  const [error, setError]         = useState('');
 
-  useEffect(() => {
-    dashboardApi.summary().then(d => setYtData(d.youtube)).catch(() => {});
-  }, []);
-
-  async function handleExportPDF() {
+  async function handleGenerate() {
     setExporting(true);
+    setError('');
     try {
-      const currentWeek = getCurrentISOWeek();
-      const dateRange   = weekToDateRange(currentWeek);
+      const dateRange = weekToDateRange(week);
 
       const [ga4Res, ytRes, metaRes] = await Promise.allSettled([
         ga4Api.monthly(),
-        youtubeApi.weekly(currentWeek),
-        metaApi.weekly(currentWeek),
+        youtubeApi.weekly(week),
+        metaApi.weekly(week),
       ]);
 
       const ga4Data  = ga4Res.status  === 'fulfilled' ? ga4Res.value  : null;
       const ytWkData = ytRes.status   === 'fulfilled' ? ytRes.value   : null;
       const metaData = metaRes.status === 'fulfilled' ? metaRes.value : null;
 
-      const { pdf } = await import('@react-pdf/renderer');
-      const React   = (await import('react')).default;
+      const { pdf }                  = await import('@react-pdf/renderer');
+      const ReactLib                 = (await import('react')).default;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const el = React.createElement(MetricsReportDocument, {
-        weekStr: currentWeek,
-        dateRange,
-        ga4:      ga4Data,
-        yt:       ytWkData,
-        ytTotals: ytData,
-        meta:     metaData,
+      const el = ReactLib.createElement(MetricsReportDocument, {
+        weekStr: week, dateRange,
+        ga4: ga4Data, yt: ytWkData, ytTotals, meta: metaData,
       }) as any;
 
       const blob = await pdf(el).toBlob();
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;
-      a.download = `metricas-mangone-${currentWeek}.pdf`;
+      a.download = `metricas-mangone-${week}.pdf`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Error generando PDF:', err);
+      onClose();
+    } catch {
+      setError('Error al generar el PDF. Intenta de nuevo.');
     } finally {
       setExporting(false);
     }
   }
+
+  const dateLabel = weekToDateRange(week);
+  const isCurrentWeek = week === current;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+
+      {/* Dialog */}
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden">
+
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 border-b border-[var(--s-e8e8f0)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-[var(--s-0c2054)] flex items-center justify-center flex-shrink-0">
+                <Download className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h2 className="text-[15px] font-bold text-[var(--t-111827)]">Exportar reporte PDF</h2>
+                <p className="text-xs text-[var(--t-6b7280)]">Selecciona la semana a exportar</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--t-9ca3af)] hover:bg-[var(--s-f0f0f0)] hover:text-[var(--t-4a4a6a)] transition-colors"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-5 space-y-5">
+
+          {/* Selector de semana */}
+          <div>
+            <p className="text-xs font-semibold text-[var(--t-4a4a6a)] mb-3">Semana</p>
+            <div className="flex items-center justify-between bg-[var(--s-f7f8fc)] border border-[var(--s-e8e8f0)] rounded-xl px-3 py-3">
+              <button
+                onClick={() => setWeek(w => addWeeks(w, -1))}
+                className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all bg-[var(--surface)]"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div className="text-center">
+                <p className="text-sm font-bold text-[var(--t-111827)]">{dateLabel}</p>
+                <p className="text-[11px] text-[var(--t-9ca3af)] mt-0.5">
+                  {week}{isCurrentWeek ? ' · Semana actual' : ''}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setWeek(w => addWeeks(w, 1))}
+                disabled={isCurrentWeek}
+                className="w-8 h-8 rounded-lg border border-[var(--s-e5e7eb)] flex items-center justify-center text-[var(--t-6b7280)] hover:border-[var(--s-0c2054)] hover:text-[var(--t-0c2054)] transition-all bg-[var(--surface)] disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Nota GA4 */}
+          <div className="flex items-start gap-2.5 bg-blue-50 border border-blue-100 rounded-xl px-3.5 py-3">
+            <BarChart3 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+            <p className="text-[11px] text-blue-700 leading-relaxed">
+              <strong>Google Analytics</strong> siempre exporta los últimos 28 días,
+              independientemente de la semana seleccionada.
+            </p>
+          </div>
+
+          {/* Contenido del reporte */}
+          <div className="space-y-1.5">
+            <p className="text-xs font-semibold text-[var(--t-4a4a6a)]">Incluye</p>
+            {[
+              { dot: '#1D4ED8', label: 'Google Analytics 4 — últimos 28 días' },
+              { dot: '#DC2626', label: 'YouTube — semana seleccionada' },
+              { dot: '#1877F2', label: 'Facebook orgánico — semana seleccionada' },
+              { dot: '#E1306C', label: 'Instagram orgánico — semana seleccionada' },
+              { dot: '#7C3AED', label: 'Meta Ads — semana seleccionada' },
+            ].map(({ dot, label }) => (
+              <div key={label} className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: dot }} />
+                <p className="text-xs text-[var(--t-6b7280)]">{label}</p>
+              </div>
+            ))}
+          </div>
+
+          {error && (
+            <p className="text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+              {error}
+            </p>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 pb-6 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 text-sm font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-xl py-2.5 hover:bg-[var(--s-f7f8fc)] transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleGenerate}
+            disabled={exporting}
+            className="flex-1 flex items-center justify-center gap-2 text-sm font-semibold text-white bg-[var(--s-0c2054)] rounded-xl py-2.5 hover:bg-[#0a1a40] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {exporting
+              ? <><Loader2 className="w-4 h-4 animate-spin" /> Generando…</>
+              : <><Download className="w-4 h-4" /> Generar PDF</>}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+export default function MetricasPage() {
+  const [period, setPeriod] = useState(PERIODS[0]);
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeTab, setActiveTab] = useState(TABS[0]);
+  const [ytData, setYtData] = useState<DashboardSummary['youtube'] | null>(null);
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  useEffect(() => {
+    dashboardApi.summary().then(d => setYtData(d.youtube)).catch(() => {});
+  }, []);
 
   const filtered = activeCategory === 'all'
     ? MOCK_KPIS
@@ -165,6 +300,12 @@ export default function MetricasPage() {
 
   return (
     <div className="animate-fade-in">
+      {showExportModal && (
+        <ExportModal
+          onClose={() => setShowExportModal(false)}
+          ytTotals={ytData}
+        />
+      )}
       <Header
         title="Métricas y KPIs"
         subtitle="Seguimiento de indicadores clave del departamento"
@@ -175,14 +316,11 @@ export default function MetricasPage() {
               Actualizar
             </button>
             <button
-              onClick={handleExportPDF}
-              disabled={exporting}
-              className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => setShowExportModal(true)}
+              className="flex items-center gap-2 text-xs font-semibold text-[var(--t-4a4a6a)] border border-[var(--s-e8e8f0)] rounded-lg px-3 py-2 hover:bg-[var(--s-f7f8fc)] transition-colors"
             >
-              {exporting
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                : <Download className="w-3.5 h-3.5" />}
-              {exporting ? 'Generando…' : 'Exportar PDF'}
+              <Download className="w-3.5 h-3.5" />
+              Exportar PDF
             </button>
           </div>
         }
