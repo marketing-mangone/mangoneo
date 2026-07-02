@@ -52,8 +52,8 @@ export async function generateMetricsPDF({
   ytTotals: YTTotals | null;
   meta:     MetaSummary | null;
 }): Promise<Blob> {
-  const jsPDF     = (await import('jspdf')).default;
-  const autoTable = (await import('jspdf-autotable')).default;
+  const { jsPDF }  = await import('jspdf');
+  const autoTable  = (await import('jspdf-autotable')).default;
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = 210, M = 14;
