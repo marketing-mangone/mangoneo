@@ -32,6 +32,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  transpilePackages: ['@react-pdf/renderer'],
   async headers() {
     return [
       {

@@ -18,7 +18,6 @@ import {
 } from '@/lib/mock-data';
 import { formatNumber, formatCurrency, calcChange } from '@/lib/utils';
 import { dashboardApi, youtubeApi, ga4Api, metaApi, type DashboardSummary, type YouTubeWeeklyData, type GA4Summary, type GA4Slug, type MetaSummary, type MetaSlug } from '@/lib/api';
-import { MetricsReportDocument } from '@/components/reports/MetricsReportPDF';
 
 const PERIODS = ['Este mes', 'Último trimestre', 'Últimos 6 meses', 'Este año'];
 const TABS = ['Departamentales', 'Google Analytics', 'YouTube', 'Meta'];
@@ -132,6 +131,7 @@ function ExportModal({
 
       const { pdf }                  = await import('@react-pdf/renderer');
       const ReactLib                 = (await import('react')).default;
+      const { MetricsReportDocument } = await import('@/components/reports/MetricsReportPDF');
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const el = ReactLib.createElement(MetricsReportDocument, {
@@ -147,7 +147,8 @@ function ExportModal({
       a.click();
       URL.revokeObjectURL(url);
       onClose();
-    } catch {
+    } catch (err) {
+      console.error('[PDF export]', err);
       setError('Error al generar el PDF. Intenta de nuevo.');
     } finally {
       setExporting(false);
