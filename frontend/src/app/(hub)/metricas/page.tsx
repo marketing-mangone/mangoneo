@@ -129,17 +129,11 @@ function ExportModal({
       const ytWkData = ytRes.status   === 'fulfilled' ? ytRes.value   : null;
       const metaData = metaRes.status === 'fulfilled' ? metaRes.value : null;
 
-      const { pdf }                  = await import('@react-pdf/renderer');
-      const ReactLib                 = (await import('react')).default;
-      const { MetricsReportDocument } = await import('@/components/reports/MetricsReportPDF');
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const el = ReactLib.createElement(MetricsReportDocument, {
+      const { generateMetricsPDF } = await import('@/lib/generateMetricsPDF');
+      const blob = await generateMetricsPDF({
         weekStr: week, dateRange,
         ga4: ga4Data, yt: ytWkData, ytTotals, meta: metaData,
-      }) as any;
-
-      const blob = await pdf(el).toBlob();
+      });
       const url  = URL.createObjectURL(blob);
       const a    = document.createElement('a');
       a.href     = url;
