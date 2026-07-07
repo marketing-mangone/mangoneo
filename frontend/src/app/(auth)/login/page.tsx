@@ -307,11 +307,12 @@ export default function LoginPage() {
             </form>
 
             {/* Footer del card */}
-            <div className="mt-6 pt-5 border-t border-[var(--s-f0f2f8)] flex items-center justify-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <p className="text-xs text-[var(--t-9ca3af)]">
-                Todos los sistemas operativos
-              </p>
+            <div className="mt-6 pt-5 border-t border-[var(--s-f0f2f8)] flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <p className="text-xs text-[var(--t-9ca3af)]">Sistemas operativos</p>
+              </div>
+              <p className="text-[10px] font-mono text-[var(--t-c4c8d4)]">v1.0 · 06-Jul-2026</p>
             </div>
           </div>
 
