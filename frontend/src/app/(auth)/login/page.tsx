@@ -98,7 +98,7 @@ export default function LoginPage() {
           <div>
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#F79C31]/15 border border-[#F79C31]/25 text-[var(--t-f79c31)] text-[11px] font-semibold tracking-wider uppercase mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-[var(--s-f79c31)] animate-pulse" />
-              Equipo de Marketing
+              Equipo de Marketing y Digital Response
             </span>
 
             <h2
