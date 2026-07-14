@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/Card';
 import {
   Plus, Search, Clock, CheckCircle2, Circle, AlertCircle, Ban,
   Calendar, MoreVertical, X, Loader2, Trash2, Pencil, CheckSquare,
-  GanttChart, ChevronLeft, ChevronRight,
+  GanttChart, ChevronLeft, ChevronRight, Send, Copy, Check,
 } from 'lucide-react';
 import { tasksApi, teamApi, auth, ApiTask, ApiTeamMember } from '@/lib/api';
 import { formatDate } from '@/lib/utils';
@@ -849,6 +849,122 @@ function RoadmapView({ tasks, onEdit }: { tasks: ApiTask[]; onEdit: (t: ApiTask)
   );
 }
 
+// ── Export Slack Modal ────────────────────────────────────────────────────────
+
+const PRIORITY_ORDER: ApiTask['priority'][] = ['urgent', 'high', 'medium', 'low'];
+const PRIORITY_EMOJI: Record<ApiTask['priority'], string> = {
+  urgent: '🔴',
+  high:   '🟠',
+  medium: '🔵',
+  low:    '⚪',
+};
+
+function buildSlackText(tasks: ApiTask[]): string {
+  const pending = tasks.filter(t => t.status !== 'done');
+  const sorted  = [...pending].sort(
+    (a, b) => PRIORITY_ORDER.indexOf(a.priority) - PRIORITY_ORDER.indexOf(b.priority),
+  );
+
+  const today = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+  const lines: string[] = [
+    '📋 *Tareas Pendientes — Mangone Marketing*',
+    `_${today}_`,
+    '',
+  ];
+
+  let lastPriority: string | null = null;
+  for (const task of sorted) {
+    if (task.priority !== lastPriority) {
+      if (lastPriority !== null) lines.push('');
+      lines.push(`${PRIORITY_EMOJI[task.priority]} *${PRIORITY_CONFIG[task.priority].label.toUpperCase()}*`);
+      lastPriority = task.priority;
+    }
+    const assignee = task.assignee_name ?? 'Sin asignar';
+    const due      = task.due_date
+      ? new Date(task.due_date + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+      : 'Sin fecha';
+    lines.push(`• ${task.title}  —  ${assignee}  —  ${due}`);
+  }
+
+  if (sorted.length === 0) lines.push('_No hay tareas pendientes._');
+  return lines.join('\n');
+}
+
+function ExportSlackModal({ tasks, onClose }: { tasks: ApiTask[]; onClose: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const text  = buildSlackText(tasks);
+  const count = tasks.filter(t => t.status !== 'done').length;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // fallback: user can select manually
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-[var(--surface)] rounded-2xl shadow-2xl w-full max-w-lg mx-4 max-h-[88vh] flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[var(--s-f0f0f0)]">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#4A154B' }}>
+              <Send className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-[var(--t-1a1a2e)] text-base">Exportar a Slack</h3>
+              <p className="text-xs text-[var(--t-8888a8)]">{count} tarea{count !== 1 ? 's' : ''} pendiente{count !== 1 ? 's' : ''}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-[var(--s-f0f0f0)] text-[var(--t-8888a8)] transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Contenido */}
+        <div className="p-6 flex-1 overflow-y-auto">
+          <textarea
+            readOnly
+            value={text}
+            onClick={e => (e.target as HTMLTextAreaElement).select()}
+            className="w-full h-80 text-[13px] font-mono bg-[var(--s-f7f8fc)] border border-[var(--s-e8e8f0)] rounded-xl p-4 resize-none outline-none text-[var(--t-1a1a2e)] leading-relaxed"
+          />
+          <p className="text-[11px] text-[var(--t-9ca3af)] mt-2">
+            Clic en el texto para seleccionar todo · usa formato mrkdwn de Slack
+          </p>
+        </div>
+
+        {/* Acciones */}
+        <div className="px-6 pb-6 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 text-sm font-semibold border border-[var(--s-e8e8f0)] rounded-xl text-[var(--t-4a4a6a)] hover:bg-[var(--s-f7f8fc)] transition-colors"
+          >
+            Cerrar
+          </button>
+          <button
+            onClick={handleCopy}
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-xl flex items-center justify-center gap-2 transition-all ${
+              copied
+                ? 'bg-green-500 text-white'
+                : 'bg-[var(--s-0c2054)] text-white hover:opacity-90'
+            }`}
+          >
+            {copied
+              ? <><Check className="w-4 h-4" />¡Copiado!</>
+              : <><Copy className="w-4 h-4" />Copiar al portapapeles</>
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Página principal ──────────────────────────────────────────────────────────
 
 export default function TareasPage() {
@@ -859,8 +975,9 @@ export default function TareasPage() {
   const [view,         setView]         = useState<'kanban' | 'list' | 'roadmap'>('kanban');
   const [search,       setSearch]       = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [showModal,    setShowModal]    = useState(false);
-  const [editingTask,  setEditingTask]  = useState<ApiTask | null>(null);
+  const [showModal,       setShowModal]       = useState(false);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [editingTask,     setEditingTask]     = useState<ApiTask | null>(null);
   const [dragId,       setDragId]       = useState<number | null>(null);
   const [dragOver,     setDragOver]     = useState<ApiTask['status'] | null>(null);
 
@@ -948,13 +1065,22 @@ export default function TareasPage() {
         subtitle="Gestión de actividades del departamento de marketing"
         actions={
           !isGuest ? (
-            <button
-              onClick={openCreate}
-              className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Nueva tarea
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowExportModal(true)}
+                className="flex items-center gap-2 border border-[var(--s-e8e8f0)] bg-[var(--surface)] text-[var(--t-4a4a6a)] text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-f7f8fc)] transition-colors"
+              >
+                <Send className="w-3.5 h-3.5" />
+                Exportar
+              </button>
+              <button
+                onClick={openCreate}
+                className="flex items-center gap-2 bg-[var(--s-f79c31)] text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-[var(--s-e08a20)] transition-colors shadow-sm"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Nueva tarea
+              </button>
+            </div>
           ) : undefined
         }
       />
@@ -1106,6 +1232,13 @@ export default function TareasPage() {
           task={editingTask}
           onClose={() => setShowModal(false)}
           onSaved={handleSaved}
+        />
+      )}
+
+      {showExportModal && (
+        <ExportSlackModal
+          tasks={tasks}
+          onClose={() => setShowExportModal(false)}
         />
       )}
     </div>
